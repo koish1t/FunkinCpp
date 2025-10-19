@@ -230,7 +230,7 @@ void FlxG::init(FlxGame* gameInstance, int gameWidth, int gameHeight) {
         throw std::runtime_error("Failed to create window: " + std::string(SDL_GetError()));
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE | SDL_RENDERER_PRESENTVSYNC);
     if (!renderer) {
         throw std::runtime_error("Failed to create renderer: " + std::string(SDL_GetError()));
     }
