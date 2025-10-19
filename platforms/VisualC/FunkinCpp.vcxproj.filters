@@ -13,10 +13,67 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\flixel">
+      <UniqueIdentifier>{3e30ec70-8811-4c95-b8e0-74147be268f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\funkin">
+      <UniqueIdentifier>{94f77383-afd7-4782-89e5-f7890925e0ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\funkin\states">
+      <UniqueIdentifier>{ba4f496e-3a60-48b0-bf78-6e5945473b81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tinyxml2">
+      <UniqueIdentifier>{201d4d8b-449c-4f75-9a3d-44858a9811bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\FlxBasic.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\FlxCamera.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\FlxG.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\FlxGame.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\FlxObject.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\FlxSprite.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\FlxState.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\FlxSubState.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\animation\FlxAnimationController.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\graphics\frames\FlxAtlasFrames.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\sound\FlxSound.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\sound\FlxSoundGroup.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\text\FlxText.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\states\PlayState.cpp">
+      <Filter>Source Files\funkin\states</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\tinyxml2.cpp">
+      <Filter>Source Files\tinyxml2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

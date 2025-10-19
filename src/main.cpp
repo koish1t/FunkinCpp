@@ -1,40 +1,40 @@
-#include <SDL2/SDL.h>
-#include <iostream>
+#include <flixel/FlxGame.h>
+#include "funkin/states/PlayState.h"
+#include "imports.h"
+
+struct GameConfig {
+    int width = 1280;        // Width of the game in pixels
+    int height = 720;        // Height of the game in pixels
+    int framerate = 60;      // How many frames per second the game should run at
+    bool skipSplash = false; // Whether to skip the splash screen (DOES NOTHING AS OF RN LOL)
+    bool startFullscreen = false; // Whether to start in fullscreen
+    std::string title = "Friday Night Funkin'"; // Window title
+};
 
 int main(int argc, char* argv[]) {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
-        return 1;
-    }
+    GameConfig config;
 
-    SDL_Window* window = SDL_CreateWindow(
-        "Friday Night Funkin'",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        1280,
-        720,
-        SDL_WINDOW_SHOWN
-    );
+    try {
+        flixel::FlxGame game(
+            config.width,
+            config.height,
+            config.framerate,
+            config.framerate,
+            config.title
+        );
 
-    if (window == nullptr) {
-        std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
-        SDL_Quit();
-        return 1;
-    }
+        game.switchState(new PlayState());
 
-    bool running = true;
-    SDL_Event event;
-    while (running) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = false;
-            }
+        if (config.startFullscreen) {
+            game.setFullscreen(true);
         }
 
-        SDL_Delay(16);
+        game.run();
+    }
+    catch (const std::exception& e) {
+        SDL_Log("Error: %s", e.what());
+        return 1;
     }
 
-    SDL_DestroyWindow(window);
-    SDL_Quit();
     return 0;
 }
