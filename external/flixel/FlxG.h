@@ -14,6 +14,7 @@
 #include "sound/FlxSound.h"
 #include "sound/FlxSoundGroup.h"
 #include "input/FlxKeyboard.h"
+#include "input/FlxGamepad.h"
 
 namespace flixel {
 
@@ -155,6 +156,7 @@ public:
     static bool isCursorVisible();
 
     static flixel::input::FlxKeyboard keys;
+    static flixel::input::FlxGamepad gamepads;
 
 private:
     static SDL_Cursor* customCursor;

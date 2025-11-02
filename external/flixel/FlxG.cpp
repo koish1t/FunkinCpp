@@ -2,6 +2,7 @@
 #include "FlxGame.h"
 #include "sound/FlxSound.h"
 #include "sound/FlxSoundGroup.h"
+#include "input/FlxGamepad.h"
 #include <stdexcept>
 #include <iostream>
 
@@ -37,6 +38,7 @@ bool FlxG::cursorVisible = true;
 std::unordered_map<std::string, SDL_Texture*> FlxG::textureCache;
 
 flixel::input::FlxKeyboard flixel::FlxG::keys;
+flixel::input::FlxGamepad flixel::FlxG::gamepads;
 
 void FlxG::Log::error(const std::string& message) {
     std::cerr << "[ERROR] " << message << std::endl;
@@ -259,6 +261,7 @@ void FlxG::init(FlxGame* gameInstance, int gameWidth, int gameHeight) {
     worldBounds = {0, 0, static_cast<float>(width), static_cast<float>(height)};
 
     sound.reset();
+    gamepads.init();
 
     initialized = true;
 }
@@ -405,6 +408,7 @@ void FlxG::destroy() {
     }
 
     clearTextureCache();
+    gamepads.close();
 
     if (customCursor) {
         SDL_FreeCursor(customCursor);

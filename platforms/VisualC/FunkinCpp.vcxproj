@@ -179,6 +179,7 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
     <ClCompile Include="..\..\external\flixel\FlxState.cpp" />
     <ClCompile Include="..\..\external\flixel\FlxSubState.cpp" />
     <ClCompile Include="..\..\external\flixel\graphics\frames\FlxAtlasFrames.cpp" />
+    <ClCompile Include="..\..\external\flixel\input\FlxGamepad.cpp" />
     <ClCompile Include="..\..\external\flixel\sound\FlxSound.cpp" />
     <ClCompile Include="..\..\external\flixel\sound\FlxSoundGroup.cpp" />
     <ClCompile Include="..\..\external\flixel\text\FlxText.cpp" />

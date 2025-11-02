@@ -336,7 +336,10 @@ void PlayState::update(float elapsed) {
             pauseCooldown -= elapsed;
         }
 
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed()) {
+        bool pausePressed = flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() ||
+                           flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_START);
+        
+        if (pausePressed) {
             if (!subState) {
                 if (pauseCooldown <= 0) {
                     if (inst) {
@@ -1064,25 +1067,50 @@ void PlayState::handleOpponentNoteHit(float deltaTime) {
 
 bool PlayState::isKeyJustPressed(int key) {
     if (key < 0 || key >= 4) return false;
-    return flixel::FlxG::keys.keys[arrowKeys[key].primary].justPressed() || flixel::FlxG::keys.keys[arrowKeys[key].alternate].justPressed();
+    
+    bool keyboardPressed = flixel::FlxG::keys.keys[arrowKeys[key].primary].justPressed() || 
+                          flixel::FlxG::keys.keys[arrowKeys[key].alternate].justPressed();
+    
+    bool controllerPressed = flixel::FlxG::gamepads.justPressed(nxArrowKeys[key].primary) ||
+                            flixel::FlxG::gamepads.justPressed(nxArrowKeys[key].alternate);
+    
+    return keyboardPressed || controllerPressed;
 }
 
 bool PlayState::isKeyJustReleased(int key) {
     if (key < 0 || key >= 4) return false;
-    return flixel::FlxG::keys.keys[arrowKeys[key].primary].justReleased() || flixel::FlxG::keys.keys[arrowKeys[key].alternate].justReleased();
+    
+    bool keyboardReleased = flixel::FlxG::keys.keys[arrowKeys[key].primary].justReleased() || 
+                           flixel::FlxG::keys.keys[arrowKeys[key].alternate].justReleased();
+    
+    bool controllerReleased = flixel::FlxG::gamepads.justReleased(nxArrowKeys[key].primary) ||
+                             flixel::FlxG::gamepads.justReleased(nxArrowKeys[key].alternate);
+    
+    return keyboardReleased || controllerReleased;
 }
 
 bool PlayState::isKeyPressed(int key) {
     if (key < 0 || key >= 4) return false;
-    return flixel::FlxG::keys.keys[arrowKeys[key].primary].pressed() || flixel::FlxG::keys.keys[arrowKeys[key].alternate].pressed();
+    
+    bool keyboardPressed = flixel::FlxG::keys.keys[arrowKeys[key].primary].pressed() || 
+                          flixel::FlxG::keys.keys[arrowKeys[key].alternate].pressed();
+    
+    bool controllerPressed = flixel::FlxG::gamepads.pressed(nxArrowKeys[key].primary) ||
+                            flixel::FlxG::gamepads.pressed(nxArrowKeys[key].alternate);
+    
+    return keyboardPressed || controllerPressed;
 }
 
 bool PlayState::isNXButtonJustPressed(int key) {
-    return false;
+    if (key < 0 || key >= 4) return false;
+    return flixel::FlxG::gamepads.justPressed(nxArrowKeys[key].primary) ||
+           flixel::FlxG::gamepads.justPressed(nxArrowKeys[key].alternate);
 }
 
 bool PlayState::isNXButtonJustReleased(int key) {
-    return false;
+    if (key < 0 || key >= 4) return false;
+    return flixel::FlxG::gamepads.justReleased(nxArrowKeys[key].primary) ||
+           flixel::FlxG::gamepads.justReleased(nxArrowKeys[key].alternate);
 }
 
 void PlayState::updateCameraZoom() {}

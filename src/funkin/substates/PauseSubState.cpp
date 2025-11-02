@@ -16,7 +16,12 @@ void PauseSubState::create() {
 void PauseSubState::update(float elapsed) {
     FlxSubState::update(elapsed);
     
-    if (flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() || flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed()) {
+    bool unpausePressed = flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() ||
+                         flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed() ||
+                         flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_START) ||
+                         flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_BACK);
+    
+    if (unpausePressed) {
         close();
     }
 }

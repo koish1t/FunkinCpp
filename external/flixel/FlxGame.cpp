@@ -54,15 +54,17 @@ void FlxGame::run() {
                 accumulator = maxAccumulation;
             }
 
-            while (accumulator >= stepMS) {
-                flixel::FlxG::keys.update();
-                update(stepSeconds);
-                accumulator -= stepMS;
-            }
-        } else {
+        while (accumulator >= stepMS) {
             flixel::FlxG::keys.update();
-            update(deltaTime);
+            flixel::FlxG::gamepads.update();
+            update(stepSeconds);
+            accumulator -= stepMS;
         }
+    } else {
+        flixel::FlxG::keys.update();
+        flixel::FlxG::gamepads.update();
+        update(deltaTime);
+    }
 
         draw();
     }
@@ -132,6 +134,7 @@ void FlxGame::handleEvents() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         flixel::FlxG::keys.onEvent(event);
+        flixel::FlxG::gamepads.onEvent(event);
 
         switch (event.type) {
             case SDL_QUIT:

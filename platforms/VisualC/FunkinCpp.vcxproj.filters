@@ -111,5 +111,8 @@
     <ClCompile Include="..\..\src\funkin\game\Character.cpp">
       <Filter>Source Files\funkin\game</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\external\flixel\input\FlxGamepad.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
