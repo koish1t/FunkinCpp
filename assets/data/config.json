@@ -1,9 +1,9 @@
 {
     "mainBinds": {
-        "left": "A",
-        "down": "S",
-        "up": "W",
-        "right": "D"
+        "left": "D",
+        "down": "F",
+        "up": "J",
+        "right": "K"
     },
     "altBinds": {
         "left": "ArrowLeft",
@@ -25,7 +25,7 @@
     },
     "gameConfig": {
         "downscroll": false,
-        "ghostTapping": false
+        "ghostTapping": true
     },
     "songConfig": {
         "songName": "fnf2",

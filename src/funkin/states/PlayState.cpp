@@ -1,6 +1,7 @@
 #include "PlayState.h"
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 #include "../game/Song.h"
 #include "../game/Conductor.h"
 #include <fstream>
@@ -145,13 +146,25 @@ void PlayState::update(float elapsed) {
     if (!subState) {
         handleInput();
         handleOpponentNoteHit(elapsed);
-        updateArrowAnimations();
 
         for (auto arrow : strumLineNotes) {
             if (arrow) {
                 arrow->update(elapsed);
+                if (arrow->animation) {
+                    arrow->animation->update(elapsed);
+                }
             }
         }
+        
+        for (int i = 0; i < 8; i++) {
+            if (i < strumLineNotes.size() && strumLineNotes[i] && strumLineNotes[i]->animation) {
+                auto arrow = strumLineNotes[i];
+                if (arrow->animation->current == "confirm" && arrow->animation->finished) {
+                    arrow->animation->play("static");
+                }
+            }
+        }
+        updateArrowAnimations();
 
         if (!startingSong && musicStartTicks > 0) {
             Conductor::songPosition = static_cast<float>(SDL_GetTicks() - musicStartTicks);
@@ -238,50 +251,86 @@ void PlayState::update(float elapsed) {
 }
 
 void PlayState::handleInput() {
-    for (size_t i = 0; i < 4; i++) {
-        size_t arrowIndex = i + 4;
-        if (arrowIndex < strumLineNotes.size() && strumLineNotes[arrowIndex]) {
-            if (isKeyJustPressed(static_cast<int>(i)) || isNXButtonJustPressed(static_cast<int>(i))) {
-                if (strumLineNotes[arrowIndex]->animation) {
-                    strumLineNotes[arrowIndex]->animation->play("pressed");
-                }
-                
-                bool noteHit = false;
-                for (auto note : notes) {
-                    if (note && note->mustPress && !note->wasGoodHit && note->noteData == static_cast<int>(i) && note->canBeHit) {
-                        goodNoteHit(note);
-                        noteHit = true;
-                        break;
-                    }
-                }
-                
-                if (!noteHit) {
-                    if (GameConfig::getInstance()->isGhostTapping()) {
-                    } else {
-                        noteMiss(static_cast<int>(i));
-                    }
-                }
+    float closestDistances[4] = {INFINITY, INFINITY, INFINITY, INFINITY};
+    std::vector<Note*> toHit;
+    
+    bool justHitArray[4] = {
+        isKeyJustPressed(0),
+        isKeyJustPressed(1),
+        isKeyJustPressed(2),
+        isKeyJustPressed(3)
+    };
+    
+    for (int i = 0; i < 4; i++) {
+        int arrowIndex = i + 4;
+        if (justHitArray[i] && arrowIndex < strumLineNotes.size() && strumLineNotes[arrowIndex]) {
+            auto arrow = strumLineNotes[arrowIndex];
+            if (arrow->animation && arrow->animation->current != "confirm") {
+                arrow->animation->play("pressed");
             }
-            else if (isKeyJustReleased(static_cast<int>(i)) || isNXButtonJustReleased(static_cast<int>(i))) {
-                if (strumLineNotes[arrowIndex]->animation) {
-                    strumLineNotes[arrowIndex]->animation->play("static");
-                }
+        }
+    }
+    
+    for (auto note : notes) {
+        if (!note || note->kill || note->wasGoodHit || note->tooLate) {
+            continue;
+        }
+        
+        if (!note->mustPress || !note->canBeHit) {
+            continue;
+        }
+        
+        int lane = note->noteData;
+        if (lane < 0 || lane >= 4) {
+            continue;
+        }
+        
+        if (!justHitArray[lane]) {
+            continue;
+        }
+        
+        float rawHitTime = note->strumTime - Conductor::songPosition;
+        float distance = std::abs(rawHitTime);
+        
+        float& closestLaneDistance = closestDistances[lane];
+        
+        if (closestLaneDistance != INFINITY && std::abs(closestLaneDistance - distance) > 5.0f) {
+            continue;
+        }
+        
+        closestLaneDistance = distance;
+        
+        toHit.erase(std::remove_if(toHit.begin(), toHit.end(), [lane, distance](Note* n) {
+            return n->noteData == lane && std::abs(n->strumTime - Conductor::songPosition) > distance;
+        }), toHit.end());
+        
+        toHit.push_back(note);
+    }
+    
+    for (auto note : toHit) {
+        goodNoteHit(note);
+    }
+    
+    if (!GameConfig::getInstance()->isGhostTapping()) {
+        for (int i = 0; i < 4; i++) {
+            if (justHitArray[i] && closestDistances[i] == INFINITY) {
+                noteMiss(i);
+            }
+        }
+    }
+    
+    for (int i = 0; i < 4; i++) {
+        int arrowIndex = i + 4;
+        if (isKeyJustReleased(i) && arrowIndex < strumLineNotes.size() && strumLineNotes[arrowIndex]) {
+            auto arrow = strumLineNotes[arrowIndex];
+            if (arrow->animation && arrow->animation->current != "confirm") {
+                arrow->animation->play("static");
             }
         }
     }
 }
 
 void PlayState::updateArrowAnimations() {
-    for (size_t i = 4; i < strumLineNotes.size(); i++) {
-        auto arrow = strumLineNotes[i];
-        if (arrow && arrow->animation) {
-            int keyIndex = (i - 4) % 4;
-            if (arrow->animation->current == "pressed" && !isKeyPressed(keyIndex)) {
-                arrow->animation->play("static");
-            }
-        }
-    }
-    
     for (auto arrow : strumLineNotes) {
         if (arrow && arrow->frames && arrow->animation) {
             int frameIdx = arrow->animation->getCurrentFrame();
@@ -408,7 +457,7 @@ void PlayState::generateStaticArrows(int player) {
     
     for (int i = 0; i < 4; i++) {
         flixel::FlxSprite* babyArrow = new flixel::FlxSprite();
-        babyArrow->setPosition(0, yPos);
+        babyArrow->setPosition(42.0f, yPos);
         
         babyArrow->texture = Note::noteFrames->texture;
         babyArrow->ownsTexture = false;
@@ -566,7 +615,10 @@ void PlayState::goodNoteHit(Note* note) {
             int arrowIndex = note->noteData + 4;
             if (arrowIndex < strumLineNotes.size() && strumLineNotes[arrowIndex]) {
                 if (strumLineNotes[arrowIndex]->animation) {
-                    strumLineNotes[arrowIndex]->animation->play("confirm");
+                    auto arrow = strumLineNotes[arrowIndex];
+                    if (arrow->animation->current != "confirm") {
+                        arrow->animation->play("confirm");
+                    }
                 }
             }
         }
@@ -719,10 +771,6 @@ SDL_GameControllerButton PlayState::getButtonFromString(const std::string& butto
 }
 
 void PlayState::handleOpponentNoteHit(float deltaTime) {
-    static float animationTimer = 0.0f;
-    static bool isAnimating = false;
-    static int currentArrowIndex = -1;
-
     for (auto note : notes) {
         if (note && !note->mustPress && !note->wasGoodHit) {
             float timeDiff = note->strumTime - Conductor::songPosition;
@@ -731,31 +779,18 @@ void PlayState::handleOpponentNoteHit(float deltaTime) {
                 note->canBeHit = true;
                 
                 int arrowIndex = note->noteData;
-                if (arrowIndex < strumLineNotes.size() && strumLineNotes[arrowIndex]) {
-                    if (strumLineNotes[arrowIndex]->animation) {
-                        strumLineNotes[arrowIndex]->animation->play("confirm");
+                if (arrowIndex >= 0 && arrowIndex < 4 && arrowIndex < strumLineNotes.size()) {
+                    if (strumLineNotes[arrowIndex] && strumLineNotes[arrowIndex]->animation) {
+                        auto arrow = strumLineNotes[arrowIndex];
+                        if (arrow->animation->current != "confirm") {
+                            arrow->animation->play("confirm");
+                        }
                     }
-                    isAnimating = true;
-                    currentArrowIndex = arrowIndex;
-                    animationTimer = 0.0f;
                 }
                 
                 note->wasGoodHit = true;
                 note->kill = true;
             }
-        }
-    }
-
-    if (isAnimating) {
-        animationTimer += deltaTime;
-        if (animationTimer >= 0.1f) {
-            if (currentArrowIndex >= 0 && currentArrowIndex < strumLineNotes.size() && strumLineNotes[currentArrowIndex]) {
-                if (strumLineNotes[currentArrowIndex]->animation) {
-                    strumLineNotes[currentArrowIndex]->animation->play("static");
-                }
-            }
-            isAnimating = false;
-            currentArrowIndex = -1;
         }
     }
 }

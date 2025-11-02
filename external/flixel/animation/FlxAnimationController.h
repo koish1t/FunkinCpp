@@ -24,7 +24,17 @@ public:
         return it->second.frames[currentFrame];
     }
     
-    inline const std::string& getName() const { return current; }
+    inline bool isFinished() const {
+        if (current.empty()) return true;
+        auto it = animations.find(current);
+        if (it == animations.end()) return true;
+        const FlxAnimation& anim = it->second;
+        if (anim.looped) return false;
+        return currentFrame >= static_cast<int>(anim.frames.size()) - 1;
+    }
+    
+    inline const std::string& getName() const { return current; }    
+    bool finished = false;
 };
 }
 }

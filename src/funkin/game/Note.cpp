@@ -49,6 +49,7 @@ Note::Note(float strumTime, int noteData, Note* prevNote, bool sustainNote)
         loadAssets();
     }
     
+    x += 42.0f;
     x += 50.0f;
     y -= 2000.0f;
     

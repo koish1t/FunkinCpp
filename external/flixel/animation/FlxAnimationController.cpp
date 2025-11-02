@@ -14,6 +14,7 @@ void FlxAnimationController::play(const std::string& name) {
         current = name;
         currentFrame = 0;
         timer = 0.0f;
+        finished = false;
     }
 }
 
@@ -41,6 +42,7 @@ void FlxAnimationController::update(float elapsed) {
                 currentFrame = currentFrame % maxFrame;
             } else {
                 currentFrame = maxFrame - 1;
+                finished = true;
             }
         }
     }

@@ -16,6 +16,7 @@ public:
     SDL_Scancode key;
     FlxInputState current = FlxInputState::RELEASED;
     FlxInputState last = FlxInputState::RELEASED;
+    int pressCount = 0;
 
     FlxInput() : key(SDL_SCANCODE_UNKNOWN) {}
 
@@ -23,10 +24,12 @@ public:
 
     void press() {
         if (current == FlxInputState::PRESSED || current == FlxInputState::JUST_PRESSED) {
+            pressCount++;
             return;
         }
         last = current;
         current = FlxInputState::JUST_PRESSED;
+        pressCount = 0;
     }
 
     void release() {
@@ -40,14 +43,21 @@ public:
     void update() {
         if (last == FlxInputState::JUST_RELEASED && current == FlxInputState::JUST_RELEASED)
             current = FlxInputState::RELEASED;
-        else if (last == FlxInputState::JUST_PRESSED && current == FlxInputState::JUST_PRESSED)
-            current = FlxInputState::PRESSED;
+        else if (last == FlxInputState::JUST_PRESSED && current == FlxInputState::JUST_PRESSED) {
+            if (pressCount > 0) {
+                pressCount--;
+                last = FlxInputState::RELEASED;
+            } else {
+                current = FlxInputState::PRESSED;
+            }
+        }
         last = current;
     }
 
     void reset() {
         current = FlxInputState::RELEASED;
         last = FlxInputState::RELEASED;
+        pressCount = 0;
     }
 
     bool justReleased() const { return current == FlxInputState::JUST_RELEASED; }
