@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <random>
 #include "../game/Song.h"
 #include "../game/Conductor.h"
@@ -54,6 +55,11 @@ PlayState::PlayState() {
     misses = 0;
     combo = 0;
     gfSpeed = 1;
+    
+    sicks = 0;
+    goods = 0;
+    bads = 0;
+    shits = 0;
     
     health = 1.0f;
     healthBarBG = nullptr;
@@ -158,6 +164,14 @@ PlayState::~PlayState() {
         delete iconP2;
         iconP2 = nullptr;
     }
+    
+    for (auto ratingSprite : ratingSprites) {
+        if (ratingSprite != nullptr) {
+            delete ratingSprite;
+        }
+    }
+    ratingSprites.clear();
+    ratingTimers.clear();
     
     Note::unloadAssets();
     destroy();
@@ -328,6 +342,38 @@ void PlayState::update(float elapsed) {
         }
         if (camHUD) {
             camHUD->update(elapsed);
+        }
+        
+        for (size_t i = 0; i < ratingSprites.size(); ) {
+            ratingTimers[i] += elapsed;
+            
+            float startDelay;
+            if (i == 0) {
+                startDelay = Conductor::crochet * 0.001f;
+            } else if (i == 1) {
+                startDelay = Conductor::crochet * 0.001f;
+            } else {
+                startDelay = Conductor::crochet * 0.002f;
+            }
+            
+            float fadeTime = 0.2f;
+            float totalTime = startDelay + fadeTime;
+            
+            if (ratingTimers[i] >= totalTime) {
+                delete ratingSprites[i];
+                ratingSprites.erase(ratingSprites.begin() + i);
+                ratingTimers.erase(ratingTimers.begin() + i);
+            } else {
+                ratingSprites[i]->update(elapsed);
+                
+                if (ratingTimers[i] < startDelay) {
+                    ratingSprites[i]->alpha = 1.0f;
+                } else {
+                    float fadeProgress = (ratingTimers[i] - startDelay) / fadeTime;
+                    ratingSprites[i]->alpha = 1.0f - fadeProgress;
+                }
+                i++;
+            }
         }
         
         handleInput();
@@ -572,7 +618,6 @@ void PlayState::update(float elapsed) {
                 }
             }
         }
-        
         
         if (pauseCooldown > 0) {
             pauseCooldown -= elapsed;
@@ -862,8 +907,14 @@ void PlayState::draw() {
     if (iconP2 && iconP2->visible) {
         iconP2->draw();
     }
-    
+
     scoreText->draw();
+    
+    for (auto ratingSprite : ratingSprites) {
+        if (ratingSprite && ratingSprite->visible) {
+            ratingSprite->draw();
+        }
+    }
     
     if (countdownSprite && countdownSprite->visible) {
         countdownSprite->draw();
@@ -1049,15 +1100,95 @@ void PlayState::destroy() {
 }
 
 void PlayState::updateScoreText() {
-    std::string text = "Score: " + std::to_string(score) + " Misses: " + std::to_string(misses);
+    std::string text = "Score: " + std::to_string(score) + 
+                      " | Misses: " + std::to_string(misses) + 
+                      " | Accuracy: ";
+    
+    int totalNotes = sicks + goods + bads + shits + misses;
+    if (totalNotes > 0) {
+        float accuracy = ((sicks * 1.0f + goods * 0.75f + bads * 0.5f + shits * 0.25f) / totalNotes) * 100.0f;
+        char accStr[16];
+        snprintf(accStr, sizeof(accStr), "%.2f%%", accuracy);
+        text += accStr;
+    } else {
+        text += "0.00%";
+    }
+    
     scoreText->setText(text);
+}
+
+void PlayState::popUpScore(const std::string& rating, int comboNum) {
+    int windowWidth = flixel::FlxG::width;
+    int windowHeight = flixel::FlxG::height;
+    
+    flixel::FlxSprite* ratingSprite = new flixel::FlxSprite();
+    ratingSprite->loadGraphic("assets/images/" + rating + ".png");
+    ratingSprite->screenCenter(flixel::util::FlxAxes::XY);
+    ratingSprite->x = windowWidth * 0.55f - 40;
+    ratingSprite->y -= 60;
+    ratingSprite->acceleration.y = 550;
+    ratingSprite->velocity.y = -(std::rand() % 36 + 140);
+    ratingSprite->velocity.x = -(std::rand() % 11);
+    ratingSprite->setScale(0.7f, 0.7f);
+    ratingSprite->scrollFactor.x = 0.0f;
+    ratingSprite->scrollFactor.y = 0.0f;
+    ratingSprite->alpha = 1.0f;
+    if (camHUD) {
+        ratingSprite->camera = camHUD;
+    }
+    ratingSprites.push_back(ratingSprite);
+    ratingTimers.push_back(0.0f);
+    
+    if (comboNum >= 10 || comboNum == 0) {
+        flixel::FlxSprite* comboSprite = new flixel::FlxSprite();
+        comboSprite->loadGraphic("assets/images/combo.png");
+        comboSprite->screenCenter(flixel::util::FlxAxes::XY);
+        comboSprite->x = windowWidth * 0.55f;
+        comboSprite->acceleration.y = 600;
+        comboSprite->velocity.y = -150;
+        comboSprite->velocity.x = std::rand() % 10 + 1;
+        comboSprite->setScale(0.7f, 0.7f);
+        comboSprite->scrollFactor.x = 0.0f;
+        comboSprite->scrollFactor.y = 0.0f;
+        comboSprite->alpha = 1.0f;
+        if (camHUD) {
+            comboSprite->camera = camHUD;
+        }
+        ratingSprites.push_back(comboSprite);
+        ratingTimers.push_back(0.0f);
+        
+        int hundreds = comboNum / 100;
+        int tens = (comboNum % 100) / 10;
+        int ones = comboNum % 10;
+        int comboDigits[3] = {hundreds, tens, ones};
+        
+        for (int i = 0; i < 3; i++) {
+            if (comboNum >= 10 || comboNum == 0) {
+                flixel::FlxSprite* numSprite = new flixel::FlxSprite();
+                numSprite->loadGraphic("assets/images/num" + std::to_string(comboDigits[i]) + ".png");
+                numSprite->screenCenter(flixel::util::FlxAxes::XY);
+                numSprite->x = windowWidth * 0.55f + (43 * i) - 90;
+                numSprite->y += 80;
+                numSprite->acceleration.y = std::rand() % 101 + 200;
+                numSprite->velocity.y = -(std::rand() % 21 + 140);
+                numSprite->velocity.x = ((std::rand() % 11) - 5.0f);
+                numSprite->setScale(0.5f, 0.5f);
+                numSprite->scrollFactor.x = 0.0f;
+                numSprite->scrollFactor.y = 0.0f;
+                numSprite->alpha = 1.0f;
+                if (camHUD) {
+                    numSprite->camera = camHUD;
+                }
+                ratingSprites.push_back(numSprite);
+                ratingTimers.push_back(0.0f);
+            }
+        }
+    }
 }
 
 void PlayState::goodNoteHit(Note* note) {
     if (!note->wasGoodHit) {
         note->wasGoodHit = true;
-        
-        health += 0.05f;
         
         if (vocals) {
             vocals->setVolume(1.0f);
@@ -1097,9 +1228,40 @@ void PlayState::goodNoteHit(Note* note) {
             }
         }
 
-        combo++;
-        score += 350;
-        updateScoreText();
+        if (!note->isSustainNote) {
+            float noteDiff = std::abs(note->strumTime - Conductor::songPosition);
+            float safeZoneOffset = (10.0f / 60.0f) * 1000.0f;
+            
+            std::string daRating = "sick";
+            int ratingScore = 350;
+            
+            if (noteDiff > safeZoneOffset * 0.9f) {
+                daRating = "shit";
+                ratingScore = 50;
+                shits++;
+            }
+            else if (noteDiff > safeZoneOffset * 0.75f) {
+                daRating = "bad";
+                ratingScore = 100;
+                bads++;
+            }
+            else if (noteDiff > safeZoneOffset * 0.2f) {
+                daRating = "good";
+                ratingScore = 200;
+                goods++;
+            }
+            else {
+                daRating = "sick";
+                ratingScore = 350;
+                sicks++;
+            }
+            
+            health += 0.05f;
+            combo++;
+            score += ratingScore;
+            popUpScore(daRating, combo);
+            updateScoreText();
+        }
         
         note->kill = true;
     }

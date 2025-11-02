@@ -4,7 +4,7 @@
 namespace flixel {
 
 FlxSprite::FlxSprite(float x, float y) 
-    : FlxObject(x, y, 0, 0), scale(1.0f, 1.0f)
+    : FlxObject(x, y, 0, 0), scale(1.0f, 1.0f), velocity(0.0f, 0.0f), acceleration(0.0f, 0.0f)
 {
 }
 
@@ -127,9 +127,17 @@ void FlxSprite::centerOrigin() {
     originY = static_cast<float>(frameHeight) * 0.5f;
 }
 
-void FlxSprite::draw() {
-    if (!texture || !visible) return;
+void FlxSprite::update(float elapsed) {
+    FlxObject::update(elapsed);
+    
+    velocity.x += acceleration.x * elapsed;
+    velocity.y += acceleration.y * elapsed;
+    x += velocity.x * elapsed;
+    y += velocity.y * elapsed;
+}
 
+void FlxSprite::draw() {
+    if (!texture || !visible || alpha <= 0.0f) return;
     const SDL_Rect* srcRect = &sourceRect;
     SDL_Rect frameRect;
     float frameOffsetX = 0.0f;

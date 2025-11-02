@@ -37,6 +37,7 @@ public:
     void centerOffsets(bool adjustPosition = false);
     void centerOrigin();
 
+    virtual void update(float elapsed) override;
     virtual void draw() override;
     virtual void destroy() override;
 
@@ -48,6 +49,10 @@ public:
     int frameHeight = 0;
     bool flipX = false;
     bool flipY = false;
+    
+    FlxPoint velocity;
+    FlxPoint acceleration;
+    float alpha = 1.0f;
 
     flixel::graphics::frames::FlxAtlasFrames* frames = nullptr;
     flixel::animation::FlxAnimationController* animation = nullptr;

@@ -44,6 +44,7 @@ public:
     void noteMiss(int direction);
     void handleOpponentNoteHit(float deltaTime);
     void updateScoreText();
+    void popUpScore(const std::string& rating, int comboNum);
     void loadKeybinds();
     void updateCameraZoom();
     void setupHUDCamera();
@@ -94,12 +95,20 @@ private:
     int combo;
     int gfSpeed;
     
+    int sicks;
+    int goods;
+    int bads;
+    int shits;
+    
     float health;
     flixel::FlxSprite* healthBarBG;
     flixel::FlxSprite* healthBarRed;
     flixel::FlxSprite* healthBarGreen;
     HealthIcon* iconP1;
     HealthIcon* iconP2;
+    
+    std::vector<flixel::FlxSprite*> ratingSprites;
+    std::vector<float> ratingTimers;
     
     flixel::FlxObject* camFollow;
     float defaultCamZoom;
