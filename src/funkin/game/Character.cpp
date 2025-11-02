@@ -53,6 +53,14 @@ void Character::setupBF() {
     );
     
     frames = tex;
+    
+    if (frames && !frames->frames.empty()) {
+        const auto& firstFrame = frames->frames[0];
+        frameWidth = firstFrame.sourceSize.w;
+        frameHeight = firstFrame.sourceSize.h;
+        width = static_cast<float>(frameWidth);
+        height = static_cast<float>(frameHeight);
+    }
     texture = tex->texture;
     ownsTexture = false;
     animation = new flixel::animation::FlxAnimationController();
@@ -112,6 +120,14 @@ void Character::setupGF() {
     );
     
     frames = tex;
+    
+    if (frames && !frames->frames.empty()) {
+        const auto& firstFrame = frames->frames[0];
+        frameWidth = firstFrame.sourceSize.w;
+        frameHeight = firstFrame.sourceSize.h;
+        width = static_cast<float>(frameWidth);
+        height = static_cast<float>(frameHeight);
+    }
     texture = tex->texture;
     ownsTexture = false;
     animation = new flixel::animation::FlxAnimationController();
@@ -167,6 +183,14 @@ void Character::setupDad() {
     );
     
     frames = tex;
+    
+    if (frames && !frames->frames.empty()) {
+        const auto& firstFrame = frames->frames[0];
+        frameWidth = firstFrame.sourceSize.w;
+        frameHeight = firstFrame.sourceSize.h;
+        width = static_cast<float>(frameWidth);
+        height = static_cast<float>(frameHeight);
+    }
     texture = tex->texture;
     ownsTexture = false;
     animation = new flixel::animation::FlxAnimationController();
@@ -204,6 +228,8 @@ void Character::update(float elapsed) {
                 const auto& frame = frames->frames[frameIdx];
                 frameWidth = frame.sourceSize.w;
                 frameHeight = frame.sourceSize.h;
+                width = static_cast<float>(frameWidth);
+                height = static_cast<float>(frameHeight);
             }
         }
     }

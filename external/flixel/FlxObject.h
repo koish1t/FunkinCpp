@@ -92,6 +92,12 @@ public:
         this->height = height;
     }
     
+    inline FlxPoint getMidpoint() const {
+        float midX = x + width * 0.5f;
+        float midY = y + height * 0.5f;
+        return FlxPoint(midX, midY);
+    }
+    
     virtual void setHitbox(float width, float height, float offsetX = 0, float offsetY = 0);
     virtual void updateHitbox();
     virtual void centerOrigin();

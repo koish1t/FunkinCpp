@@ -119,10 +119,6 @@ void FlxCamera::update(float elapsed) {
     updateFlash(elapsed);
     updateFade(elapsed);
 
-    if (filtersEnabled && !filters.empty()) {
-        // todo: filter shit lmao!
-    }
-
     updateFlashSpritePosition();
     updateShake(elapsed);
 }
@@ -132,13 +128,17 @@ void FlxCamera::updateScroll() {
 }
 
 void FlxCamera::bindScrollPos(FlxPoint& scrollPos) {
-    float minX = (minScrollX == 0) ? 0 : minScrollX - getViewMarginLeft();
-    float maxX = (maxScrollX == 0) ? 0 : maxScrollX - getViewMarginRight();
-    float minY = (minScrollY == 0) ? 0 : minScrollY - getViewMarginTop();
-    float maxY = (maxScrollY == 0) ? 0 : maxScrollY - getViewMarginBottom();
-
-    scrollPos.x = std::clamp(scrollPos.x, minX, maxX);
-    scrollPos.y = std::clamp(scrollPos.y, minY, maxY);
+    if (minScrollX != 0 || maxScrollX != 0) {
+        float minX = minScrollX - getViewMarginLeft();
+        float maxX = maxScrollX - getViewMarginRight();
+        scrollPos.x = std::clamp(scrollPos.x, minX, maxX);
+    }
+    
+    if (minScrollY != 0 || maxScrollY != 0) {
+        float minY = minScrollY - getViewMarginTop();
+        float maxY = maxScrollY - getViewMarginBottom();
+        scrollPos.y = std::clamp(scrollPos.y, minY, maxY);
+    }
 }
 
 void FlxCamera::updateFollow() {

@@ -59,6 +59,15 @@ void FunkinState::updateCurStep() {
         }
     }
 
+    if (Conductor::stepCrochet == 0) {
+        static bool warned = false;
+        if (!warned) {
+            std::cout << "[WARNING] Conductor::stepCrochet is 0! Cannot calculate curStep." << std::endl;
+            warned = true;
+        }
+        return;
+    }
+
     float stepsSinceChange = (Conductor::songPosition - lastChange.songTime) / Conductor::stepCrochet;
     curStep = lastChange.stepTime + static_cast<int>(std::floor(stepsSinceChange));
 }

@@ -37,8 +37,6 @@ public:
     virtual void draw() override;
     virtual void destroy() override;
 
-    float width = 0;
-    float height = 0;
     float offsetX = 0;
     float offsetY = 0;
     float originX = 0;

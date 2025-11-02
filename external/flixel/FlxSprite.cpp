@@ -120,10 +120,21 @@ void FlxSprite::draw() {
         }
     }
 
-    destRect.x = static_cast<int>(x - offsetX + frameOffsetX);
-    destRect.y = static_cast<int>(y - offsetY + frameOffsetY);
-    destRect.w = static_cast<int>(srcRect->w * scaleX);
-    destRect.h = static_cast<int>(srcRect->h * scaleY);
+    float camScrollX = 0.0f;
+    float camScrollY = 0.0f;
+    float camZoom = 1.0f;
+    if (camera) {
+        camScrollX = camera->scroll.x * scrollFactor.x;
+        camScrollY = camera->scroll.y * scrollFactor.y;
+        camZoom = camera->zoom;
+    }
+
+    float finalX = (x - offsetX + frameOffsetX - camScrollX) * camZoom;
+    float finalY = (y - offsetY + frameOffsetY - camScrollY) * camZoom;
+    float finalW = srcRect->w * scaleX * camZoom;
+    float finalH = srcRect->h * scaleY * camZoom;
+
+    SDL_FRect destRectF = {finalX, finalY, finalW, finalH};
 
     if (color != 0xFFFFFFFF) {
         const Uint8 r = static_cast<Uint8>((color >> 16) & 0xFF);
@@ -146,9 +157,9 @@ void FlxSprite::draw() {
     }
 
     if (angle == 0.0f && flip == SDL_FLIP_NONE) {
-        SDL_RenderCopy(FlxG::renderer, texture, srcRect, &destRect);
+        SDL_RenderCopyF(FlxG::renderer, texture, srcRect, &destRectF);
     } else {
-        SDL_RenderCopyEx(FlxG::renderer, texture, srcRect, &destRect, angle, nullptr, flip);
+        SDL_RenderCopyExF(FlxG::renderer, texture, srcRect, &destRectF, angle, nullptr, flip);
     }
 }
 

@@ -83,9 +83,11 @@ private:
     int score;
     int misses;
     int combo;
-    int curBeat;
-    int curStep;
     int gfSpeed;
+    
+    flixel::FlxObject* camFollow;
+    float defaultCamZoom;
+    bool camZooming;
     
     struct KeyBind {
         SDL_Scancode primary;

@@ -9,6 +9,7 @@
 #include <map>
 #include "../../../external/nlohmann/json.hpp"
 #include <flixel/FlxG.h>
+#include <flixel/math/FlxMath.h>
 
 PlayState* PlayState::instance = nullptr;
 SwagSong PlayState::SONG;
@@ -32,8 +33,11 @@ PlayState::PlayState() {
     dad = nullptr;
     Note::loadAssets();
     scoreText = new flixel::FlxText(0, 0, 0, "");
-    scoreText->setFont("assets/fonts/monsterrat.ttf");
-    scoreText->setSize(32);
+    scoreText->setFont("assets/fonts/vcr.ttf");
+    scoreText->setSize(16);
+    scoreText->setBorderStyle(flixel::FlxTextBorderStyle::OUTLINE_FAST, {0, 0, 0, 255}, 1.0f);
+    scoreText->scrollFactor.x = 0.0f;
+    scoreText->scrollFactor.y = 0.0f;
     
     int windowWidth = flixel::FlxG::width;
     int windowHeight = flixel::FlxG::height;
@@ -49,9 +53,11 @@ PlayState::PlayState() {
     score = 0;
     misses = 0;
     combo = 0;
-    curBeat = 0;
-    curStep = 0;
     gfSpeed = 1;
+    
+    camFollow = nullptr;
+    defaultCamZoom = 1.05f;
+    camZooming = false;
 }
 
 PlayState::~PlayState() {
@@ -62,6 +68,11 @@ PlayState::~PlayState() {
     if (inst != nullptr) {
         delete inst;
         inst = nullptr;
+    }
+    
+    if (camFollow != nullptr) {
+        delete camFollow;
+        camFollow = nullptr;
     }
     
     if (camGame != nullptr) {
@@ -164,6 +175,13 @@ void PlayState::create() {
     }
     
     stage = new Stage(stageName);
+    if (stage && camGame) {
+        for (auto sprite : stage->getSprites()) {
+            if (sprite) {
+                sprite->camera = camGame;
+            }
+        }
+    }
     
     gf = new Character(400, 130, "gf", false);
     gf->scrollFactor.set(0.95f, 0.95f);
@@ -179,6 +197,14 @@ void PlayState::create() {
     boyfriend = new Character(770, 450, "bf", true);
     if (camGame) {
         boyfriend->camera = camGame;
+    }
+    
+    camFollow = new flixel::FlxObject(boyfriend->getMidpoint().x - 100, boyfriend->getMidpoint().y - 100, 1, 1);
+    
+    if (camGame) {
+        camGame->follow(camFollow, flixel::FlxCameraFollowStyle::LOCKON, 0.04f);
+        camGame->zoom = defaultCamZoom;
+        camGame->focusOn(camFollow->getMidpoint());
     }
     
     startCountdown();
@@ -204,6 +230,13 @@ void PlayState::update(float elapsed) {
     wasPaused = (subState != nullptr);
 
     if (!subState) {
+        if (camGame) {
+            camGame->update(elapsed);
+        }
+        if (camHUD) {
+            camHUD->update(elapsed);
+        }
+        
         handleInput();
         handleOpponentNoteHit(elapsed);
         
@@ -278,6 +311,27 @@ void PlayState::update(float elapsed) {
             }
         }
 
+        int curSection = curStep / 16;
+        static int lastSection = -1;
+        if (curSection >= 0 && curSection < SONG.notes.size()) {
+            if (curSection != lastSection) {
+                lastSection = curSection;
+            }
+            
+            bool mustHit = SONG.notes[curSection].mustHitSection;
+            
+            if (mustHit) {
+                if (camFollow && boyfriend) {
+                    camFollow->setPosition(boyfriend->getMidpoint().x - 100, boyfriend->getMidpoint().y - 100);
+                }
+            } else {
+                if (camFollow && dad) {
+                    camFollow->setPosition(dad->getMidpoint().x + 150, dad->getMidpoint().y - 100);
+                }
+            }
+        }
+        
+        
         if (pauseCooldown > 0) {
             pauseCooldown -= elapsed;
         }
@@ -469,6 +523,7 @@ void PlayState::generateSong(std::string dataPath) {
 void PlayState::startSong() {
     startingSong = false;
     musicStartTicks = SDL_GetTicks();
+    camZooming = true;
     
     inst = new flixel::FlxSound();
     if (!inst->loadEmbedded(instPath)) {
@@ -614,6 +669,8 @@ void PlayState::generateStaticArrows(int player) {
         babyArrow->x += (static_cast<float>(windowWidth) / 2.0f) * player;
         
         babyArrow->visible = true;
+        babyArrow->scrollFactor.x = 0.0f;
+        babyArrow->scrollFactor.y = 0.0f;
 
         if (camHUD) {
             babyArrow->camera = camHUD;
@@ -628,7 +685,6 @@ void PlayState::generateNotes() {
     notes.clear();
 
     if (SONG.notes.empty()) {
-        std::cout << "Warning: No song sections found!" << std::endl;
         return;
     }
 
@@ -670,13 +726,15 @@ void PlayState::generateNotes() {
                 Note* note = new Note(strumTime, noteType, prevNote, sustainNote);
                 note->mustPress = mustPress;
                 note->sustainLength = sustainLength;
+                note->scrollFactor.x = 0.0f;
+                note->scrollFactor.y = 0.0f;
                 
                 if (mustPress) {
                     note->x += static_cast<float>(flixel::FlxG::width) / 2.0f;
                 }
                 
-                if (camGame) {
-                    note->camera = camGame;
+                if (camHUD) {
+                    note->camera = camHUD;
                 }
                 
                 unspawnNotes.push_back(note);
@@ -1057,4 +1115,5 @@ void PlayState::beatHit() {
             }
         }
     }
+    
 } 
