@@ -1,0 +1,34 @@
+{
+    "mainBinds": {
+        "left": "A",
+        "down": "S",
+        "up": "W",
+        "right": "D"
+    },
+    "altBinds": {
+        "left": "ArrowLeft",
+        "down": "ArrowDown",
+        "up": "ArrowUp",
+        "right": "ArrowRight"
+    },
+    "nxBinds": {
+        "left": "X",
+        "down": "A",
+        "up": "Y",
+        "right": "B"
+    },
+    "nxAltBinds": {
+        "left": "DPAD_LEFT",
+        "down": "DPAD_DOWN",
+        "up": "DPAD_UP",
+        "right": "DPAD_RIGHT"
+    },
+    "gameConfig": {
+        "downscroll": false,
+        "ghostTapping": false
+    },
+    "songConfig": {
+        "songName": "fnf2",
+        "difficulty": "hard"
+    }
+}

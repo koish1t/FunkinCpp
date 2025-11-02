@@ -34,6 +34,7 @@ FlxG::Log FlxG::log;
 SDL_Cursor* FlxG::customCursor = nullptr;
 SDL_Surface* FlxG::cursorSurface = nullptr;
 bool FlxG::cursorVisible = true;
+std::unordered_map<std::string, SDL_Texture*> FlxG::textureCache;
 
 flixel::input::FlxKeyboard flixel::FlxG::keys;
 
@@ -293,6 +294,28 @@ SDL_Texture* FlxG::loadTexture(const std::string& path) {
     return texture;
 }
 
+SDL_Texture* FlxG::loadTextureCached(const std::string& path) {
+    auto it = textureCache.find(path);
+    if (it != textureCache.end()) {
+        return it->second;
+    }
+
+    SDL_Texture* texture = loadTexture(path);
+    
+    textureCache[path] = texture;
+    
+    return texture;
+}
+
+void FlxG::clearTextureCache() {
+    for (auto& pair : textureCache) {
+        if (pair.second) {
+            SDL_DestroyTexture(pair.second);
+        }
+    }
+    textureCache.clear();
+}
+
 Mix_Chunk* FlxG::loadSound(const std::string& path) {
     Mix_Chunk* sound = Mix_LoadWAV(path.c_str());
     if (!sound) {
@@ -368,6 +391,8 @@ void FlxG::destroy() {
     if (!initialized) {
         return;
     }
+
+    clearTextureCache();
 
     if (customCursor) {
         SDL_FreeCursor(customCursor);

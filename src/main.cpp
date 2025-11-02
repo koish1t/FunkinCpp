@@ -2,7 +2,7 @@
 #include "funkin/states/PlayState.h"
 #include "imports.h"
 
-struct GameConfig {
+struct Config {
     int width = 1280;        // Width of the game in pixels
     int height = 720;        // Height of the game in pixels
     int framerate = 60;      // How many frames per second the game should run at
@@ -12,7 +12,7 @@ struct GameConfig {
 };
 
 int main(int argc, char* argv[]) {
-    GameConfig config;
+    Config config;
 
     try {
         flixel::FlxGame game(

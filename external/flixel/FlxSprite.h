@@ -15,10 +15,20 @@ public:
     void loadGraphic(const std::string& path);
     void loadGraphic(SDL_Texture* texture);
 
-    void setScale(float x, float y);
-    void setScale(float scale);
-    float getScaleX() const { return scaleX; }
-    float getScaleY() const { return scaleY; }
+    inline void setScale(float x, float y) {
+        scaleX = x;
+        scaleY = y;
+    }
+    
+    inline void setScale(float scale) {
+        scaleX = scale;
+        scaleY = scale;
+    }
+    
+    inline float getScaleX() const { return scaleX; }
+    inline float getScaleY() const { return scaleY; }
+    inline float getWidth() const { return width; }
+    inline float getHeight() const { return height; }
 
     virtual void updateHitbox() override;
     void centerOffsets(bool adjustPosition = false);
@@ -38,10 +48,11 @@ public:
 
     flixel::graphics::frames::FlxAtlasFrames* frames = nullptr;
     flixel::animation::FlxAnimationController* animation = nullptr;
-
-protected:
     SDL_Texture* texture = nullptr;
     SDL_Rect sourceRect = {0, 0, 0, 0};
+    bool ownsTexture = false;
+
+protected:
     SDL_Rect destRect = {0, 0, 0, 0};
     float scaleX = 1.0f;
     float scaleY = 1.0f;

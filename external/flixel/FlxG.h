@@ -10,6 +10,7 @@
 #include "FlxCamera.h"
 #include <vector>
 #include <memory>
+#include <unordered_map>
 #include "sound/FlxSound.h"
 #include "sound/FlxSoundGroup.h"
 #include "input/FlxKeyboard.h"
@@ -140,6 +141,8 @@ public:
     static void setFullscreen(bool fullscreen);
     
     static SDL_Texture* loadTexture(const std::string& path);
+    static SDL_Texture* loadTextureCached(const std::string& path);
+    static void clearTextureCache();
     static Mix_Chunk* loadSound(const std::string& path);
     static TTF_Font* loadFont(const std::string& path, int size);
 
@@ -155,5 +158,6 @@ private:
     static SDL_Cursor* customCursor;
     static SDL_Surface* cursorSurface;
     static bool cursorVisible;
+    static std::unordered_map<std::string, SDL_Texture*> textureCache;
 };
 }

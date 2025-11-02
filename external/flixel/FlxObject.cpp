@@ -43,6 +43,7 @@ FlxObject::FlxObject(float x, float y, float width, float height)
     , collisionYDrag(CollisionDragType::NEVER)
     , lastX(x)
     , lastY(y)
+    , camera(nullptr)
 {
     initVars();
 }
@@ -104,11 +105,6 @@ void FlxObject::destroy() {
 }
 
 void FlxObject::updateHitbox() {}
-
-void FlxObject::setPosition(float x, float y) {
-    this->x = x;
-    this->y = y;
-}
 
 void FlxObject::reset(float x, float y) {
     touching = FlxDirectionFlags::NONE;
@@ -199,11 +195,6 @@ bool FlxObject::isTouching(FlxDirectionFlags direction) {
 
 bool FlxObject::justTouched(FlxDirectionFlags direction) {
     return hasAny(touching, direction) && !hasAny(wasTouching, direction);
-}
-
-void FlxObject::setSize(float width, float height) {
-    this->width = width;
-    this->height = height;
 }
 
 bool FlxObject::get_solid() const {

@@ -1,4 +1,5 @@
 #include "FlxAnimationController.h"
+#include <algorithm>
 
 namespace flixel {
 namespace animation {
@@ -8,7 +9,8 @@ void FlxAnimationController::addByPrefix(const std::string& name, const std::vec
 }
 
 void FlxAnimationController::play(const std::string& name) {
-    if (animations.count(name)) {
+    auto it = animations.find(name);
+    if (it != animations.end()) {
         current = name;
         currentFrame = 0;
         timer = 0.0f;
@@ -16,23 +18,32 @@ void FlxAnimationController::play(const std::string& name) {
 }
 
 void FlxAnimationController::update(float elapsed) {
-    if (current.empty() || !animations.count(current)) return;
-    auto& anim = animations[current];
+    if (current.empty()) return;
+    
+    auto it = animations.find(current);
+    if (it == animations.end()) return;
+    
+    const FlxAnimation& anim = it->second;
+    if (anim.frames.empty()) return;
+    
     timer += elapsed;
-    float frameTime = 1.0f / anim.frameRate;
-    while (timer >= frameTime) {
-        timer -= frameTime;
-        currentFrame++;
-        if (currentFrame >= anim.frames.size()) {
-            if (anim.looped) currentFrame = 0;
-            else currentFrame = anim.frames.size() - 1;
+    const float frameTime = 1.0f / anim.frameRate;
+    
+    if (timer >= frameTime) {
+        const int framesToAdvance = static_cast<int>(timer / frameTime);
+        timer = std::fmod(timer, frameTime);
+        
+        currentFrame += framesToAdvance;
+        const int maxFrame = static_cast<int>(anim.frames.size());
+        
+        if (currentFrame >= maxFrame) {
+            if (anim.looped) {
+                currentFrame = currentFrame % maxFrame;
+            } else {
+                currentFrame = maxFrame - 1;
+            }
         }
     }
-}
-
-int FlxAnimationController::getCurrentFrame() const {
-    if (current.empty() || !animations.count(current)) return 0;
-    return animations.at(current).frames[currentFrame];
 }
 
 }

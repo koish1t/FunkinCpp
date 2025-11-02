@@ -25,6 +25,12 @@
     <Filter Include="Source Files\tinyxml2">
       <UniqueIdentifier>{201d4d8b-449c-4f75-9a3d-44858a9811bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\funkin\game">
+      <UniqueIdentifier>{235391ce-d911-4ae8-8195-51fe85228709}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\funkin\substates">
+      <UniqueIdentifier>{6ccfbe5d-6ebc-4192-9821-670b5c3be18b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -74,6 +80,27 @@
     </ClCompile>
     <ClCompile Include="..\..\external\tinyxml2.cpp">
       <Filter>Source Files\tinyxml2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\game\Conductor.cpp">
+      <Filter>Source Files\funkin\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\game\GameConfig.cpp">
+      <Filter>Source Files\funkin\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\game\Note.cpp">
+      <Filter>Source Files\funkin\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\game\Section.cpp">
+      <Filter>Source Files\funkin\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\game\Song.cpp">
+      <Filter>Source Files\funkin\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\substates\PauseSubState.cpp">
+      <Filter>Source Files\funkin\substates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\FunkinState.cpp">
+      <Filter>Source Files\funkin</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
