@@ -48,8 +48,6 @@ void FlxGame::run() {
 
         handleEvents();
 
-        flixel::FlxG::keys.update();
-
         if (FlxG::fixedTimestep) {
             accumulator += deltaTime * 1000.0f;
             if (accumulator > maxAccumulation) {
@@ -57,10 +55,12 @@ void FlxGame::run() {
             }
 
             while (accumulator >= stepMS) {
+                flixel::FlxG::keys.update();
                 update(stepSeconds);
                 accumulator -= stepMS;
             }
         } else {
+            flixel::FlxG::keys.update();
             update(deltaTime);
         }
 
