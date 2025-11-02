@@ -57,6 +57,9 @@ private:
     flixel::FlxCamera* camGame;
     flixel::FlxCamera* camHUD;
     flixel::FlxSound* vocals;
+    flixel::FlxSound* missSound1;
+    flixel::FlxSound* missSound2;
+    flixel::FlxSound* missSound3;
     std::vector<flixel::FlxSprite*> strumLineNotes;
     std::vector<Note*> notes;
     std::vector<Note*> unspawnNotes;

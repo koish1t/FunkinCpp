@@ -33,6 +33,7 @@ public:
 
     FlxSound* load(const std::string& path, bool looped = false, bool autoDestroy = true);
     FlxSound* play(const std::string& path, float volume = 1.0f, bool looped = false, bool autoDestroy = true);
+    FlxSound* playAsChunk(const std::string& path, float volume = 1.0f, bool looped = false, bool autoDestroy = true);
     void stop(const std::string& path);
     void pause(const std::string& path);
     void resume(const std::string& path);
@@ -101,6 +102,7 @@ public:
 
         FlxSound* load(const std::string& path, bool looped = false, bool autoDestroy = true);
         FlxSound* play(const std::string& path, float volume = 1.0f, bool looped = false, bool autoDestroy = true);
+        FlxSound* playAsChunk(const std::string& path, float volume = 1.0f, bool looped = false, bool autoDestroy = true);
         void stop(const std::string& path);
         void pause(const std::string& path);
         void resume(const std::string& path);

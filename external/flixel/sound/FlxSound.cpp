@@ -74,7 +74,17 @@ void FlxSound::destroy()
 
 void FlxSound::update(float elapsed)
 {
-    if (!get_playing())
+    bool wasPlaying = playing;
+    bool isCurrentlyPlaying = get_playing();
+    
+    if (!isStream && wasPlaying && !isCurrentlyPlaying)
+    {
+        playing = false;
+        stopped();
+        return;
+    }
+    
+    if (!isCurrentlyPlaying)
         return;
 
     if (isFading)
@@ -180,6 +190,28 @@ bool FlxSound::loadEmbedded(const std::string& path, bool looped, bool autoDestr
 bool FlxSound::loadStream(const std::string& path, bool looped, bool autoDestroy)
 {
     return loadEmbedded(path, looped, autoDestroy);
+}
+
+bool FlxSound::loadAsChunk(const std::string& path, bool looped, bool autoDestroy)
+{
+    cleanup(true);
+    
+    chunk = Mix_LoadWAV(path.c_str());
+    if (!chunk)
+    {
+        FlxG::log.error("Could not load sound as chunk: " + path);
+        return false;
+    }
+    isStream = false;
+
+    set_looped(looped);
+    this->autoDestroy = autoDestroy;
+    updateTransform();
+    exists = true;
+    
+    _length = chunk->alen * 1000.0f / 44100.0f;
+    set_endTime(_length);
+    return true;
 }
 
 bool FlxSound::loadByteArray(const void* data, size_t size, bool looped, bool autoDestroy)
@@ -341,8 +373,10 @@ bool FlxSound::get_playing() const
 {
     if (isStream)
         return Mix_PlayingMusic() != 0;
+    else if (channel >= 0)
+        return Mix_Playing(channel) != 0;
     else
-        return Mix_Playing(-1) != 0;
+        return false;
 }
 
 float FlxSound::get_volume() const

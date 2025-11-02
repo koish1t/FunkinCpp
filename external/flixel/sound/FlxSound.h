@@ -25,6 +25,7 @@ public:
 
     bool loadEmbedded(const std::string& path, bool looped = false, bool autoDestroy = true);
     bool loadStream(const std::string& path, bool looped = false, bool autoDestroy = false);
+    bool loadAsChunk(const std::string& path, bool looped = false, bool autoDestroy = true);
     bool loadByteArray(const void* data, size_t size, bool looped = false, bool autoDestroy = false);
 
     void play(bool forceRestart = false, float startTime = 0.0f, float endTime = 0.0f);

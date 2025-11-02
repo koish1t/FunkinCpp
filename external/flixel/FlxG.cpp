@@ -108,6 +108,17 @@ FlxSound* FlxG::SoundFrontEnd::play(const std::string& path, float volume, bool 
     return sound;
 }
 
+FlxSound* FlxG::SoundFrontEnd::playAsChunk(const std::string& path, float volume, bool looped, bool autoDestroy) {
+    auto sound = std::make_unique<FlxSound>();
+    if (sound->loadAsChunk(path, looped, autoDestroy)) {
+        sound->setVolume(volume);
+        sound->play();
+        sounds.push_back(std::move(sound));
+        return sounds.back().get();
+    }
+    return nullptr;
+}
+
 void FlxG::SoundFrontEnd::stop(const std::string& path) {
     for (auto& sound : sounds) {
         if (sound->exists && sound->name == path) {

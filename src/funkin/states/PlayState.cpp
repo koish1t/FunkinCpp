@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <random>
 #include "../game/Song.h"
 #include "../game/Conductor.h"
 #include <fstream>
@@ -22,6 +23,9 @@ PlayState::PlayState() {
     vocals = nullptr;
     camGame = nullptr;
     camHUD = nullptr;
+    missSound1 = nullptr;
+    missSound2 = nullptr;
+    missSound3 = nullptr;
     Note::loadAssets();
     scoreText = new flixel::FlxText(0, 0, 0, "");
     scoreText->setFont("assets/fonts/monsterrat.ttf");
@@ -120,6 +124,13 @@ void PlayState::create() {
         std::cout << "Error: Failed to load song data!" << std::endl;
         return;
     }
+    
+    missSound1 = new flixel::FlxSound();
+    missSound1->loadAsChunk("assets/sounds/missnote1" + soundExt, false, false);
+    missSound2 = new flixel::FlxSound();
+    missSound2->loadAsChunk("assets/sounds/missnote2" + soundExt, false, false);
+    missSound3 = new flixel::FlxSound();
+    missSound3->loadAsChunk("assets/sounds/missnote3" + soundExt, false, false);
     
     startCountdown();
     generateNotes();
@@ -271,7 +282,7 @@ void PlayState::handleInput() {
         }
     }
     
-    for (auto note : notes) {
+                for (auto note : notes) {
         if (!note || note->kill || note->wasGoodHit || note->tooLate) {
             continue;
         }
@@ -454,7 +465,7 @@ void PlayState::generateStaticArrows(int player) {
         std::cerr << "ERROR: Note assets not loaded!" << std::endl;
         return;
     }
-    
+        
     for (int i = 0; i < 4; i++) {
         flixel::FlxSprite* babyArrow = new flixel::FlxSprite();
         babyArrow->setPosition(42.0f, yPos);
@@ -472,43 +483,43 @@ void PlayState::generateStaticArrows(int player) {
             babyArrow->width = static_cast<float>(babyArrow->frameWidth);
             babyArrow->height = static_cast<float>(babyArrow->frameHeight);
         }
-        
-        std::string staticFrame, pressPrefix, confirmPrefix;
-        switch (i) {
-            case 0:
-                staticFrame = "arrowLEFT";
-                pressPrefix = "left press";
-                confirmPrefix = "left confirm";
-                break;
-            case 1:
-                staticFrame = "arrowDOWN";
-                pressPrefix = "down press";
-                confirmPrefix = "down confirm";
-                break;
-            case 2:
-                staticFrame = "arrowUP";
-                pressPrefix = "up press";
-                confirmPrefix = "up confirm";
-                break;
-            case 3:
-                staticFrame = "arrowRIGHT";
-                pressPrefix = "right press";
-                confirmPrefix = "right confirm";
-                break;
-        }
-        
+            
+            std::string staticFrame, pressPrefix, confirmPrefix;
+            switch (i) {
+                case 0:
+                    staticFrame = "arrowLEFT";
+                    pressPrefix = "left press";
+                    confirmPrefix = "left confirm";
+                    break;
+                case 1:
+                    staticFrame = "arrowDOWN";
+                    pressPrefix = "down press";
+                    confirmPrefix = "down confirm";
+                    break;
+                case 2:
+                    staticFrame = "arrowUP";
+                    pressPrefix = "up press";
+                    confirmPrefix = "up confirm";
+                    break;
+                case 3:
+                    staticFrame = "arrowRIGHT";
+                    pressPrefix = "right press";
+                    confirmPrefix = "right confirm";
+                    break;
+            }
+            
         auto staticFrames = Note::noteFrames->getFramesByPrefix(staticFrame);
         auto pressedFrames = Note::noteFrames->getFramesByPrefix(pressPrefix);
         auto confirmFrames = Note::noteFrames->getFramesByPrefix(confirmPrefix);
-        
-        if (!staticFrames.empty()) {
-            babyArrow->animation->addByPrefix("static", staticFrames, 24, false);
-        }
-        if (!pressedFrames.empty()) {
-            babyArrow->animation->addByPrefix("pressed", pressedFrames, 24, false);
-        }
-        if (!confirmFrames.empty()) {
-            babyArrow->animation->addByPrefix("confirm", confirmFrames, 24, false);
+            
+            if (!staticFrames.empty()) {
+                babyArrow->animation->addByPrefix("static", staticFrames, 24, false);
+            }
+            if (!pressedFrames.empty()) {
+                babyArrow->animation->addByPrefix("pressed", pressedFrames, 24, false);
+            }
+            if (!confirmFrames.empty()) {
+                babyArrow->animation->addByPrefix("confirm", confirmFrames, 24, false);
         }
         
         babyArrow->setScale(0.7f, 0.7f);
@@ -599,6 +610,19 @@ void PlayState::generateNotes() {
 }
 
 void PlayState::destroy() {
+    if (missSound1 != nullptr) {
+        delete missSound1;
+        missSound1 = nullptr;
+    }
+    if (missSound2 != nullptr) {
+        delete missSound2;
+        missSound2 = nullptr;
+    }
+    if (missSound3 != nullptr) {
+        delete missSound3;
+        missSound3 = nullptr;
+    }
+    
     FunkinState::destroy();
 }
 
@@ -637,6 +661,26 @@ void PlayState::noteMiss(int direction) {
     score -= 10;
     if (score < 0) score = 0;
     updateScoreText();
+    
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<> missNoteDist(1, 3);
+    static std::uniform_real_distribution<> volumeDist(0.5, 0.8);
+    
+    int missNoteNum = missNoteDist(gen);
+    float volume = static_cast<float>(volumeDist(gen));
+    
+    flixel::FlxSound* selectedSound = nullptr;
+    switch(missNoteNum) {
+        case 1: selectedSound = missSound1; break;
+        case 2: selectedSound = missSound2; break;
+        case 3: selectedSound = missSound3; break;
+    }
+    
+    if (selectedSound) {
+        selectedSound->setVolume(volume);
+        selectedSound->play(true);
+    }
 }
 
 void PlayState::loadKeybinds() {
