@@ -25,7 +25,8 @@ FlxSound::FlxSound() :
     fadeDuration(0.0f),
     fadeTime(0.0f),
     isFading(false),
-    looped(false)
+    looped(false),
+    channel(-1)
 {
     reset();
 }
@@ -57,6 +58,7 @@ void FlxSound::reset()
     amplitudeRight = 0;
     autoDestroy = false;
     _pan = 0;
+    channel = -1;
 }
 
 void FlxSound::destroy()
@@ -241,28 +243,45 @@ void FlxSound::play(bool forceRestart, float startTime, float endTime)
 
 void FlxSound::pause()
 {
-    if (!get_playing())
+    if (paused)
         return;
 
     _time = get_time();
     _paused = true;
+    paused = true;
+    playing = false;
     
     if (isStream)
-        Mix_PauseMusic();
-    else
-        Mix_Pause(-1);
+    {
+        if (Mix_PlayingMusic())
+            Mix_PauseMusic();
+    }
+    else if (channel >= 0)
+    {
+        if (Mix_Playing(channel))
+            Mix_Pause(channel);
+    }
 }
 
 void FlxSound::resume()
 {
-    if (_paused)
+    if (!paused)
+        return;
+        
+    if (isStream)
     {
-        if (isStream)
+        if (Mix_PausedMusic())
             Mix_ResumeMusic();
-        else
-            Mix_Resume(-1);
-        _paused = false;
     }
+    else if (channel >= 0)
+    {
+        if (Mix_Paused(channel))
+            Mix_Resume(channel);
+    }
+    
+    _paused = false;
+    paused = false;
+    playing = true;
 }
 
 void FlxSound::stop()
@@ -493,6 +512,8 @@ void FlxSound::startSound(float startTime)
 
     _time = startTime;
     _paused = false;
+    paused = false;
+    playing = true;
 
     if (isStream)
     {
@@ -501,7 +522,11 @@ void FlxSound::startSound(float startTime)
     }
     else
     {
-        Mix_PlayChannel(-1, chunk, get_looped() ? -1 : 0);
+        channel = Mix_PlayChannel(-1, chunk, get_looped() ? -1 : 0);
+        if (channel == -1) {
+            std::cerr << "Failed to play sound: " << Mix_GetError() << std::endl;
+            playing = false;
+        }
     }
 
     active = true;

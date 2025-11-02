@@ -221,7 +221,7 @@ void Note::update(float elapsed) {
     }
 
     float songPos = Conductor::songPosition;
-    float scrollSpeed = 1.0f;
+    float scrollSpeed = PlayState::SONG.speed;
     
     float targetY = getTargetY();
     

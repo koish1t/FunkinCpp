@@ -126,6 +126,21 @@ void PlayState::create() {
 
 void PlayState::update(float elapsed) {
     FunkinState::update(elapsed);
+    
+    static bool wasPaused = false;
+    if (wasPaused && !subState) {
+        if (musicStartTicks > 0) {
+            musicStartTicks = SDL_GetTicks() - static_cast<Uint32>(Conductor::songPosition);
+        }
+        
+        if (inst && inst->paused) {
+            inst->resume();
+        }
+        if (vocals && vocals->paused) {
+            vocals->resume();
+        }
+    }
+    wasPaused = (subState != nullptr);
 
     if (!subState) {
         handleInput();
@@ -187,12 +202,34 @@ void PlayState::update(float elapsed) {
         if (flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed()) {
             if (!subState) {
                 if (pauseCooldown <= 0) {
+                    if (inst) {
+                        inst->pause();
+                    }
+                    if (vocals) {
+                        vocals->pause();
+                    }
+                    
+                    if (musicStartTicks > 0) {
+                        musicStartTicks = SDL_GetTicks() - static_cast<Uint32>(Conductor::songPosition);
+                    }
+                    
                     PauseSubState* pauseSubState = new PauseSubState();
                     openSubState(pauseSubState);
                     std::cout << "Pause SubState opened" << std::endl;
                     pauseCooldown = 0.5f;
                 }
             } else {
+                if (musicStartTicks > 0) {
+                    musicStartTicks = SDL_GetTicks() - static_cast<Uint32>(Conductor::songPosition);
+                }
+                
+                if (inst) {
+                    inst->resume();
+                }
+                if (vocals) {
+                    vocals->resume();
+                }
+                
                 closeSubState();
                 std::cout << "Pause SubState closed" << std::endl;
             }
