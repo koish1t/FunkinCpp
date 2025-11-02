@@ -55,6 +55,13 @@ PlayState::PlayState() {
     combo = 0;
     gfSpeed = 1;
     
+    health = 1.0f;
+    healthBarBG = nullptr;
+    healthBarRed = nullptr;
+    healthBarGreen = nullptr;
+    iconP1 = nullptr;
+    iconP2 = nullptr;
+    
     countdownStep = 0;
     countdownTimer = 0.0f;
     countdownInterval = 0.0f;
@@ -129,6 +136,27 @@ PlayState::~PlayState() {
     if (countdownSprite != nullptr) {
         delete countdownSprite;
         countdownSprite = nullptr;
+    }
+    
+    if (healthBarBG != nullptr) {
+        delete healthBarBG;
+        healthBarBG = nullptr;
+    }
+    if (healthBarRed != nullptr) {
+        delete healthBarRed;
+        healthBarRed = nullptr;
+    }
+    if (healthBarGreen != nullptr) {
+        delete healthBarGreen;
+        healthBarGreen = nullptr;
+    }
+    if (iconP1 != nullptr) {
+        delete iconP1;
+        iconP1 = nullptr;
+    }
+    if (iconP2 != nullptr) {
+        delete iconP2;
+        iconP2 = nullptr;
     }
     
     Note::unloadAssets();
@@ -225,6 +253,53 @@ void PlayState::create() {
         camGame->focusOn(camFollow->getMidpoint());
     }
     
+    int windowWidth = flixel::FlxG::width;
+    int windowHeight = flixel::FlxG::height;
+    
+    healthBarBG = new flixel::FlxSprite();
+    healthBarBG->makeGraphic(601, 19, {0, 0, 0, 255});
+    healthBarBG->y = GameConfig::getInstance()->isDownscroll() ? (windowHeight * 0.11f) : (windowHeight * 0.89f);
+    healthBarBG->screenCenter(flixel::util::FlxAxes::X);
+    healthBarBG->scrollFactor.x = 0.0f;
+    healthBarBG->scrollFactor.y = 0.0f;
+    if (camHUD) {
+        healthBarBG->camera = camHUD;
+    }
+    
+    healthBarRed = new flixel::FlxSprite();
+    healthBarRed->makeGraphic(593, 11, {255, 0, 0, 255});
+    healthBarRed->setPosition(healthBarBG->x + 4, healthBarBG->y + 4);
+    healthBarRed->scrollFactor.x = 0.0f;
+    healthBarRed->scrollFactor.y = 0.0f;
+    if (camHUD) {
+        healthBarRed->camera = camHUD;
+    }
+    
+    healthBarGreen = new flixel::FlxSprite();
+    healthBarGreen->makeGraphic(593, 11, {0, 255, 0, 255});
+    healthBarGreen->setPosition(healthBarBG->x + 4, healthBarBG->y + 4);
+    healthBarGreen->scrollFactor.x = 0.0f;
+    healthBarGreen->scrollFactor.y = 0.0f;
+    if (camHUD) {
+        healthBarGreen->camera = camHUD;
+    }
+    
+    iconP1 = new HealthIcon("bf", true);
+    iconP1->y = healthBarBG->y - 75;
+    iconP1->scrollFactor.x = 0.0f;
+    iconP1->scrollFactor.y = 0.0f;
+    if (camHUD) {
+        iconP1->camera = camHUD;
+    }
+    
+    iconP2 = new HealthIcon("dad", false);
+    iconP2->y = healthBarBG->y - 75;
+    iconP2->scrollFactor.x = 0.0f;
+    iconP2->scrollFactor.y = 0.0f;
+    if (camHUD) {
+        iconP2->camera = camHUD;
+    }
+    
     startCountdown();
     generateNotes();
 }
@@ -266,6 +341,40 @@ void PlayState::update(float elapsed) {
         }
         if (boyfriend) {
             boyfriend->update(elapsed);
+        }
+        
+        if (health > 2.0f) health = 2.0f;
+        if (health < 0.0f) health = 0.0f;
+        
+        if (healthBarGreen && healthBarRed && iconP1 && iconP2) {
+            float healthPercent = (health / 2.0f) * 100.0f;
+            float barWidth = 593.0f;
+            
+            float greenWidth = (healthPercent / 100.0f) * barWidth;
+            healthBarGreen->setScale((healthPercent / 100.0f), 1.0f);
+            healthBarGreen->x = healthBarBG->x + 4 + barWidth - greenWidth;
+            
+            int iconOffset = 26;
+            float iconX = healthBarBG->x + 4 + barWidth - greenWidth;
+            iconP1->x = iconX + (150 * iconP1->scale.x - 150) / 2 - iconOffset;
+            iconP2->x = iconX - (150 * iconP2->scale.x) / 2 - iconOffset * 2;
+            
+            iconP1->update(elapsed);
+            iconP2->update(elapsed);
+            
+            int iconWidth = iconP1->fullIconWidth / 2;
+            if (healthPercent <= 20.0f) {
+                iconP1->sourceRect.x = iconWidth;
+            } else {
+                iconP1->sourceRect.x = 0;
+            }
+            
+            iconWidth = iconP2->fullIconWidth / 2;
+            if (healthPercent >= 80.0f) {
+                iconP2->sourceRect.x = iconWidth;
+            } else {
+                iconP2->sourceRect.x = 0;
+            }
         }
 
         for (auto arrow : strumLineNotes) {
@@ -738,6 +847,22 @@ void PlayState::draw() {
         }
     }
 
+    if (healthBarBG && healthBarBG->visible) {
+        healthBarBG->draw();
+    }
+    if (healthBarRed && healthBarRed->visible) {
+        healthBarRed->draw();
+    }
+    if (healthBarGreen && healthBarGreen->visible) {
+        healthBarGreen->draw();
+    }
+    if (iconP1 && iconP1->visible) {
+        iconP1->draw();
+    }
+    if (iconP2 && iconP2->visible) {
+        iconP2->draw();
+    }
+    
     scoreText->draw();
     
     if (countdownSprite && countdownSprite->visible) {
@@ -932,6 +1057,8 @@ void PlayState::goodNoteHit(Note* note) {
     if (!note->wasGoodHit) {
         note->wasGoodHit = true;
         
+        health += 0.05f;
+        
         if (vocals) {
             vocals->setVolume(1.0f);
         }
@@ -982,6 +1109,8 @@ void PlayState::noteMiss(int direction) {
     if (combo > 5 && gf) {
         gf->playAnim("sad", true);
     }
+    
+    health -= 0.1f;
     
     combo = 0;
     misses++;

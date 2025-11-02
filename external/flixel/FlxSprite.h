@@ -14,6 +14,7 @@ public:
 
     void loadGraphic(const std::string& path);
     void loadGraphic(SDL_Texture* texture);
+    void makeGraphic(int width, int height, SDL_Color color);
 
     inline void setScale(float x, float y) {
         scaleX = x;
@@ -29,6 +30,8 @@ public:
     inline float getScaleY() const { return scaleY; }
     inline float getWidth() const { return width; }
     inline float getHeight() const { return height; }
+    
+    FlxPoint scale;
 
     virtual void updateHitbox() override;
     void centerOffsets(bool adjustPosition = false);

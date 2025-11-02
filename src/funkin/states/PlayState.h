@@ -12,6 +12,7 @@
 #include "../substates/PauseSubState.h"
 #include "../game/Stage.h"
 #include "../game/Character.h"
+#include "../game/HealthIcon.h"
 #include <flixel/FlxSprite.h>
 #include <flixel/text/FlxText.h>
 #include <flixel/sound/FlxSound.h>
@@ -92,6 +93,13 @@ private:
     int misses;
     int combo;
     int gfSpeed;
+    
+    float health;
+    flixel::FlxSprite* healthBarBG;
+    flixel::FlxSprite* healthBarRed;
+    flixel::FlxSprite* healthBarGreen;
+    HealthIcon* iconP1;
+    HealthIcon* iconP2;
     
     flixel::FlxObject* camFollow;
     float defaultCamZoom;

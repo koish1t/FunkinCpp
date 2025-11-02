@@ -4,7 +4,7 @@
 namespace flixel {
 
 FlxSprite::FlxSprite(float x, float y) 
-    : FlxObject(x, y, 0, 0)
+    : FlxObject(x, y, 0, 0), scale(1.0f, 1.0f)
 {
 }
 
@@ -75,6 +75,32 @@ void FlxSprite::loadGraphic(SDL_Texture* newTexture) {
     height = static_cast<float>(sourceRect.h);
     frameWidth = sourceRect.w;
     frameHeight = sourceRect.h;
+    centerOrigin();
+}
+
+void FlxSprite::makeGraphic(int w, int h, SDL_Color color) {
+    if (ownsTexture && texture) {
+        SDL_DestroyTexture(texture);
+    }
+    
+    SDL_Renderer* renderer = FlxG::renderer;
+    if (!renderer) return;
+    
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
+    if (!texture) return;
+    
+    SDL_SetRenderTarget(renderer, texture);
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderClear(renderer);
+    SDL_SetRenderTarget(renderer, nullptr);
+    
+    ownsTexture = true;
+    sourceRect = {0, 0, w, h};
+    destRect = {0, 0, w, h};
+    frameWidth = w;
+    frameHeight = h;
+    width = static_cast<float>(w);
+    height = static_cast<float>(h);
     centerOrigin();
 }
 
