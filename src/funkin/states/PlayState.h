@@ -80,6 +80,14 @@ private:
     float pauseCooldown;
     Uint32 musicStartTicks;
     
+    int countdownStep;
+    float countdownTimer;
+    float countdownInterval;
+    flixel::FlxSound* countdownSound;
+    flixel::FlxSprite* countdownSprite;
+    float countdownSpriteTimer;
+    float countdownSpriteStartY;
+    
     int score;
     int misses;
     int combo;

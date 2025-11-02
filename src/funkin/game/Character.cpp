@@ -238,7 +238,7 @@ void Character::update(float elapsed) {
         holdTimer += elapsed;
         
         if (holdTimer >= Conductor::stepCrochet * 4 * 0.001f && animation) {
-            if (animation->current.rfind("sing", 0) == 0 && animation->current.find("miss") == std::string::npos) {
+            if (animation->current.rfind("sing", 0) == 0) {
                 dance();
             }
         }

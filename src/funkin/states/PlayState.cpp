@@ -55,6 +55,14 @@ PlayState::PlayState() {
     combo = 0;
     gfSpeed = 1;
     
+    countdownStep = 0;
+    countdownTimer = 0.0f;
+    countdownInterval = 0.0f;
+    countdownSound = nullptr;
+    countdownSprite = nullptr;
+    countdownSpriteTimer = 0.0f;
+    countdownSpriteStartY = 0.0f;
+    
     camFollow = nullptr;
     defaultCamZoom = 1.05f;
     camZooming = false;
@@ -113,6 +121,16 @@ PlayState::~PlayState() {
     notes.clear();
     
     delete scoreText;
+    
+    if (countdownSound != nullptr) {
+        delete countdownSound;
+        countdownSound = nullptr;
+    }
+    if (countdownSprite != nullptr) {
+        delete countdownSprite;
+        countdownSprite = nullptr;
+    }
+    
     Note::unloadAssets();
     destroy();
 }
@@ -305,8 +323,123 @@ void PlayState::update(float elapsed) {
             }
         }
 
-        if (startingSong && startedCountdown) {
-            if (Conductor::songPosition >= 0) {
+        if (startedCountdown && startingSong) {
+            countdownTimer += elapsed;
+            
+            if (countdownTimer >= countdownInterval) {
+                countdownTimer -= countdownInterval;
+                
+                if (countdownSprite) {
+                    delete countdownSprite;
+                    countdownSprite = nullptr;
+                }
+                
+                if (dad) dad->dance();
+                if (gf) gf->dance();
+                if (boyfriend) boyfriend->playAnim("idle", true);
+                
+                switch (countdownStep) {
+                    case 0:
+                        if (countdownSound) delete countdownSound;
+                        countdownSound = new flixel::FlxSound();
+                        countdownSound->loadAsChunk("assets/sounds/intro3" + soundExt, false, false);
+                        countdownSound->play();
+                        break;
+                        
+                    case 1: {
+                        countdownSprite = new flixel::FlxSprite();
+                        countdownSprite->loadGraphic("assets/images/ready.png");
+                        if (countdownSprite->texture) {
+                            countdownSprite->scrollFactor.x = 0.0f;
+                            countdownSprite->scrollFactor.y = 0.0f;
+                            countdownSprite->screenCenter();
+                            countdownSpriteStartY = countdownSprite->y;
+                            countdownSpriteTimer = 0.0f;
+                            if (camHUD) {
+                                countdownSprite->camera = camHUD;
+                            }
+                        } else {
+                            delete countdownSprite;
+                            countdownSprite = nullptr;
+                        }
+                        
+                        if (countdownSound) delete countdownSound;
+                        countdownSound = new flixel::FlxSound();
+                        countdownSound->loadAsChunk("assets/sounds/intro2" + soundExt, false, false);
+                        countdownSound->play();
+                        break;
+                    }
+                        
+                    case 2: {
+                        countdownSprite = new flixel::FlxSprite();
+                        countdownSprite->loadGraphic("assets/images/set.png");
+                        if (countdownSprite->texture) {
+                            countdownSprite->scrollFactor.x = 0.0f;
+                            countdownSprite->scrollFactor.y = 0.0f;
+                            countdownSprite->screenCenter();
+                            countdownSpriteStartY = countdownSprite->y;
+                            countdownSpriteTimer = 0.0f;
+                            if (camHUD) {
+                                countdownSprite->camera = camHUD;
+                            }
+                        } else {
+                            delete countdownSprite;
+                            countdownSprite = nullptr;
+                        }
+                        
+                        if (countdownSound) delete countdownSound;
+                        countdownSound = new flixel::FlxSound();
+                        countdownSound->loadAsChunk("assets/sounds/intro1" + soundExt, false, false);
+                        countdownSound->play();
+                        break;
+                    }
+                        
+                    case 3: {
+                        countdownSprite = new flixel::FlxSprite();
+                        countdownSprite->loadGraphic("assets/images/go.png");
+                        if (countdownSprite->texture) {
+                            countdownSprite->scrollFactor.x = 0.0f;
+                            countdownSprite->scrollFactor.y = 0.0f;
+                            countdownSprite->screenCenter();
+                            countdownSpriteStartY = countdownSprite->y;
+                            countdownSpriteTimer = 0.0f;
+                            if (camHUD) {
+                                countdownSprite->camera = camHUD;
+                            }
+                        } else {
+                            delete countdownSprite;
+                            countdownSprite = nullptr;
+                        }
+                        
+                        if (countdownSound) delete countdownSound;
+                        countdownSound = new flixel::FlxSound();
+                        countdownSound->loadAsChunk("assets/sounds/introGo" + soundExt, false, false);
+                        countdownSound->play();
+                        break;
+                    }
+                        
+                    case 4:
+                        break;
+                }
+                
+                countdownStep++;
+            }
+            
+            if (countdownSprite) {
+                countdownSpriteTimer += elapsed;
+                float progress = countdownSpriteTimer / countdownInterval;
+                if (progress > 1.0f) progress = 1.0f;
+                
+                countdownSprite->alpha = 1.0f - progress;
+                countdownSprite->y = countdownSpriteStartY + (100.0f * progress);
+                
+                if (progress >= 1.0f) {
+                    delete countdownSprite;
+                    countdownSprite = nullptr;
+                }
+            }
+            
+            if (Conductor::songPosition >= 0 && countdownStep > 4) {
                 startSong();
             }
         }
@@ -506,17 +639,39 @@ void PlayState::generateSong(std::string dataPath) {
         Conductor::changeBPM(static_cast<float>(SONG.bpm));
         curSong = songName;
 
-        if (vocals != nullptr) {
-            delete vocals;
-            vocals = nullptr;
-        }
+        vocalsPath = SONG.needsVoices ? "assets/songs/" + baseSongName + "/Voices" + soundExt : "";
+        instPath = "assets/songs/" + baseSongName + "/Inst" + soundExt;
+        
         if (inst != nullptr) {
             delete inst;
             inst = nullptr;
         }
-
-        vocalsPath = SONG.needsVoices ? "assets/songs/" + baseSongName + "/Voices" + soundExt : "";
-        instPath = "assets/songs/" + baseSongName + "/Inst" + soundExt;
+        inst = new flixel::FlxSound();
+        if (!inst->loadEmbedded(instPath, false, false)) {
+            std::cerr << "Failed to preload instrumental: " << instPath << std::endl;
+            delete inst;
+            inst = nullptr;
+        }
+        if (inst) {
+            inst->stop();
+        }
+        
+        if (!vocalsPath.empty()) {
+            if (vocals != nullptr) {
+                delete vocals;
+                vocals = nullptr;
+            }
+            vocals = new flixel::FlxSound();
+            if (!vocals->loadAsChunk(vocalsPath, false, false)) {
+                std::cerr << "Failed to preload vocals: " << vocalsPath << std::endl;
+                delete vocals;
+                vocals = nullptr;
+            } else {
+                vocals->setChannel(0);
+                vocals->setVolume(1.0f);
+                vocals->stop();
+            }
+        }
         
     } catch (const std::exception& ex) {
         std::cerr << "Error generating song: " << ex.what() << std::endl;
@@ -528,31 +683,25 @@ void PlayState::startSong() {
     musicStartTicks = SDL_GetTicks();
     camZooming = true;
     
-    inst = new flixel::FlxSound();
-    if (!inst->loadEmbedded(instPath)) {
-        std::cerr << "Failed to load instrumental: " << instPath << std::endl;
-        delete inst;
-        inst = nullptr;
-    } else {
+    if (inst) {
         inst->play();
+    } else {
+        std::cerr << "Error: Instrumental not loaded!" << std::endl;
     }
     
-    if (!vocalsPath.empty()) {
-        vocals = new flixel::FlxSound();
-        if (!vocals->loadAsChunk(vocalsPath, false, false)) {
-            std::cerr << "Failed to load vocals: " << vocalsPath << std::endl;
-            delete vocals;
-            vocals = nullptr;
-        } else {
-            vocals->setChannel(0);
-            vocals->setVolume(1.0f);
-            vocals->play();
-        }
+    if (vocals) {
+        vocals->play();
     }
 }
 
 void PlayState::startCountdown() {
     startedCountdown = true;
+    countdownStep = 0;
+    countdownTimer = 0.0f;
+    countdownInterval = Conductor::crochet / 1000.0f;
+    countdownSpriteTimer = 0.0f;
+    
+    Conductor::songPosition = -(Conductor::crochet * 5);
 
     generateStaticArrows(0);
     generateStaticArrows(1);
@@ -590,6 +739,10 @@ void PlayState::draw() {
     }
 
     scoreText->draw();
+    
+    if (countdownSprite && countdownSprite->visible) {
+        countdownSprite->draw();
+    }
 
     if (subState) {
         subState->draw();

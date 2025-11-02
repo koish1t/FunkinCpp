@@ -230,5 +230,12 @@ void FlxObject::kill() {}
 void FlxObject::revive() {}
 void FlxObject::setHitbox(float, float, float, float) {}
 void FlxObject::centerOrigin() {}
-void FlxObject::screenCenter(flixel::util::FlxAxes) {}
+void FlxObject::screenCenter(flixel::util::FlxAxes axes) {
+    if (axes == util::FlxAxes::X || axes == util::FlxAxes::XY) {
+        x = (FlxG::width - width) / 2.0f;
+    }
+    if (axes == util::FlxAxes::Y || axes == util::FlxAxes::XY) {
+        y = (FlxG::height - height) / 2.0f;
+    }
+}
 } 
