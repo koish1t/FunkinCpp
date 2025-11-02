@@ -136,10 +136,19 @@ void FlxSprite::draw() {
         SDL_SetTextureAlphaMod(texture, static_cast<Uint8>(alpha * 255.0f));
     }
 
-    if (angle == 0.0f) {
+    SDL_RendererFlip flip = SDL_FLIP_NONE;
+    if (flipX && flipY) {
+        flip = static_cast<SDL_RendererFlip>(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
+    } else if (flipX) {
+        flip = SDL_FLIP_HORIZONTAL;
+    } else if (flipY) {
+        flip = SDL_FLIP_VERTICAL;
+    }
+
+    if (angle == 0.0f && flip == SDL_FLIP_NONE) {
         SDL_RenderCopy(FlxG::renderer, texture, srcRect, &destRect);
     } else {
-        SDL_RenderCopyEx(FlxG::renderer, texture, srcRect, &destRect, angle, nullptr, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(FlxG::renderer, texture, srcRect, &destRect, angle, nullptr, flip);
     }
 }
 

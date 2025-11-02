@@ -11,6 +11,7 @@ struct SwagSong {
     float speed = 1.0f;
     std::string player1 = "bf";
     std::string player2 = "dad";
+    std::string stage = "";
     bool validScore = false;
 };
 

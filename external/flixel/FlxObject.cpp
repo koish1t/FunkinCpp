@@ -54,6 +54,7 @@ FlxObject::~FlxObject() {
 
 void FlxObject::initVars() {
     flixelType = FlixelType::OBJECT;
+    scrollFactor.set(1.0f, 1.0f);
 }
 
 void FlxObject::initMotionVars() {

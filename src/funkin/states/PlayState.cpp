@@ -26,6 +26,10 @@ PlayState::PlayState() {
     missSound1 = nullptr;
     missSound2 = nullptr;
     missSound3 = nullptr;
+    stage = nullptr;
+    boyfriend = nullptr;
+    gf = nullptr;
+    dad = nullptr;
     Note::loadAssets();
     scoreText = new flixel::FlxText(0, 0, 0, "");
     scoreText->setFont("assets/fonts/monsterrat.ttf");
@@ -45,6 +49,9 @@ PlayState::PlayState() {
     score = 0;
     misses = 0;
     combo = 0;
+    curBeat = 0;
+    curStep = 0;
+    gfSpeed = 1;
 }
 
 PlayState::~PlayState() {
@@ -64,6 +71,24 @@ PlayState::~PlayState() {
     if (camHUD != nullptr) {
         delete camHUD;
         camHUD = nullptr;
+    }
+    
+    if (stage != nullptr) {
+        delete stage;
+        stage = nullptr;
+    }
+    
+    if (boyfriend != nullptr) {
+        delete boyfriend;
+        boyfriend = nullptr;
+    }
+    if (gf != nullptr) {
+        delete gf;
+        gf = nullptr;
+    }
+    if (dad != nullptr) {
+        delete dad;
+        dad = nullptr;
     }
     
     for (auto arrow : strumLineNotes) {
@@ -132,6 +157,30 @@ void PlayState::create() {
     missSound3 = new flixel::FlxSound();
     missSound3->loadAsChunk("assets/sounds/missnote3" + soundExt, false, false);
     
+    std::string stageName = SONG.stage;
+    if (stageName.empty()) {
+        stageName = Stage::getStageFromSong(SONG.song);
+        SONG.stage = stageName;
+    }
+    
+    stage = new Stage(stageName);
+    
+    gf = new Character(400, 130, "gf", false);
+    gf->scrollFactor.set(0.95f, 0.95f);
+    if (camGame) {
+        gf->camera = camGame;
+    }
+    
+    dad = new Character(100, 100, "dad", false);
+    if (camGame) {
+        dad->camera = camGame;
+    }
+    
+    boyfriend = new Character(770, 450, "bf", true);
+    if (camGame) {
+        boyfriend->camera = camGame;
+    }
+    
     startCountdown();
     generateNotes();
 }
@@ -157,6 +206,16 @@ void PlayState::update(float elapsed) {
     if (!subState) {
         handleInput();
         handleOpponentNoteHit(elapsed);
+        
+        if (gf) {
+            gf->update(elapsed);
+        }
+        if (dad) {
+            dad->update(elapsed);
+        }
+        if (boyfriend) {
+            boyfriend->update(elapsed);
+        }
 
         for (auto arrow : strumLineNotes) {
             if (arrow) {
@@ -271,6 +330,10 @@ void PlayState::handleInput() {
         isKeyJustPressed(2),
         isKeyJustPressed(3)
     };
+    
+    if (boyfriend && (justHitArray[0] || justHitArray[1] || justHitArray[2] || justHitArray[3])) {
+        boyfriend->holdTimer = 0.0f;
+    }
     
     for (int i = 0; i < 4; i++) {
         int arrowIndex = i + 4;
@@ -407,24 +470,26 @@ void PlayState::startSong() {
     startingSong = false;
     musicStartTicks = SDL_GetTicks();
     
-    if (!vocalsPath.empty()) {
-        vocals = new flixel::FlxSound();
-        if (!vocals->loadEmbedded(vocalsPath)) {
-            std::cerr << "Failed to load vocals: " << vocalsPath << std::endl;
-            delete vocals;
-            vocals = nullptr;
-        } else {
-            vocals->play();
-        }
-    }
-    
     inst = new flixel::FlxSound();
     if (!inst->loadEmbedded(instPath)) {
-        std::cerr << "Failed to load instrumentals: " << instPath << std::endl;
+        std::cerr << "Failed to load instrumental: " << instPath << std::endl;
         delete inst;
         inst = nullptr;
     } else {
         inst->play();
+    }
+    
+    if (!vocalsPath.empty()) {
+        vocals = new flixel::FlxSound();
+        if (!vocals->loadAsChunk(vocalsPath, false, false)) {
+            std::cerr << "Failed to load vocals: " << vocalsPath << std::endl;
+            delete vocals;
+            vocals = nullptr;
+        } else {
+            vocals->setChannel(0);
+            vocals->setVolume(1.0f);
+            vocals->play();
+        }
     }
 }
 
@@ -436,6 +501,24 @@ void PlayState::startCountdown() {
 }
 
 void PlayState::draw() {
+    if (stage) {
+        for (auto sprite : stage->getSprites()) {
+            if (sprite && sprite->visible) {
+                sprite->draw();
+            }
+        }
+    }
+    
+    if (gf && gf->visible) {
+        gf->draw();
+    }
+    if (dad && dad->visible) {
+        dad->draw();
+    }
+    if (boyfriend && boyfriend->visible) {
+        boyfriend->draw();
+    }
+    
     for (auto arrow : strumLineNotes) {
         if (arrow && arrow->visible) {
             arrow->draw();
@@ -635,6 +718,10 @@ void PlayState::goodNoteHit(Note* note) {
     if (!note->wasGoodHit) {
         note->wasGoodHit = true;
         
+        if (vocals) {
+            vocals->setVolume(1.0f);
+        }
+        
         if (note->noteData >= 0 && note->noteData < 4) {
             int arrowIndex = note->noteData + 4;
             if (arrowIndex < strumLineNotes.size() && strumLineNotes[arrowIndex]) {
@@ -643,6 +730,28 @@ void PlayState::goodNoteHit(Note* note) {
                     if (arrow->animation->current != "confirm") {
                         arrow->animation->play("confirm");
                     }
+                }
+            }
+            
+            if (boyfriend) {
+                std::string animToPlay = "";
+                switch (note->noteData) {
+                    case 0:
+                        animToPlay = "singLEFT";
+                        break;
+                    case 1:
+                        animToPlay = "singDOWN";
+                        break;
+                    case 2:
+                        animToPlay = "singUP";
+                        break;
+                    case 3:
+                        animToPlay = "singRIGHT";
+                        break;
+                }
+                if (!animToPlay.empty()) {
+                    boyfriend->playAnim(animToPlay, true);
+                    boyfriend->holdTimer = 0.0f;
                 }
             }
         }
@@ -656,11 +765,41 @@ void PlayState::goodNoteHit(Note* note) {
 }
 
 void PlayState::noteMiss(int direction) {
+    if (combo > 5 && gf) {
+        gf->playAnim("sad", true);
+    }
+    
     combo = 0;
     misses++;
     score -= 10;
     if (score < 0) score = 0;
     updateScoreText();
+    
+    if (vocals) {
+        vocals->setVolume(0.0f);
+    }
+    
+    if (boyfriend && direction >= 0 && direction < 4) {
+        std::string animToPlay = "";
+        switch (direction) {
+            case 0:
+                animToPlay = "singLEFTmiss";
+                break;
+            case 1:
+                animToPlay = "singDOWNmiss";
+                break;
+            case 2:
+                animToPlay = "singUPmiss";
+                break;
+            case 3:
+                animToPlay = "singRIGHTmiss";
+                break;
+        }
+        if (!animToPlay.empty()) {
+            boyfriend->playAnim(animToPlay, true);
+            boyfriend->holdTimer = 0.0f;
+        }
+    }
     
     static std::random_device rd;
     static std::mt19937 gen(rd());
@@ -822,6 +961,10 @@ void PlayState::handleOpponentNoteHit(float deltaTime) {
             if (timeDiff <= 45.0f && timeDiff >= -Conductor::safeZoneOffset) {
                 note->canBeHit = true;
                 
+                if (vocals && SONG.needsVoices) {
+                    vocals->setVolume(1.0f);
+                }
+                
                 int arrowIndex = note->noteData;
                 if (arrowIndex >= 0 && arrowIndex < 4 && arrowIndex < strumLineNotes.size()) {
                     if (strumLineNotes[arrowIndex] && strumLineNotes[arrowIndex]->animation) {
@@ -829,6 +972,28 @@ void PlayState::handleOpponentNoteHit(float deltaTime) {
                         if (arrow->animation->current != "confirm") {
                             arrow->animation->play("confirm");
                         }
+                    }
+                }
+                
+                if (dad) {
+                    std::string animToPlay = "";
+                    switch (note->noteData) {
+                        case 0:
+                            animToPlay = "singLEFT";
+                            break;
+                        case 1:
+                            animToPlay = "singDOWN";
+                            break;
+                        case 2:
+                            animToPlay = "singUP";
+                            break;
+                        case 3:
+                            animToPlay = "singRIGHT";
+                            break;
+                    }
+                    if (!animToPlay.empty()) {
+                        dad->playAnim(animToPlay, true);
+                        dad->holdTimer = 0.0f;
                     }
                 }
                 
@@ -867,5 +1032,29 @@ void PlayState::updateCameraZoom() {}
 void PlayState::setupHUDCamera() {
     if (camHUD && scoreText) {
         scoreText->camera = camHUD;
+    }
+}
+
+void PlayState::beatHit() {
+    if (gf && curBeat % gfSpeed == 0) {
+        gf->dance();
+    }
+    
+    if (boyfriend && boyfriend->animation) {
+        std::string currentAnim = boyfriend->animation->current;
+        bool isSinging = (currentAnim.length() >= 4 && currentAnim.substr(0, 4) == "sing");
+        
+        if (!isSinging) {
+            boyfriend->dance();
+        }
+    }
+    
+    if (dad && curBeat % 1 == 0) {
+        int curSection = curStep / 16;
+        if (curSection >= 0 && curSection < SONG.notes.size()) {
+            if (SONG.notes[curSection].mustHitSection) {
+                dad->dance();
+            }
+        }
     }
 } 

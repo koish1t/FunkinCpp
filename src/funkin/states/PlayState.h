@@ -10,6 +10,8 @@
 #include "../game/Conductor.h"
 #include "../game/GameConfig.h"
 #include "../substates/PauseSubState.h"
+#include "../game/Stage.h"
+#include "../game/Character.h"
 #include <flixel/FlxSprite.h>
 #include <flixel/text/FlxText.h>
 #include <flixel/sound/FlxSound.h>
@@ -44,6 +46,7 @@ public:
     void loadKeybinds();
     void updateCameraZoom();
     void setupHUDCamera();
+    void beatHit();
 
     bool isKeyJustPressed(int key);
     bool isKeyJustReleased(int key);
@@ -60,6 +63,10 @@ private:
     flixel::FlxSound* missSound1;
     flixel::FlxSound* missSound2;
     flixel::FlxSound* missSound3;
+    Stage* stage;
+    Character* boyfriend;
+    Character* gf;
+    Character* dad;
     std::vector<flixel::FlxSprite*> strumLineNotes;
     std::vector<Note*> notes;
     std::vector<Note*> unspawnNotes;
@@ -76,6 +83,9 @@ private:
     int score;
     int misses;
     int combo;
+    int curBeat;
+    int curStep;
+    int gfSpeed;
     
     struct KeyBind {
         SDL_Scancode primary;

@@ -26,7 +26,8 @@ FlxSound::FlxSound() :
     fadeTime(0.0f),
     isFading(false),
     looped(false),
-    channel(-1)
+    channel(-1),
+    reservedChannel(-1)
 {
     reset();
 }
@@ -59,6 +60,7 @@ void FlxSound::reset()
     autoDestroy = false;
     _pan = 0;
     channel = -1;
+    reservedChannel = -1;
 }
 
 void FlxSound::destroy()
@@ -318,7 +320,21 @@ void FlxSound::resume()
 
 void FlxSound::stop()
 {
-    cleanup(autoDestroy, true);
+    if (isStream) {
+        Mix_HaltMusic();
+    } else if (channel >= 0) {
+        Mix_HaltChannel(channel);
+        channel = -1;
+    }
+    
+    playing = false;
+    paused = false;
+    _paused = false;
+    active = false;
+    
+    if (autoDestroy) {
+        cleanup(true, true);
+    }
 }
 
 void FlxSound::fadeOut(float duration, float to)
@@ -387,7 +403,11 @@ float FlxSound::get_volume() const
 void FlxSound::setVolume(float volume)
 {
     _volume = math::bound(volume, 0.0f, 1.0f);
-    updateTransform();
+    if (!isStream && channel >= 0) {
+        Mix_Volume(channel, static_cast<int>(calcTransformVolume() * MIX_MAX_VOLUME));
+    } else {
+        updateTransform();
+    }
 }
 
 float FlxSound::get_pan() const
@@ -486,7 +506,10 @@ void FlxSound::cleanup(bool destroySound, bool resetPosition)
         }
         else if (chunk)
         {
-            Mix_HaltChannel(-1);
+            if (channel >= 0) {
+                Mix_HaltChannel(channel);
+                channel = -1;
+            }
             Mix_FreeChunk(chunk);
             chunk = nullptr;
         }
@@ -497,13 +520,16 @@ void FlxSound::cleanup(bool destroySound, bool resetPosition)
         {
             Mix_HaltMusic();
         }
-        else if (chunk)
+        else if (chunk && channel >= 0)
         {
-            Mix_HaltChannel(-1);
+            Mix_HaltChannel(channel);
+            channel = -1;
         }
     }
 
     active = false;
+    playing = false;
+    paused = false;
 
     if (resetPosition)
     {
@@ -518,14 +544,14 @@ void FlxSound::updateTransform()
     
     if (isStream)
         Mix_VolumeMusic(static_cast<int>(volume * MIX_MAX_VOLUME));
-    else if (chunk)
-        Mix_VolumeChunk(chunk, static_cast<int>(volume * MIX_MAX_VOLUME));
+    else if (channel >= 0)
+        Mix_Volume(channel, static_cast<int>(volume * MIX_MAX_VOLUME));
 
-    if (!isStream && chunk)
+    if (!isStream && channel >= 0 && chunk)
     {
         int leftVol = static_cast<int>(volume * MIX_MAX_VOLUME * (1.0f - _pan));
         int rightVol = static_cast<int>(volume * MIX_MAX_VOLUME * (1.0f + _pan));
-        Mix_SetPanning(-1, leftVol, rightVol);
+        Mix_SetPanning(channel, leftVol, rightVol);
     }
 }
 
@@ -556,7 +582,8 @@ void FlxSound::startSound(float startTime)
     }
     else
     {
-        channel = Mix_PlayChannel(-1, chunk, get_looped() ? -1 : 0);
+        int channelToUse = (reservedChannel >= 0) ? reservedChannel : -1;
+        channel = Mix_PlayChannel(channelToUse, chunk, get_looped() ? -1 : 0);
         if (channel == -1) {
             std::cerr << "Failed to play sound: " << Mix_GetError() << std::endl;
             playing = false;
@@ -581,4 +608,9 @@ void FlxSound::stopped()
 }
 
 void FlxSound::gotID3() {}
+
+void FlxSound::setChannel(int channelToUse) {
+    reservedChannel = channelToUse;
+}
+
 }

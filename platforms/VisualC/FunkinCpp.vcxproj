@@ -184,11 +184,13 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
     <ClCompile Include="..\..\external\flixel\text\FlxText.cpp" />
     <ClCompile Include="..\..\external\tinyxml2.cpp" />
     <ClCompile Include="..\..\src\funkin\FunkinState.cpp" />
+    <ClCompile Include="..\..\src\funkin\game\Character.cpp" />
     <ClCompile Include="..\..\src\funkin\game\Conductor.cpp" />
     <ClCompile Include="..\..\src\funkin\game\GameConfig.cpp" />
     <ClCompile Include="..\..\src\funkin\game\Note.cpp" />
     <ClCompile Include="..\..\src\funkin\game\Section.cpp" />
     <ClCompile Include="..\..\src\funkin\game\Song.cpp" />
+    <ClCompile Include="..\..\src\funkin\game\Stage.cpp" />
     <ClCompile Include="..\..\src\funkin\states\PlayState.cpp" />
     <ClCompile Include="..\..\src\funkin\substates\PauseSubState.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />

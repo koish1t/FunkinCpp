@@ -31,6 +31,9 @@
     <Filter Include="Source Files\funkin\substates">
       <UniqueIdentifier>{6ccfbe5d-6ebc-4192-9821-670b5c3be18b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\funkin\play">
+      <UniqueIdentifier>{35a18379-73dc-42d1-9a78-89d3eccec883}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -101,6 +104,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\funkin\FunkinState.cpp">
       <Filter>Source Files\funkin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\game\Stage.cpp">
+      <Filter>Source Files\funkin\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\game\Character.cpp">
+      <Filter>Source Files\funkin\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -224,6 +224,7 @@ void FlxG::init(FlxGame* gameInstance, int gameWidth, int gameHeight) {
     }
 
     Mix_AllocateChannels(32);
+    Mix_ReserveChannels(1);
 
     if (TTF_Init() < 0) {
         throw std::runtime_error("Failed to initialize SDL_ttf: " + std::string(TTF_GetError()));

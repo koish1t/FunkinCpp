@@ -45,6 +45,8 @@ public:
     float originY = 0;
     int frameWidth = 0;
     int frameHeight = 0;
+    bool flipX = false;
+    bool flipY = false;
 
     flixel::graphics::frames::FlxAtlasFrames* frames = nullptr;
     flixel::animation::FlxAnimationController* animation = nullptr;

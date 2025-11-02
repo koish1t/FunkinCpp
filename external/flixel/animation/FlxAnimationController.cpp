@@ -8,13 +8,25 @@ void FlxAnimationController::addByPrefix(const std::string& name, const std::vec
     animations[name] = {name, frames, frameRate, looped};
 }
 
-void FlxAnimationController::play(const std::string& name) {
+void FlxAnimationController::addByIndices(const std::string& name, const std::vector<int>& sourceFrames, const std::vector<int>& indices, int frameRate, bool looped) {
+    std::vector<int> selectedFrames;
+    for (int idx : indices) {
+        if (idx >= 0 && idx < static_cast<int>(sourceFrames.size())) {
+            selectedFrames.push_back(sourceFrames[idx]);
+        }
+    }
+    animations[name] = {name, selectedFrames, frameRate, looped};
+}
+
+void FlxAnimationController::play(const std::string& name, bool force) {
     auto it = animations.find(name);
     if (it != animations.end()) {
-        current = name;
-        currentFrame = 0;
-        timer = 0.0f;
-        finished = false;
+        if (force || current != name) {
+            current = name;
+            currentFrame = 0;
+            timer = 0.0f;
+            finished = false;
+        }
     }
 }
 

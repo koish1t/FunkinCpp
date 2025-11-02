@@ -14,7 +14,8 @@ public:
     float timer = 0.0f;
 
     void addByPrefix(const std::string& name, const std::vector<int>& frames, int frameRate, bool looped);
-    void play(const std::string& name);
+    void addByIndices(const std::string& name, const std::vector<int>& sourceFrames, const std::vector<int>& indices, int frameRate, bool looped);
+    void play(const std::string& name, bool force = false);
     void update(float elapsed);
     
     inline int getCurrentFrame() const {
