@@ -187,16 +187,14 @@ void FlxCamera::updateFollow() {
             }
         }
 
-        if (dynamic_cast<FlxSprite*>(target) != nullptr) {
-            if (_lastTargetPosition.x == 0 && _lastTargetPosition.y == 0) {
-                _lastTargetPosition.set(target->x, target->y);
-            }
-            _scrollTarget.x += (target->x - _lastTargetPosition.x) * followLead.x;
-            _scrollTarget.y += (target->y - _lastTargetPosition.y) * followLead.y;
-
-            _lastTargetPosition.x = target->x;
-            _lastTargetPosition.y = target->y;
+        if (_lastTargetPosition.x == 0 && _lastTargetPosition.y == 0) {
+            _lastTargetPosition.set(target->x, target->y);
         }
+        _scrollTarget.x += (target->x - _lastTargetPosition.x) * followLead.x;
+        _scrollTarget.y += (target->y - _lastTargetPosition.y) * followLead.y;
+
+        _lastTargetPosition.x = target->x;
+        _lastTargetPosition.y = target->y;
     }
 }
 

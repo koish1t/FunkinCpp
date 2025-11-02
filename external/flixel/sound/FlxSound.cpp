@@ -105,7 +105,13 @@ void FlxSound::update(float elapsed)
     }
 
     if (isStream)
+    {
+#ifdef __SWITCH__
+        _time += elapsed * 1000.0f;
+#else
         _time = Mix_GetMusicPosition(music) * 1000.0f;
+#endif
+    }
     else if (chunk)
         _time += elapsed * 1000.0f;
 
@@ -166,7 +172,16 @@ bool FlxSound::loadEmbedded(const std::string& path, bool looped, bool autoDestr
     }
     else
     {
+#ifdef __SWITCH__
+        SDL_RWops* rw = SDL_RWFromFile(path.c_str(), "rb");
+        if (rw) {
+            chunk = Mix_LoadWAV_RW(rw, 1);
+        } else {
+            chunk = nullptr;
+        }
+#else
         chunk = Mix_LoadWAV(path.c_str());
+#endif
         if (!chunk)
         {
             FlxG::log.error("Could not load sound: " + path);
@@ -181,7 +196,13 @@ bool FlxSound::loadEmbedded(const std::string& path, bool looped, bool autoDestr
     exists = true;
     
     if (isStream)
+    {
+#ifdef __SWITCH__
+        _length = 180000.0f;
+#else
         _length = Mix_MusicDuration(music) * 1000.0f;
+#endif
+    }
     else
         _length = chunk->alen * 1000.0f / 44100.0f;
     
@@ -198,7 +219,16 @@ bool FlxSound::loadAsChunk(const std::string& path, bool looped, bool autoDestro
 {
     cleanup(true);
     
+#ifdef __SWITCH__
+    SDL_RWops* rw = SDL_RWFromFile(path.c_str(), "rb");
+    if (rw) {
+        chunk = Mix_LoadWAV_RW(rw, 1);
+    } else {
+        chunk = nullptr;
+    }
+#else
     chunk = Mix_LoadWAV(path.c_str());
+#endif
     if (!chunk)
     {
         FlxG::log.error("Could not load sound as chunk: " + path);
@@ -583,7 +613,11 @@ void FlxSound::startSound(float startTime)
     else
     {
         int channelToUse = (reservedChannel >= 0) ? reservedChannel : -1;
+#ifdef __SWITCH__
+        channel = Mix_PlayChannelTimed(channelToUse, chunk, get_looped() ? -1 : 0, -1);
+#else
         channel = Mix_PlayChannel(channelToUse, chunk, get_looped() ? -1 : 0);
+#endif
         if (channel == -1) {
             std::cerr << "Failed to play sound: " << Mix_GetError() << std::endl;
             playing = false;

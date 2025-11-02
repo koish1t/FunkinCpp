@@ -1,5 +1,6 @@
 #include "FlxAnimationController.h"
 #include <algorithm>
+#include <cmath>
 
 namespace flixel {
 namespace animation {

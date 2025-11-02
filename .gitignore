@@ -399,3 +399,7 @@ FodyWeavers.xsd
 *.sln.iml
 /platforms/VisualC/assets
 /ref
+/platforms/NX/build
+*.nro
+*.elf
+*.nacp
