@@ -211,6 +211,8 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
     <ClCompile Include="..\..\src\funkin\play\song\SongLoader.cpp" />
     <ClCompile Include="..\..\src\funkin\play\stage\Stage.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\components\Alphabet.cpp" />
+    <ClCompile Include="..\..\src\funkin\ui\components\AtlasMenuItem.cpp" />
+    <ClCompile Include="..\..\src\funkin\ui\MainMenuState.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\TitleState.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>

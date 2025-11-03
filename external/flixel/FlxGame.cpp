@@ -86,6 +86,10 @@ void FlxGame::update(float elapsed) {
     }
 
     currentState->update(elapsed);
+    
+    if (FlxG::camera) {
+        FlxG::camera->update(elapsed);
+    }
 }
 
 void FlxGame::draw() {

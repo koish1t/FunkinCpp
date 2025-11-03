@@ -339,7 +339,7 @@ void PlayState::update(float elapsed) {
             
             flixel::FlxSprite* countdownSprite = countdown->getCurrentSprite();
             if (countdownSprite && camHUD) {
-                countdownSprite->camera = camHUD;
+                                countdownSprite->camera = camHUD;
             }
             
             if (Conductor::songPosition >= 0 && countdown->isFinished()) {
@@ -379,7 +379,7 @@ void PlayState::startCountdown() {
     if (countdown) {
         countdown->start(Conductor::crochet);
     }
-    
+
     Conductor::songPosition = -(Conductor::crochet * 5);
 }
 

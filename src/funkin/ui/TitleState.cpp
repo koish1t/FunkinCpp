@@ -1,6 +1,8 @@
 #include "TitleState.h"
+#include "MainMenuState.h"
 #include "../play/song/Conductor.h"
 #include <flixel/FlxG.h>
+#include <flixel/FlxGame.h>
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
 #include <SDL2/SDL.h>
 #include <iostream>
@@ -148,7 +150,7 @@ void TitleState::update(float elapsed) {
         }
         transitioning = true;
         
-        std::cout << "Would switch to MainMenuState" << std::endl;
+        flixel::FlxG::game->switchState(new MainMenuState());
     }
 }
 
