@@ -1,5 +1,5 @@
 #include <flixel/FlxGame.h>
-#include "funkin/play/PlayState.h"
+#include "funkin/ui/TitleState.h"
 #include "imports.h"
 
 struct Config {
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
             config.title
         );
 
-        game.switchState(new PlayState());
+        game.switchState(new TitleState());
 
         if (config.startFullscreen) {
             game.setFullscreen(true);
