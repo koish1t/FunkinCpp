@@ -1,6 +1,6 @@
 #include "Character.h"
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
-#include "Conductor.h"
+#include "../song/Conductor.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>

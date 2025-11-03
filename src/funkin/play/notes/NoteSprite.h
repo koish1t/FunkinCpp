@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 
-class Note : public flixel::FlxSprite {
+class NoteSprite : public flixel::FlxSprite {
 public:
     static constexpr int LEFT_NOTE = 0;
     static constexpr int DOWN_NOTE = 1;
@@ -22,8 +22,8 @@ public:
     static void unloadAssets();
     static float getTargetY();
 
-    Note(float strumTime, int noteData, Note* prevNote = nullptr, bool sustainNote = false);
-    ~Note();
+    NoteSprite(float strumTime, int noteData, NoteSprite* prevNote = nullptr, bool sustainNote = false);
+    ~NoteSprite();
 
     void update(float elapsed) override;
     void setupNote();
@@ -38,8 +38,8 @@ public:
     bool wasGoodHit;
     bool tooLate;
     float noteScore;
-    Note* prevNote;
-    Note* parentNote;
+    NoteSprite* prevNote;
+    NoteSprite* parentNote;
     float yOffset = 0.0f;
     bool kill = false;
 };

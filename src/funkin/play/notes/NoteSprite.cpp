@@ -1,18 +1,18 @@
-#include "Note.h"
-#include "../states/PlayState.h"
-#include "Conductor.h"
-#include "GameConfig.h"
+#include "NoteSprite.h"
+#include "../PlayState.h"
+#include "../song/Conductor.h"
+#include "../../game/GameConfig.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 
-const float Note::STRUM_X = 42.0f;
-const float Note::swagWidth = 160.0f * 0.7f;
-bool Note::assetsLoaded = false;
-flixel::graphics::frames::FlxAtlasFrames* Note::noteFrames = nullptr;
+const float NoteSprite::STRUM_X = 42.0f;
+const float NoteSprite::swagWidth = 160.0f * 0.7f;
+bool NoteSprite::assetsLoaded = false;
+flixel::graphics::frames::FlxAtlasFrames* NoteSprite::noteFrames = nullptr;
 
-void Note::loadAssets() {
+void NoteSprite::loadAssets() {
     if (!assetsLoaded) {
         std::ifstream file("assets/images/NOTE_assets.xml");
         if (file.is_open()) {
@@ -30,7 +30,7 @@ void Note::loadAssets() {
     }
 }
 
-void Note::unloadAssets() {
+void NoteSprite::unloadAssets() {
     if (assetsLoaded) {
         if (noteFrames) {
             delete noteFrames;
@@ -40,7 +40,7 @@ void Note::unloadAssets() {
     }
 }
 
-Note::Note(float strumTime, int noteData, Note* prevNote, bool sustainNote) 
+NoteSprite::NoteSprite(float strumTime, int noteData, NoteSprite* prevNote, bool sustainNote) 
     : FlxSprite(), strumTime(strumTime), noteData(noteData), prevNote(prevNote), 
       isSustainNote(sustainNote), sustainLength(0), mustPress(false), canBeHit(false),
       tooLate(false), wasGoodHit(false), noteScore(1.0f), parentNote(nullptr) {
@@ -157,7 +157,7 @@ Note::Note(float strumTime, int noteData, Note* prevNote, bool sustainNote)
     visible = true;
 }
 
-void Note::setupNote() {
+void NoteSprite::setupNote() {
     std::string colorPrefix;
     switch (noteData) {
         case LEFT_NOTE:
@@ -175,7 +175,7 @@ void Note::setupNote() {
     }
 }
 
-void Note::setupSustainNote() {
+void NoteSprite::setupSustainNote() {
     noteScore *= 0.2f;
     alpha = 0.6f;
 
@@ -206,7 +206,7 @@ void Note::setupSustainNote() {
     }
 }
 
-float Note::getTargetY() {
+float NoteSprite::getTargetY() {
     int windowHeight = 720;
     if (GameConfig::getInstance()->isDownscroll()) {
         return windowHeight - 150.0f;
@@ -214,7 +214,7 @@ float Note::getTargetY() {
     return 50.0f;
 }
 
-void Note::update(float elapsed) {
+void NoteSprite::update(float elapsed) {
     FlxSprite::update(elapsed);
 
     if (animation) {
@@ -271,4 +271,4 @@ void Note::update(float elapsed) {
     }
 }
 
-Note::~Note() {}
+NoteSprite::~NoteSprite() {}

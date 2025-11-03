@@ -4,8 +4,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <random>
-#include "../game/Song.h"
-#include "../game/Conductor.h"
+#include "song/Song.h"
+#include "song/Conductor.h"
 #include <fstream>
 #include <map>
 #include "../../../external/nlohmann/json.hpp"
@@ -32,7 +32,7 @@ PlayState::PlayState() {
     boyfriend = nullptr;
     gf = nullptr;
     dad = nullptr;
-    Note::loadAssets();
+    NoteSprite::loadAssets();
     scoreText = new flixel::FlxText(0, 0, 0, "");
     scoreText->setFont("assets/fonts/vcr.ttf");
     scoreText->setSize(16);
@@ -173,7 +173,7 @@ PlayState::~PlayState() {
     ratingSprites.clear();
     ratingTimers.clear();
     
-    Note::unloadAssets();
+    NoteSprite::unloadAssets();
     destroy();
 }
 
@@ -449,7 +449,7 @@ void PlayState::update(float elapsed) {
         }
 
         while (!unspawnNotes.empty()) {
-            Note* nextNote = unspawnNotes[0];
+            NoteSprite* nextNote = unspawnNotes[0];
             if (nextNote->strumTime - Conductor::songPosition > 1500) {
                 break;
             }
@@ -459,7 +459,7 @@ void PlayState::update(float elapsed) {
         }
 
         for (auto it = notes.begin(); it != notes.end();) {
-            Note* note = *it;
+            NoteSprite* note = *it;
             if (note) {
                 note->update(elapsed);
 
@@ -672,7 +672,7 @@ void PlayState::update(float elapsed) {
 
 void PlayState::handleInput() {
     float closestDistances[4] = {INFINITY, INFINITY, INFINITY, INFINITY};
-    std::vector<Note*> toHit;
+    std::vector<NoteSprite*> toHit;
     
     bool justHitArray[4] = {
         isKeyJustPressed(0),
@@ -738,7 +738,7 @@ void PlayState::handleInput() {
         
         closestLaneDistance = distance;
         
-        toHit.erase(std::remove_if(toHit.begin(), toHit.end(), [lane, distance](Note* n) {
+        toHit.erase(std::remove_if(toHit.begin(), toHit.end(), [lane, distance](NoteSprite* n) {
             return n->noteData == lane && std::abs(n->strumTime - Conductor::songPosition) > distance;
         }), toHit.end());
         
@@ -831,10 +831,10 @@ void PlayState::generateSong(std::string dataPath) {
         }
         
         if (!vocalsPath.empty()) {
-            if (vocals != nullptr) {
-                delete vocals;
-                vocals = nullptr;
-            }
+        if (vocals != nullptr) {
+            delete vocals;
+            vocals = nullptr;
+        }
             vocals = new flixel::FlxSound();
             if (!vocals->loadAsChunk(vocalsPath, false, false)) {
                 std::cerr << "Failed to preload vocals: " << vocalsPath << std::endl;
@@ -859,7 +859,7 @@ void PlayState::startSong() {
     
     if (inst) {
         inst->play();
-    } else {
+        } else {
         std::cerr << "Error: Instrumental not loaded!" << std::endl;
     }
     
@@ -951,7 +951,7 @@ void PlayState::generateStaticArrows(int player) {
     
     float yPos = GameConfig::getInstance()->isDownscroll() ? (windowHeight - 150.0f) : 50.0f;
     
-    if (!Note::noteFrames) {
+    if (!NoteSprite::noteFrames) {
         std::cerr << "ERROR: Note assets not loaded!" << std::endl;
         return;
     }
@@ -960,13 +960,13 @@ void PlayState::generateStaticArrows(int player) {
         flixel::FlxSprite* babyArrow = new flixel::FlxSprite();
         babyArrow->setPosition(42.0f, yPos);
         
-        babyArrow->texture = Note::noteFrames->texture;
+        babyArrow->texture = NoteSprite::noteFrames->texture;
         babyArrow->ownsTexture = false;
-        babyArrow->frames = Note::noteFrames;
+        babyArrow->frames = NoteSprite::noteFrames;
         babyArrow->animation = new flixel::animation::FlxAnimationController();
         
-        if (!Note::noteFrames->frames.empty()) {
-            const auto& firstFrame = Note::noteFrames->frames[0];
+        if (!NoteSprite::noteFrames->frames.empty()) {
+            const auto& firstFrame = NoteSprite::noteFrames->frames[0];
             babyArrow->sourceRect = firstFrame.rect;
             babyArrow->frameWidth = firstFrame.sourceSize.w;
             babyArrow->frameHeight = firstFrame.sourceSize.h;
@@ -998,9 +998,9 @@ void PlayState::generateStaticArrows(int player) {
                     break;
             }
             
-        auto staticFrames = Note::noteFrames->getFramesByPrefix(staticFrame);
-        auto pressedFrames = Note::noteFrames->getFramesByPrefix(pressPrefix);
-        auto confirmFrames = Note::noteFrames->getFramesByPrefix(confirmPrefix);
+        auto staticFrames = NoteSprite::noteFrames->getFramesByPrefix(staticFrame);
+        auto pressedFrames = NoteSprite::noteFrames->getFramesByPrefix(pressPrefix);
+        auto confirmFrames = NoteSprite::noteFrames->getFramesByPrefix(confirmPrefix);
             
             if (!staticFrames.empty()) {
                 babyArrow->animation->addByPrefix("static", staticFrames, 24, false);
@@ -1016,7 +1016,7 @@ void PlayState::generateStaticArrows(int player) {
         babyArrow->updateHitbox();
         
         babyArrow->animation->play("static");
-        babyArrow->x += Note::swagWidth * i;
+        babyArrow->x += NoteSprite::swagWidth * i;
         babyArrow->x += 50.0f;
         babyArrow->x += (static_cast<float>(windowWidth) / 2.0f) * player;
         
@@ -1069,9 +1069,9 @@ void PlayState::generateNotes() {
 
                 float sustainLength = (noteData.size() > 2) ? noteData[2] : 0;
                 
-                Note* oldNote = !unspawnNotes.empty() ? unspawnNotes.back() : nullptr;
+                NoteSprite* oldNote = !unspawnNotes.empty() ? unspawnNotes.back() : nullptr;
                 
-                Note* swagNote = new Note(strumTime, noteType, oldNote, false);
+                NoteSprite* swagNote = new NoteSprite(strumTime, noteType, oldNote, false);
                 swagNote->sustainLength = sustainLength;
                 swagNote->mustPress = mustPress;
                 swagNote->scrollFactor.x = 0.0f;
@@ -1093,7 +1093,7 @@ void PlayState::generateNotes() {
                         oldNote = !unspawnNotes.empty() ? unspawnNotes.back() : nullptr;
                         
                         float sustainNoteTime = strumTime + (Conductor::stepCrochet * susNote);
-                        Note* sustainNote = new Note(sustainNoteTime, noteType, oldNote, true);
+                        NoteSprite* sustainNote = new NoteSprite(sustainNoteTime, noteType, oldNote, true);
                         sustainNote->mustPress = mustPress;
                         sustainNote->scrollFactor.x = 0.0f;
                         sustainNote->scrollFactor.y = 0.0f;
@@ -1135,7 +1135,7 @@ void PlayState::generateNotes() {
     }
 
     std::sort(unspawnNotes.begin(), unspawnNotes.end(),
-        [](Note* a, Note* b) {
+        [](NoteSprite* a, NoteSprite* b) {
             return a->strumTime < b->strumTime;
         });
 }
@@ -1244,7 +1244,7 @@ void PlayState::popUpScore(const std::string& rating, int comboNum) {
     }
 }
 
-void PlayState::goodNoteHit(Note* note) {
+void PlayState::goodNoteHit(NoteSprite* note) {
     if (!note->wasGoodHit) {
         note->wasGoodHit = true;
         
@@ -1315,11 +1315,11 @@ void PlayState::goodNoteHit(Note* note) {
             }
             
             health += 0.05f;
-            combo++;
+        combo++;
             score += ratingScore;
             popUpScore(daRating, combo);
-            updateScoreText();
-            note->kill = true;
+        updateScoreText();
+        note->kill = true;
         }
     }
 }

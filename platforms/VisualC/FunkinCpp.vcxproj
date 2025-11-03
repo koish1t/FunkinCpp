@@ -185,16 +185,16 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
     <ClCompile Include="..\..\external\flixel\text\FlxText.cpp" />
     <ClCompile Include="..\..\external\tinyxml2.cpp" />
     <ClCompile Include="..\..\src\funkin\FunkinState.cpp" />
-    <ClCompile Include="..\..\src\funkin\game\Character.cpp" />
-    <ClCompile Include="..\..\src\funkin\game\Conductor.cpp" />
     <ClCompile Include="..\..\src\funkin\game\GameConfig.cpp" />
-    <ClCompile Include="..\..\src\funkin\game\HealthIcon.cpp" />
-    <ClCompile Include="..\..\src\funkin\game\Note.cpp" />
     <ClCompile Include="..\..\src\funkin\game\Section.cpp" />
-    <ClCompile Include="..\..\src\funkin\game\Song.cpp" />
-    <ClCompile Include="..\..\src\funkin\game\Stage.cpp" />
-    <ClCompile Include="..\..\src\funkin\states\PlayState.cpp" />
-    <ClCompile Include="..\..\src\funkin\substates\PauseSubState.cpp" />
+    <ClCompile Include="..\..\src\funkin\play\character\Character.cpp" />
+    <ClCompile Include="..\..\src\funkin\play\components\HealthIcon.cpp" />
+    <ClCompile Include="..\..\src\funkin\play\notes\NoteSprite.cpp" />
+    <ClCompile Include="..\..\src\funkin\play\PauseSubState.cpp" />
+    <ClCompile Include="..\..\src\funkin\play\PlayState.cpp" />
+    <ClCompile Include="..\..\src\funkin\play\song\Conductor.cpp" />
+    <ClCompile Include="..\..\src\funkin\play\song\Song.cpp" />
+    <ClCompile Include="..\..\src\funkin\play\stage\Stage.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

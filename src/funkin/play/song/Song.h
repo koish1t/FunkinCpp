@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "Section.h"
+#include "../../game/Section.h"
 
 struct SwagSong {
     std::string song;

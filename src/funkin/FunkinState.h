@@ -2,7 +2,7 @@
 
 #include <flixel/FlxState.h>
 #include <flixel/sound/FlxSound.h>
-#include "game/Conductor.h"
+#include "play/song/Conductor.h"
 
 class FunkinState : public flixel::FlxState {
 public:

@@ -5,14 +5,14 @@
 #include <map>
 #include <SDL2/SDL.h>
 #include "../FunkinState.h"
-#include "../game/Note.h"
-#include "../game/Song.h"
-#include "../game/Conductor.h"
+#include "notes/NoteSprite.h"
+#include "song/Song.h"
+#include "song/Conductor.h"
 #include "../game/GameConfig.h"
-#include "../substates/PauseSubState.h"
-#include "../game/Stage.h"
-#include "../game/Character.h"
-#include "../game/HealthIcon.h"
+#include "PauseSubState.h"
+#include "stage/Stage.h"
+#include "character/Character.h"
+#include "components/HealthIcon.h"
 #include <flixel/FlxSprite.h>
 #include <flixel/text/FlxText.h>
 #include <flixel/sound/FlxSound.h>
@@ -40,7 +40,7 @@ public:
     void generateNotes();
     void handleInput();
     void updateArrowAnimations();
-    void goodNoteHit(Note* note);
+    void goodNoteHit(NoteSprite* note);
     void noteMiss(int direction);
     void handleOpponentNoteHit(float deltaTime);
     void updateScoreText();
@@ -70,8 +70,8 @@ private:
     Character* gf;
     Character* dad;
     std::vector<flixel::FlxSprite*> strumLineNotes;
-    std::vector<Note*> notes;
-    std::vector<Note*> unspawnNotes;
+    std::vector<NoteSprite*> notes;
+    std::vector<NoteSprite*> unspawnNotes;
     flixel::FlxText* scoreText;
     
     std::string curSong;

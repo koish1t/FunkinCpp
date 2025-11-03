@@ -1,5 +1,5 @@
 #include <flixel/FlxGame.h>
-#include "funkin/states/PlayState.h"
+#include "funkin/play/PlayState.h"
 #include "imports.h"
 
 struct Config {
