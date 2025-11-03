@@ -43,7 +43,7 @@ void Note::unloadAssets() {
 Note::Note(float strumTime, int noteData, Note* prevNote, bool sustainNote) 
     : FlxSprite(), strumTime(strumTime), noteData(noteData), prevNote(prevNote), 
       isSustainNote(sustainNote), sustainLength(0), mustPress(false), canBeHit(false),
-      tooLate(false), wasGoodHit(false), noteScore(1.0f) {
+      tooLate(false), wasGoodHit(false), noteScore(1.0f), parentNote(nullptr) {
     
     if (!assetsLoaded) {
         loadAssets();
@@ -114,12 +114,12 @@ Note::Note(float strumTime, int noteData, Note* prevNote, bool sustainNote)
             auto scrollFrames = frames->getFramesByPrefix(holdPiecePrefix);
             auto endFrames = frames->getFramesByPrefix(holdEndPrefix);
             if (!scrollFrames.empty()) {
-                animation->addByPrefix("scroll", scrollFrames, 24, false);
+                animation->addByPrefix("hold", scrollFrames, 24, false);
             }
             if (!endFrames.empty()) {
-                animation->addByPrefix("end", endFrames, 24, false);
+                animation->addByPrefix("hold_end", endFrames, 24, false);
             }
-            animation->play("scroll");
+            animation->play("hold");
         } else {
             std::string framePrefix;
             switch (noteData) {
@@ -230,10 +230,27 @@ void Note::update(float elapsed) {
     float distance = timeDiff * 0.45f * scrollSpeed;
     
     float x = this->x;
-    float y = targetY + (GameConfig::getInstance()->isDownscroll() ? -distance : distance);
+    float y = targetY + (GameConfig::getInstance()->isDownscroll() ? -distance : distance) + yOffset;
     
     setPosition(x, y);
     visible = true;
+    
+    if (isSustainNote && y + offsetY <= targetY + swagWidth / 2.0f &&
+        (!mustPress || (wasGoodHit || (prevNote && prevNote->wasGoodHit && !canBeHit)))) {
+        float clipY = targetY + swagWidth / 2.0f - y;
+        clipRect.x = 0;
+        clipRect.y = static_cast<int>(clipY / getScaleY());
+        clipRect.w = static_cast<int>(width * 2.0f);
+        clipRect.h = static_cast<int>(height * 2.0f) - clipRect.y;
+        
+        if (clipRect.h > 0) {
+            useClipRect = true;
+        } else {
+            useClipRect = false;
+        }
+    } else {
+        useClipRect = false;
+    }
 
     if (mustPress) {
         if (strumTime > songPos - Conductor::safeZoneOffset &&

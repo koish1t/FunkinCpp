@@ -468,6 +468,12 @@ void PlayState::update(float elapsed) {
                     note->kill = true;
                 }
 
+                if (note->y < -note->height) {
+                    if (note->isSustainNote && note->wasGoodHit) {
+                        note->kill = true;
+                    }
+                }
+
                 if (note->kill || note->strumTime < Conductor::songPosition - 5000) {
                     it = notes.erase(it);
                 } else {
@@ -618,7 +624,7 @@ void PlayState::update(float elapsed) {
                 }
             }
         }
-        
+
         if (pauseCooldown > 0) {
             pauseCooldown -= elapsed;
         }
@@ -675,6 +681,13 @@ void PlayState::handleInput() {
         isKeyJustPressed(3)
     };
     
+    bool heldArray[4] = {
+        isKeyPressed(0),
+        isKeyPressed(1),
+        isKeyPressed(2),
+        isKeyPressed(3)
+    };
+    
     if (boyfriend && (justHitArray[0] || justHitArray[1] || justHitArray[2] || justHitArray[3])) {
         boyfriend->holdTimer = 0.0f;
     }
@@ -700,6 +713,13 @@ void PlayState::handleInput() {
         
         int lane = note->noteData;
         if (lane < 0 || lane >= 4) {
+            continue;
+        }
+        
+        if (note->isSustainNote) {
+            if (heldArray[lane] && note->parentNote && note->parentNote->wasGoodHit) {
+                        goodNoteHit(note);
+            }
             continue;
         }
         
@@ -1047,29 +1067,67 @@ void PlayState::generateNotes() {
                     noteType = noteType % 4;
                 }
 
-                bool sustainNote = noteData.size() > 3 && noteData[3] > 0;
-                float sustainLength = sustainNote ? noteData[3] : 0;
-
-                Note* prevNote = nullptr;
-                if (sustainNote && !unspawnNotes.empty()) {
-                    prevNote = unspawnNotes.back();
-                }
-
-                Note* note = new Note(strumTime, noteType, prevNote, sustainNote);
-                note->mustPress = mustPress;
-                note->sustainLength = sustainLength;
-                note->scrollFactor.x = 0.0f;
-                note->scrollFactor.y = 0.0f;
+                float sustainLength = (noteData.size() > 2) ? noteData[2] : 0;
+                
+                Note* oldNote = !unspawnNotes.empty() ? unspawnNotes.back() : nullptr;
+                
+                Note* swagNote = new Note(strumTime, noteType, oldNote, false);
+                swagNote->sustainLength = sustainLength;
+                swagNote->mustPress = mustPress;
+                swagNote->scrollFactor.x = 0.0f;
+                swagNote->scrollFactor.y = 0.0f;
                 
                 if (mustPress) {
-                    note->x += static_cast<float>(flixel::FlxG::width) / 2.0f;
+                    swagNote->x += static_cast<float>(flixel::FlxG::width) / 2.0f;
                 }
                 
                 if (camHUD) {
-                    note->camera = camHUD;
+                    swagNote->camera = camHUD;
                 }
                 
-                unspawnNotes.push_back(note);
+                if (sustainLength > 0) {
+                    float susLength = sustainLength / Conductor::stepCrochet;
+                    int numSustainPieces = static_cast<int>(std::round(susLength));
+                    
+                    for (int susNote = 0; susNote < numSustainPieces; susNote++) {
+                        oldNote = !unspawnNotes.empty() ? unspawnNotes.back() : nullptr;
+                        
+                        float sustainNoteTime = strumTime + (Conductor::stepCrochet * susNote);
+                        Note* sustainNote = new Note(sustainNoteTime, noteType, oldNote, true);
+                        sustainNote->mustPress = mustPress;
+                        sustainNote->scrollFactor.x = 0.0f;
+                        sustainNote->scrollFactor.y = 0.0f;
+                        sustainNote->parentNote = swagNote;
+                        
+                        if (susNote == numSustainPieces - 1 && sustainNote->animation) {
+                            sustainNote->animation->play("hold_end");
+                            sustainNote->setScale(0.7f, 0.7f);
+                            sustainNote->updateHitbox();
+                            sustainNote->x += 34.0f;
+                        } else {
+                            float scaleMultiplier = Conductor::stepCrochet / 100.0f * 1.5f * SONG.speed;
+                            sustainNote->setScale(0.7f, 0.7f * scaleMultiplier);
+                            sustainNote->originX = 0.0f;
+                            sustainNote->originY = 0.0f;
+                            sustainNote->x += 34.0f;
+                        }
+                        
+                        sustainNote->yOffset = 30.0f;
+                        
+                        if (mustPress) {
+                            sustainNote->x += static_cast<float>(flixel::FlxG::width) / 2.0f;
+                        }
+                        
+                        if (camHUD) {
+                            sustainNote->camera = camHUD;
+                        }
+                        
+                        unspawnNotes.push_back(sustainNote);
+                        totalNotes++;
+                    }
+                }
+                
+                unspawnNotes.push_back(swagNote);
                 totalNotes++;
             }
         }
@@ -1261,9 +1319,8 @@ void PlayState::goodNoteHit(Note* note) {
             score += ratingScore;
             popUpScore(daRating, combo);
             updateScoreText();
+            note->kill = true;
         }
-        
-        note->kill = true;
     }
 }
 

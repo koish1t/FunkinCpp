@@ -39,5 +39,7 @@ public:
     bool tooLate;
     float noteScore;
     Note* prevNote;
+    Note* parentNote;
+    float yOffset = 0.0f;
     bool kill = false;
 };

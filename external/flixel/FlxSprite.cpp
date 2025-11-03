@@ -140,6 +140,7 @@ void FlxSprite::draw() {
     if (!texture || !visible || alpha <= 0.0f) return;
     const SDL_Rect* srcRect = &sourceRect;
     SDL_Rect frameRect;
+    SDL_Rect clippedRect;
     float frameOffsetX = 0.0f;
     float frameOffsetY = 0.0f;
     
@@ -152,6 +153,14 @@ void FlxSprite::draw() {
             frameOffsetX = static_cast<float>(frame.sourceSize.x) * scaleX;
             frameOffsetY = static_cast<float>(frame.sourceSize.y) * scaleY;
         }
+    }
+    
+    if (useClipRect) {
+        clippedRect = *srcRect;
+        clippedRect.y += clipRect.y;
+        clippedRect.h = clipRect.h;
+        srcRect = &clippedRect;
+        frameOffsetY += static_cast<float>(clipRect.y) * scaleY;
     }
 
     float camScrollX = 0.0f;

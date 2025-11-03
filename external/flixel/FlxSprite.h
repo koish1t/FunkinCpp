@@ -58,6 +58,8 @@ public:
     flixel::animation::FlxAnimationController* animation = nullptr;
     SDL_Texture* texture = nullptr;
     SDL_Rect sourceRect = {0, 0, 0, 0};
+    SDL_Rect clipRect = {0, 0, 0, 0};
+    bool useClipRect = false;
     bool ownsTexture = false;
 
 protected:
