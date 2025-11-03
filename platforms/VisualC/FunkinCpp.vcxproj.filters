@@ -43,6 +43,12 @@
     <Filter Include="Source Files\funkin\play\stage">
       <UniqueIdentifier>{7b006197-63ef-44ac-a659-a48f17351709}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\funkin\play\scoring">
+      <UniqueIdentifier>{e5d8f790-5df1-4f9e-83cc-f1e22d49f8d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\funkin\play\input">
+      <UniqueIdentifier>{b6e7aa39-1684-4672-aa98-76198f37c14c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -125,6 +131,51 @@
     </ClCompile>
     <ClCompile Include="..\..\src\funkin\play\stage\Stage.cpp">
       <Filter>Source Files\funkin\play\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\Countdown.cpp">
+      <Filter>Source Files\funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\components\PopUpStuff.cpp">
+      <Filter>Source Files\funkin\play\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\scoring\Scoring.cpp">
+      <Filter>Source Files\funkin\play\scoring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\notes\Strumline.cpp">
+      <Filter>Source Files\funkin\play\notes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\input\Controls.cpp">
+      <Filter>Source Files\funkin\play\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\notes\NoteManager.cpp">
+      <Filter>Source Files\funkin\play\notes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\components\HealthBar.cpp">
+      <Filter>Source Files\funkin\play\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\song\SongLoader.cpp">
+      <Filter>Source Files\funkin\play\song</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\notes\NoteHitHandler.cpp">
+      <Filter>Source Files\funkin\play\notes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\GameplayManager.cpp">
+      <Filter>Source Files\funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\CameraManager.cpp">
+      <Filter>Source Files\funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\notes\NoteUpdateHandler.cpp">
+      <Filter>Source Files\funkin\play\notes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\PauseHandler.cpp">
+      <Filter>Source Files\funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\PlayStateRenderer.cpp">
+      <Filter>Source Files\funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\character\CharacterManager.cpp">
+      <Filter>Source Files\funkin\play\character</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

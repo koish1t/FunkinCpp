@@ -12,7 +12,22 @@
 #include "PauseSubState.h"
 #include "stage/Stage.h"
 #include "character/Character.h"
+#include "character/CharacterManager.h"
 #include "components/HealthIcon.h"
+#include "components/PopUpStuff.h"
+#include "components/HealthBar.h"
+#include "scoring/Scoring.h"
+#include "Countdown.h"
+#include "notes/Strumline.h"
+#include "notes/NoteManager.h"
+#include "notes/NoteHitHandler.h"
+#include "notes/NoteUpdateHandler.h"
+#include "input/Controls.h"
+#include "song/SongLoader.h"
+#include "GameplayManager.h"
+#include "CameraManager.h"
+#include "PauseHandler.h"
+#include "PlayStateRenderer.h"
 #include <flixel/FlxSprite.h>
 #include <flixel/text/FlxText.h>
 #include <flixel/sound/FlxSound.h>
@@ -33,45 +48,30 @@ public:
     void destroy() override;
 
     void loadSongConfig();
-    void generateSong(std::string dataPath);
     void startSong();
     void startCountdown();
-    void generateStaticArrows(int player);
-    void generateNotes();
-    void handleInput();
-    void updateArrowAnimations();
-    void goodNoteHit(NoteSprite* note);
-    void noteMiss(int direction);
-    void handleOpponentNoteHit(float deltaTime);
-    void updateScoreText();
-    void popUpScore(const std::string& rating, int comboNum);
-    void loadKeybinds();
     void updateCameraZoom();
     void setupHUDCamera();
     void beatHit();
-
-    bool isKeyJustPressed(int key);
-    bool isKeyJustReleased(int key);
-    bool isKeyPressed(int key);
-    bool isNXButtonJustPressed(int key);
-    bool isNXButtonJustReleased(int key);
-    SDL_Scancode getScancodeFromString(const std::string& keyName);
-    SDL_GameControllerButton getButtonFromString(const std::string& buttonName);
 
 private:
     flixel::FlxCamera* camGame;
     flixel::FlxCamera* camHUD;
     flixel::FlxSound* vocals;
-    flixel::FlxSound* missSound1;
-    flixel::FlxSound* missSound2;
-    flixel::FlxSound* missSound3;
     Stage* stage;
     Character* boyfriend;
     Character* gf;
     Character* dad;
-    std::vector<flixel::FlxSprite*> strumLineNotes;
-    std::vector<NoteSprite*> notes;
-    std::vector<NoteSprite*> unspawnNotes;
+    CharacterManager* characterManager;
+    Strumline* opponentStrumline;
+    Strumline* playerStrumline;
+    NoteManager* noteManager;
+    NoteHitHandler* noteHitHandler;
+    NoteUpdateHandler* noteUpdateHandler;
+    GameplayManager* gameplayManager;
+    CameraManager* cameraManager;
+    PauseHandler* pauseHandler;
+    PlayStateRenderer* renderer;
     flixel::FlxText* scoreText;
     
     std::string curSong;
@@ -79,53 +79,16 @@ private:
     std::string instPath;
     bool startingSong;
     bool startedCountdown;
-    float pauseCooldown;
     Uint32 musicStartTicks;
     
-    int countdownStep;
-    float countdownTimer;
-    float countdownInterval;
-    flixel::FlxSound* countdownSound;
-    flixel::FlxSprite* countdownSprite;
-    float countdownSpriteTimer;
-    float countdownSpriteStartY;
+    Countdown* countdown;
     
-    int score;
-    int misses;
-    int combo;
     int gfSpeed;
     
-    int sicks;
-    int goods;
-    int bads;
-    int shits;
+    HealthBar* healthBar;
+    PopUpStuff* popUpStuff;
     
-    float health;
-    flixel::FlxSprite* healthBarBG;
-    flixel::FlxSprite* healthBarRed;
-    flixel::FlxSprite* healthBarGreen;
-    HealthIcon* iconP1;
-    HealthIcon* iconP2;
-    
-    std::vector<flixel::FlxSprite*> ratingSprites;
-    std::vector<float> ratingTimers;
-    
-    flixel::FlxObject* camFollow;
-    float defaultCamZoom;
-    bool camZooming;
-    
-    struct KeyBind {
-        SDL_Scancode primary;
-        SDL_Scancode alternate;
-    };
-    
-    struct NXKeyBind {
-        SDL_GameControllerButton primary;
-        SDL_GameControllerButton alternate;
-    };
-    
-    KeyBind arrowKeys[4];
-    NXKeyBind nxArrowKeys[4];
+    Controls* controls;
     
     static const char* NOTE_STYLES[];
     static const char* NOTE_DIRS[];
