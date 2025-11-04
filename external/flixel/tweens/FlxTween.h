@@ -46,6 +46,8 @@ public:
     float percent() const;
     float scale() const;
     
+    virtual void* getObject() const { return nullptr; }
+    
 protected:
     bool _started;
     bool _backward;
@@ -64,6 +66,7 @@ public:
     void addProperty(const std::string& name, float* ptr, float target);
     
     void update(float elapsed) override;
+    void* getObject() const override { return object; }
 };
 
 class FlxTweenManager {

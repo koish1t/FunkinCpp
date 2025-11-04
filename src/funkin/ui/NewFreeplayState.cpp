@@ -81,8 +81,6 @@ void NewFreeplayState::create() {
     addScrollingText("BOYFRIEND ", 455.0f, -3.8f, 60, 0xFFFEA400);
     
     addSong("bopeebo", "Bopeebo", "dad", 1, "vol1", {"ALL", "Week 1"});
-    addSong("fresh", "Fresh", "dad", 1, "vol1", {"ALL", "Week 1"});
-    addSong("dadbattle", "Dadbattle", "dad", 1, "vol1", {"ALL", "Week 1"});
     addSong("fnf2", "FNF2", "bf", 2, "vol1", {"ALL", "Extras"});
     addSong("shitton-of-notes", "A shitton of notes", "bf", 2, "vol1", {"ALL", "Extras"});
     
@@ -118,14 +116,22 @@ void NewFreeplayState::update(float elapsed) {
        scoreDisplay->setNumber(lerpScore);
     }
     
-    bool upP = flixel::FlxG::keys.keys[SDL_SCANCODE_UP].justPressed();
-    bool downP = flixel::FlxG::keys.keys[SDL_SCANCODE_DOWN].justPressed();
-    bool leftP = flixel::FlxG::keys.keys[SDL_SCANCODE_LEFT].justPressed();
-    bool rightP = flixel::FlxG::keys.keys[SDL_SCANCODE_RIGHT].justPressed();
-    bool backP = flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed();
-    bool accepted = flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed();
-    bool qP = flixel::FlxG::keys.keys[SDL_SCANCODE_Q].justPressed();
-    bool eP = flixel::FlxG::keys.keys[SDL_SCANCODE_E].justPressed();
+    bool upP = flixel::FlxG::keys.keys[SDL_SCANCODE_UP].justPressed() || 
+               flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_UP);
+    bool downP = flixel::FlxG::keys.keys[SDL_SCANCODE_DOWN].justPressed() || 
+                 flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+    bool leftP = flixel::FlxG::keys.keys[SDL_SCANCODE_LEFT].justPressed() || 
+                 flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+    bool rightP = flixel::FlxG::keys.keys[SDL_SCANCODE_RIGHT].justPressed() || 
+                  flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+    bool backP = flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed() || 
+                 flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_B);
+    bool accepted = flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() || 
+                    flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_A);
+    bool qP = flixel::FlxG::keys.keys[SDL_SCANCODE_Q].justPressed() || 
+              flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+    bool eP = flixel::FlxG::keys.keys[SDL_SCANCODE_E].justPressed() || 
+              flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
     bool oneP = flixel::FlxG::keys.keys[SDL_SCANCODE_1].justPressed();
     
     if (oneP && scoreDisplay) {

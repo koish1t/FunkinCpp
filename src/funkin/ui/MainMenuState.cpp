@@ -142,7 +142,7 @@ void MainMenuState::update(float elapsed) {
             selectItem();
         }
         
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed() || flixel::FlxG::keys.keys[SDL_SCANCODE_BACKSPACE].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_BACK)) {
+        if (flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed() || flixel::FlxG::keys.keys[SDL_SCANCODE_BACKSPACE].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_B)) {
             flixel::FlxG::sound.playAsChunk("assets/sounds/cancelMenu.ogg");
             startExitState([]() {
                 flixel::FlxG::game->switchState(new TitleState(true));

@@ -256,7 +256,7 @@ void TitleState::beatHit() {
     
     switch (curBeat) {
     case 1:
-        createCoolText({"NINJAMUFFIN99", "PHANTOMARCADE", "KAWAISPRITE", "EVILSKER"});
+        createCoolText({"NINJAMUFFIN99", "PHANTOMARCADE", "KAWAISPRITE", "EVILSK8R"});
         break;
     case 3:
         createMoreCoolText("PRESENT");

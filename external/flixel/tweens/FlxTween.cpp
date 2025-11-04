@@ -190,8 +190,7 @@ namespace flixel {
 
         void FlxTweenManager::cancelTweensOf(void* object) {
             for (auto it = tweens.begin(); it != tweens.end();) {
-                VarTween* varTween = dynamic_cast<VarTween*>(*it);
-                if (varTween && varTween->object == object) {
+                if ((*it)->getObject() == object) {
                     delete *it;
                     it = tweens.erase(it);
                 } else {
@@ -202,8 +201,8 @@ namespace flixel {
 
         void FlxTweenManager::completeTweensOf(void* object) {
             for (auto tween : tweens) {
-                VarTween* varTween = dynamic_cast<VarTween*>(tween);
-                if (varTween && varTween->object == object) {
+                if (tween->getObject() == object) {
+                    VarTween* varTween = static_cast<VarTween*>(tween);
                     varTween->time = varTween->duration;
                     varTween->update(0.0f);
                     varTween->cancel();
