@@ -4,6 +4,7 @@
 #include <flixel/FlxG.h>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 NoteHitHandler::NoteHitHandler(Controls* controls, NoteManager* noteManager,
                                Strumline* playerStrumline, Character* boyfriend,

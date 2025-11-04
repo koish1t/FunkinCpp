@@ -48,7 +48,10 @@ FlxAtlasFrames* FlxAtlasFrames::fromSparrow(const std::string& imagePath, const 
         frame.index = idx++;
         atlas->frames.push_back(frame);
 
-        std::string prefix = frame.name.substr(0, frame.name.find_first_of("0123456789"));
+        size_t lastNonDigit = frame.name.find_last_not_of("0123456789");
+        std::string prefix = (lastNonDigit != std::string::npos) 
+            ? frame.name.substr(0, lastNonDigit + 1) 
+            : frame.name;
         atlas->prefixToIndices[prefix].push_back(frame.index);
     }
     return atlas;

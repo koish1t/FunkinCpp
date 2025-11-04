@@ -217,6 +217,8 @@ void PlayState::create() {
         return;
     }
     
+    Conductor::changeBPM(SONG.bpm);
+    
     std::string stageName = SONG.stage;
     if (stageName.empty()) {
         stageName = Stage::getStageFromSong(SONG.song);

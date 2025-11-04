@@ -89,6 +89,7 @@ void FlxSprite::makeGraphic(int w, int h, SDL_Color color) {
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
     if (!texture) return;
     
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetRenderTarget(renderer, texture);
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     SDL_RenderClear(renderer);
@@ -110,6 +111,23 @@ void FlxSprite::updateHitbox() {
     offsetX = -0.5f * (width - static_cast<float>(frameWidth));
     offsetY = -0.5f * (height - static_cast<float>(frameHeight));
     centerOrigin();
+}
+
+void FlxSprite::setGraphicSize(int Width, int Height) {
+    if (Width <= 0 && Height <= 0)
+        return;
+    
+    float newScaleX = static_cast<float>(Width) / frameWidth;
+    float newScaleY = static_cast<float>(Height) / frameHeight;
+    scale.set(newScaleX, newScaleY);
+    
+    if (Width <= 0)
+        scale.x = newScaleY;
+    else if (Height <= 0)
+        scale.y = newScaleX;
+    
+    scaleX = scale.x;
+    scaleY = scale.y;
 }
 
 void FlxSprite::centerOffsets(bool adjustPosition) {
@@ -188,11 +206,11 @@ void FlxSprite::draw() {
         const Uint8 g = static_cast<Uint8>((color >> 8) & 0xFF);
         const Uint8 b = static_cast<Uint8>(color & 0xFF);
         SDL_SetTextureColorMod(texture, r, g, b);
+    } else {
+        SDL_SetTextureColorMod(texture, 255, 255, 255);
     }
 
-    if (alpha < 1.0f) {
-        SDL_SetTextureAlphaMod(texture, static_cast<Uint8>(alpha * 255.0f));
-    }
+    SDL_SetTextureAlphaMod(texture, static_cast<Uint8>(alpha * 255.0f));
 
     SDL_RendererFlip flip = SDL_FLIP_NONE;
     if (flipX && flipY) {

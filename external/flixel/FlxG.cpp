@@ -3,6 +3,7 @@
 #include "sound/FlxSound.h"
 #include "sound/FlxSoundGroup.h"
 #include "input/FlxGamepad.h"
+#include "util/FlxTimer.h"
 #include <stdexcept>
 #include <iostream>
 
@@ -39,6 +40,7 @@ std::unordered_map<std::string, SDL_Texture*> FlxG::textureCache;
 
 flixel::input::FlxKeyboard flixel::FlxG::keys;
 flixel::input::FlxGamepad flixel::FlxG::gamepads;
+flixel::util::FlxTimerManager* flixel::FlxG::timers = nullptr;
 
 void FlxG::Log::error(const std::string& message) {
     std::cerr << "[ERROR] " << message << std::endl;
@@ -52,7 +54,7 @@ void FlxG::Log::notice(const std::string& message) {
     std::cout << "[NOTICE] " << message << std::endl;
 }
 
-FlxG::SoundFrontEnd::SoundFrontEnd() : volume(1.0f), muted(false) {
+FlxG::SoundFrontEnd::SoundFrontEnd() : volume(1.0f), muted(false), music(nullptr) {
     reset();
 }
 
@@ -61,6 +63,10 @@ FlxG::SoundFrontEnd::~SoundFrontEnd() {
 }
 
 void FlxG::SoundFrontEnd::destroy() {
+    if (music) {
+        music->stop();
+        music.reset();
+    }
     stopAll();
     sounds.clear();
     groups.clear();
@@ -121,6 +127,22 @@ FlxSound* FlxG::SoundFrontEnd::playAsChunk(const std::string& path, float volume
     return nullptr;
 }
 
+FlxSound* FlxG::SoundFrontEnd::playMusic(const std::string& path, float volume, bool looped) {
+    if (music) {
+        music->stop();
+    }
+    
+    music = std::make_unique<FlxSound>();
+    if (music->loadStream(path, looped, false)) {
+        music->setVolume(volume);
+        music->play();
+        return music.get();
+    }
+    
+    music.reset();
+    return nullptr;
+}
+
 void FlxG::SoundFrontEnd::stop(const std::string& path) {
     for (auto& sound : sounds) {
         if (sound->exists && sound->name == path) {
@@ -151,8 +173,6 @@ void FlxG::SoundFrontEnd::stopAll() {
             sound->stop();
         }
     }
-    Mix_HaltMusic();
-    Mix_HaltChannel(-1);
 }
 
 void FlxG::SoundFrontEnd::pauseAll() {
@@ -262,6 +282,10 @@ void FlxG::init(FlxGame* gameInstance, int gameWidth, int gameHeight) {
 
     sound.reset();
     gamepads.init();
+    
+    if (!timers) {
+        timers = new util::FlxTimerManager();
+    }
 
     initialized = true;
 }
@@ -306,6 +330,7 @@ SDL_Texture* FlxG::loadTexture(const std::string& path) {
         throw std::runtime_error("Failed to create texture: " + std::string(SDL_GetError()));
     }
 
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     return texture;
 }
 
@@ -408,6 +433,12 @@ void FlxG::destroy() {
     }
 
     clearTextureCache();
+    
+    if (timers) {
+        delete timers;
+        timers = nullptr;
+    }
+    
     gamepads.close();
 
     if (customCursor) {

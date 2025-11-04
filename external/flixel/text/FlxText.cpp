@@ -267,10 +267,10 @@ void FlxText::regenGraphic() {
     }
     
     SDL_Color textColor = {
+        static_cast<Uint8>((color >> 24) & 0xFF),
         static_cast<Uint8>((color >> 16) & 0xFF),
         static_cast<Uint8>((color >> 8) & 0xFF),
-        static_cast<Uint8>(color & 0xFF),
-        static_cast<Uint8>((color >> 24) & 0xFF)
+        static_cast<Uint8>(color & 0xFF)
     };
     
     if (wordWrap && fieldWidth > 0) {
@@ -341,7 +341,7 @@ void FlxText::applyBorderStyle() {
                 for (int i = 0; i < borderSurface->w * borderSurface->h; i++) {
                     Uint8 alpha = (pixels[i] >> 24) & 0xFF;
                     if (alpha > 0) {
-                        pixels[i] = (alpha << 24) | (borderColor.r << 16) | (borderColor.g << 8) | borderColor.b;
+                        pixels[i] = (alpha << 24) | (borderColor.b << 16) | (borderColor.g << 8) | borderColor.r;
                     }
                 }
                 SDL_UnlockSurface(borderSurface);
@@ -388,7 +388,7 @@ void FlxText::applyBorderStyle() {
                 for (int i = 0; i < borderSurface->w * borderSurface->h; i++) {
                     Uint8 alpha = (pixels[i] >> 24) & 0xFF;
                     if (alpha > 0) {
-                        pixels[i] = (alpha << 24) | (borderColor.r << 16) | (borderColor.g << 8) | borderColor.b;
+                        pixels[i] = (alpha << 24) | (borderColor.b << 16) | (borderColor.g << 8) | borderColor.r;
                     }
                 }
                 SDL_UnlockSurface(borderSurface);
@@ -441,6 +441,13 @@ void FlxText::screenCenter() {
     float widthToUse = fieldWidth > 0 ? fieldWidth : width;
     x = (FlxG::width - widthToUse) / 2;
     y = (FlxG::height - height) / 2;
+}
+
+SDL_Texture* FlxText::getTexture() {
+    if (needsUpdate) {
+        regenGraphic();
+    }
+    return textTexture;
 }
 
 } 

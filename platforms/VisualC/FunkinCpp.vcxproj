@@ -169,7 +169,9 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\external\flixel\addons\FlxBackdrop.cpp" />
     <ClCompile Include="..\..\external\flixel\animation\FlxAnimationController.cpp" />
+    <ClCompile Include="..\..\external\flixel\effects\FlxFlicker.cpp" />
     <ClCompile Include="..\..\external\flixel\FlxBasic.cpp" />
     <ClCompile Include="..\..\external\flixel\FlxCamera.cpp" />
     <ClCompile Include="..\..\external\flixel\FlxG.cpp" />
@@ -182,7 +184,10 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
     <ClCompile Include="..\..\external\flixel\input\FlxGamepad.cpp" />
     <ClCompile Include="..\..\external\flixel\sound\FlxSound.cpp" />
     <ClCompile Include="..\..\external\flixel\sound\FlxSoundGroup.cpp" />
+    <ClCompile Include="..\..\external\flixel\text\FlxBitmapText.cpp" />
     <ClCompile Include="..\..\external\flixel\text\FlxText.cpp" />
+    <ClCompile Include="..\..\external\flixel\tweens\FlxTween.cpp" />
+    <ClCompile Include="..\..\external\flixel\util\FlxTimer.cpp" />
     <ClCompile Include="..\..\external\tinyxml2.cpp" />
     <ClCompile Include="..\..\src\funkin\FunkinState.cpp" />
     <ClCompile Include="..\..\src\funkin\game\GameConfig.cpp" />
@@ -212,7 +217,10 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
     <ClCompile Include="..\..\src\funkin\play\stage\Stage.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\components\Alphabet.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\components\AtlasMenuItem.cpp" />
+    <ClCompile Include="..\..\src\funkin\ui\freeplay\Capsule.cpp" />
+    <ClCompile Include="..\..\src\funkin\ui\freeplay\DigitDisplay.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\MainMenuState.cpp" />
+    <ClCompile Include="..\..\src\funkin\ui\NewFreeplayState.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\TitleState.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>

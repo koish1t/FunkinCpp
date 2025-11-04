@@ -61,6 +61,8 @@ public:
     void updateHitbox() override;
 
     void screenCenter();
+    
+    SDL_Texture* getTexture();
 
 private:
     void regenGraphic();

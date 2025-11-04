@@ -46,9 +46,9 @@ SPLASH := OFF
 #---------------------------------------------------------------------------------
 TARGET		:=	funkin
 BUILD		:=	build
-SOURCES		:=	../../src ../../external/flixel ../../external/flixel/animation ../../external/flixel/sound ../../external/flixel/text ../../external/flixel/input ../../external/flixel/graphics/frames ../../external ../../src/funkin ../../src/funkin/game ../../src/funkin/states ../../src/funkin/substates
+SOURCES		:=	../../src ../../external/flixel ../../external/flixel/animation ../../external/flixel/addons ../../external/flixel/tweens ../../external/flixel/sound ../../external/flixel/text ../../external/flixel/input ../../external/flixel/graphics/frames ../../external ../../src/funkin ../../src/funkin/game ../../src/funkin/play ../../src/funkin/play/characters ../../src/funkin/play/components ../../src/funkin/play/input ../../src/funkin/play/components ../../src/funkin/play/notes ../../src/funkin/play/scoring ../../src/funkin/play/song ../../src/funkin/play/stage ../../src/funkin/ui ../../src/funkin/ui/components ../../src/funkin/ui/freeplay
 DATA		:=	data
-INCLUDES	:=	../../src ../../external/flixel ../../external ../../src/funkin ../../src/funkin/game ../../src/funkin/states ../../src/funkin/substates
+INCLUDES	:=	../../src ../../external/flixel ../../external ../../src/funkin ../../src/funkin/game ../../src/funkin/play ../../src/funkin/play/characters ../../src/funkin/play/components ../../src/funkin/play/input ../../src/funkin/play/components ../../src/funkin/play/notes ../../src/funkin/play/scoring ../../src/funkin/play/song ../../src/funkin/play/stage ../../src/funkin/ui ../../src/funkin/ui/components ../../src/funkin/ui/freeplay
 ROMFS	:=	romfs
 
 APP_TITLE := "Friday Night Funkin'"

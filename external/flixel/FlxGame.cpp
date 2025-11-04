@@ -1,6 +1,8 @@
 #include "FlxGame.h"
 #include "FlxG.h"
 #include "FlxState.h"
+#include "tweens/FlxTween.h"
+#include "util/FlxTimer.h"
 #include <stdexcept>
 
 namespace flixel {
@@ -26,12 +28,14 @@ FlxGame::FlxGame(int gameWidth, int gameHeight, int updateFramerate, int drawFra
     }
 
     FlxG::init(this, width, height);
+    tweens::init();
 }
 
 FlxGame::~FlxGame() {
     if (currentState) {
         delete currentState;
     }
+    tweens::cleanup();
     FlxG::destroy();
 }
 
@@ -89,6 +93,14 @@ void FlxGame::update(float elapsed) {
     
     if (FlxG::camera) {
         FlxG::camera->update(elapsed);
+    }
+    
+    if (tweens::globalManager) {
+        tweens::globalManager->update(elapsed);
+    }
+    
+    if (FlxG::timers) {
+        FlxG::timers->update(elapsed);
     }
 }
 
@@ -152,9 +164,6 @@ void FlxGame::handleEvents() {
                 break;
 
             case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
-                    running = false;
-                }
                 break;
         }
     }

@@ -4,19 +4,19 @@
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
+#include <flixel/util/FlxTimer.h>
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-TitleState::TitleState() 
+TitleState::TitleState(bool skipIntro) 
     : logo(nullptr)
     , gf(nullptr)
     , enter(nullptr)
-    , music(nullptr)
     , confirmSound(nullptr)
     , whiteAlpha(0.0f)
-    , skippedIntro(false)
+    , skippedIntro(skipIntro)
     , transitioning(false)
     , musicStartTicks(0)
     , musicStarted(false)
@@ -30,9 +30,9 @@ TitleState::~TitleState() {
 void TitleState::create() {
     Conductor::changeBPM(102.0f);
     
-    music = new flixel::FlxSound();
-    music->loadStream("assets/music/freakyMenu.ogg", true, false);
-    music->play();
+    if (!flixel::FlxG::sound.music || !Mix_PlayingMusic()) {
+        flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg", 1.0f, true);
+    }
     
     confirmSound = new flixel::FlxSound();
     confirmSound->loadAsChunk("assets/sounds/confirmMenu.ogg", false, false);
@@ -109,6 +109,12 @@ void TitleState::create() {
         }
     }
     enter->alpha = 0.0f;
+    
+    if (skippedIntro) {
+        gf->alpha = 1.0f;
+        logo->alpha = 1.0f;
+        enter->alpha = 1.0f;
+    }
 }
 
 void TitleState::update(float elapsed) {
@@ -137,11 +143,10 @@ void TitleState::update(float elapsed) {
         if (whiteAlpha < 0.0f) whiteAlpha = 0.0f;
     }
     
-    if (flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() && !skippedIntro) {
+    if ((flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_A)) && !skippedIntro) {
         skipIntro();
     }
-    
-    if (flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() && skippedIntro && !transitioning) {
+    else if ((flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_A)) && skippedIntro && !transitioning) {
         if (enter) {
             enter->animation->play("ENTER PRESSED", true);
         }
@@ -150,7 +155,11 @@ void TitleState::update(float elapsed) {
         }
         transitioning = true;
         
-        flixel::FlxG::game->switchState(new MainMenuState());
+        auto timer = new flixel::util::FlxTimer();
+        timer->start(2.0f, [](flixel::util::FlxTimer* t) {
+            flixel::FlxG::game->switchState(new MainMenuState());
+            delete t;
+        });
     }
 }
 
@@ -197,10 +206,6 @@ void TitleState::destroy() {
     if (enter) {
         delete enter;
         enter = nullptr;
-    }
-    if (music) {
-        delete music;
-        music = nullptr;
     }
     if (confirmSound) {
         delete confirmSound;

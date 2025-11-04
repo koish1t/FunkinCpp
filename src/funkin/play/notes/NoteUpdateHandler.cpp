@@ -28,6 +28,7 @@ void NoteUpdateHandler::updateNotes(float elapsed, Character* boyfriend, flixel:
                 if (noteHitHandler) {
                     noteHitHandler->incrementMisses();
                     noteHitHandler->resetCombo();
+                    noteHitHandler->updateScore();
                 }
                 if (gf && noteHitHandler && noteHitHandler->getCombo() > 5) {
                     gf->playAnim("sad", true);

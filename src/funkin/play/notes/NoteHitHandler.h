@@ -33,6 +33,7 @@ public:
     void incrementScore(int amount) { score += amount; }
     void incrementMisses() { misses++; }
     void resetCombo() { combo = 0; }
+    void updateScore() { updateScoreText(); }
     
 private:
     Controls* controls;

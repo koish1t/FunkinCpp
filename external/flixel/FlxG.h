@@ -20,6 +20,10 @@ namespace flixel {
 
 class FlxGame;
 
+namespace util {
+    class FlxTimerManager;
+}
+
 namespace system {
 namespace frontEnds {
 
@@ -104,6 +108,7 @@ public:
         FlxSound* load(const std::string& path, bool looped = false, bool autoDestroy = true);
         FlxSound* play(const std::string& path, float volume = 1.0f, bool looped = false, bool autoDestroy = true);
         FlxSound* playAsChunk(const std::string& path, float volume = 1.0f, bool looped = false, bool autoDestroy = true);
+        FlxSound* playMusic(const std::string& path, float volume = 1.0f, bool looped = true);
         void stop(const std::string& path);
         void pause(const std::string& path);
         void resume(const std::string& path);
@@ -118,6 +123,7 @@ public:
         float volume;
         bool muted;
         std::string defaultGroup;
+        std::unique_ptr<FlxSound> music;
 
     private:
         std::vector<std::unique_ptr<FlxSound>> sounds;
@@ -157,6 +163,7 @@ public:
 
     static flixel::input::FlxKeyboard keys;
     static flixel::input::FlxGamepad gamepads;
+    static flixel::util::FlxTimerManager* timers;
 
 private:
     static SDL_Cursor* customCursor;

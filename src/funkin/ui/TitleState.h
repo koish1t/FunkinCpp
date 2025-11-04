@@ -9,7 +9,7 @@
 
 class TitleState : public FunkinState {
 public:
-    TitleState();
+    TitleState(bool skipIntro = false);
     ~TitleState();
     
     void create() override;
@@ -27,7 +27,6 @@ private:
     flixel::FlxSprite* logo;
     flixel::FlxSprite* gf;
     flixel::FlxSprite* enter;
-    flixel::FlxSound* music;
     flixel::FlxSound* confirmSound;
     
     float whiteAlpha;

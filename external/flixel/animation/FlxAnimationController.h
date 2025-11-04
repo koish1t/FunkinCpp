@@ -2,6 +2,7 @@
 #include "FlxAnimation.h"
 #include <unordered_map>
 #include <string>
+#include <functional>
 
 namespace flixel {
 namespace animation {
@@ -12,10 +13,13 @@ public:
     std::string current;
     int currentFrame = 0;
     float timer = 0.0f;
+    
+    std::function<void(const std::string&)> finishCallback;
+    std::function<void(const std::string&, int, int)> frameCallback;
 
     void addByPrefix(const std::string& name, const std::vector<int>& frames, int frameRate, bool looped);
     void addByIndices(const std::string& name, const std::vector<int>& sourceFrames, const std::vector<int>& indices, int frameRate, bool looped);
-    void play(const std::string& name, bool force = false);
+    void play(const std::string& name, bool force = false, int startFrame = 0);
     void update(float elapsed);
     
     inline int getCurrentFrame() const {

@@ -55,6 +55,9 @@
     <Filter Include="Source Files\funkin\ui\components">
       <UniqueIdentifier>{bdf26f91-ea9c-4778-aa15-b9a37054a930}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\funkin\ui\freeplay">
+      <UniqueIdentifier>{6fe61f65-7c20-4184-98c6-1bfccb6bf08f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -188,6 +191,36 @@
     </ClCompile>
     <ClCompile Include="..\..\src\funkin\ui\components\Alphabet.cpp">
       <Filter>Source Files\funkin\ui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\text\FlxBitmapText.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\tweens\FlxTween.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\addons\FlxBackdrop.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\ui\MainMenuState.cpp">
+      <Filter>Source Files\funkin\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\ui\NewFreeplayState.cpp">
+      <Filter>Source Files\funkin\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\ui\freeplay\Capsule.cpp">
+      <Filter>Source Files\funkin\ui\freeplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\ui\freeplay\DigitDisplay.cpp">
+      <Filter>Source Files\funkin\ui\freeplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\ui\components\AtlasMenuItem.cpp">
+      <Filter>Source Files\funkin\ui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\effects\FlxFlicker.cpp">
+      <Filter>Source Files\flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\flixel\util\FlxTimer.cpp">
+      <Filter>Source Files\flixel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

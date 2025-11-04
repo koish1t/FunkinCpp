@@ -19,14 +19,18 @@ void FlxAnimationController::addByIndices(const std::string& name, const std::ve
     animations[name] = {name, selectedFrames, frameRate, looped};
 }
 
-void FlxAnimationController::play(const std::string& name, bool force) {
+void FlxAnimationController::play(const std::string& name, bool force, int startFrame) {
     auto it = animations.find(name);
     if (it != animations.end()) {
         if (force || current != name) {
             current = name;
-            currentFrame = 0;
+            currentFrame = startFrame;
             timer = 0.0f;
             finished = false;
+            
+            if (frameCallback && !it->second.frames.empty()) {
+                frameCallback(current, currentFrame, it->second.frames[currentFrame]);
+            }
         }
     }
 }
@@ -47,6 +51,7 @@ void FlxAnimationController::update(float elapsed) {
         const int framesToAdvance = static_cast<int>(timer / frameTime);
         timer = std::fmod(timer, frameTime);
         
+        int oldFrame = currentFrame;
         currentFrame += framesToAdvance;
         const int maxFrame = static_cast<int>(anim.frames.size());
         
@@ -54,9 +59,20 @@ void FlxAnimationController::update(float elapsed) {
             if (anim.looped) {
                 currentFrame = currentFrame % maxFrame;
             } else {
-                currentFrame = maxFrame - 1;
-                finished = true;
+                if (!finished) {
+                    finished = true;
+                    if (finishCallback) {
+                        finishCallback(current);
+                    }
+                }
+                if (finished) {
+                    currentFrame = maxFrame - 1;
+                }
             }
+        }
+        
+        if (oldFrame != currentFrame && frameCallback) {
+            frameCallback(current, currentFrame, anim.frames[currentFrame]);
         }
     }
 }

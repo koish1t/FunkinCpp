@@ -1,9 +1,13 @@
 #include "MainMenuState.h"
 #include "TitleState.h"
+#include "NewFreeplayState.h"
 #include "../play/PlayState.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
 #include <flixel/sound/FlxSound.h>
+#include <flixel/effects/FlxFlicker.h>
+#include <flixel/util/FlxTimer.h>
+#include <flixel/tweens/FlxTween.h>
 #include <SDL2/SDL_mixer.h>
 #include <iostream>
 
@@ -26,35 +30,38 @@ void MainMenuState::create() {
         flixel::FlxG::camera = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 1.0f);
     }
     
-    bg = new flixel::FlxSprite(0, 0);
+    bg = new flixel::FlxSprite(-80, 0);
     bg->loadGraphic("assets/images/menuBG.png");
     bg->scrollFactor.x = 0.0f;
-    bg->scrollFactor.y = 0.17f;
-    bg->setScale(1.5f, 1.5f);
-    bg->screenCenter();
+    bg->scrollFactor.y = 0.18f;
+    bg->setGraphicSize(static_cast<int>(bg->width * 1.18f));
     bg->updateHitbox();
+    bg->screenCenter();
     bg->camera = flixel::FlxG::camera;
     
     camFollow = new flixel::FlxObject(0, 0, 1, 1);
     
-    magenta = new flixel::FlxSprite(0, 0);
+    magenta = new flixel::FlxSprite(-80, 0);
     magenta->loadGraphic("assets/images/menuBGMagenta.png");
-    magenta->scrollFactor.x = bg->scrollFactor.x;
-    magenta->scrollFactor.y = bg->scrollFactor.y;
-    magenta->setScale(1.5f, 1.5f);
-    magenta->x = bg->x;
-    magenta->y = bg->y;
-    magenta->visible = false;
-    bg->screenCenter();
+    magenta->scrollFactor.x = 0.0f;
+    magenta->scrollFactor.y = 0.18f;
+    magenta->setGraphicSize(static_cast<int>(magenta->width * 1.18f));
     magenta->updateHitbox();
+    magenta->screenCenter();
+    magenta->visible = false;
     magenta->camera = flixel::FlxG::camera;
     
     createMenuItem("storymode", "assets/images/mainmenu/storymode", []() {
         std::cout << "Story Mode selected (not implemented)" << std::endl;
     });
     
-    createMenuItem("freeplay", "assets/images/mainmenu/freeplay", []() {
-        std::cout << "Freeplay selected (not implemented)" << std::endl;
+    createMenuItem("freeplay", "assets/images/mainmenu/freeplay", [this]() {
+        if (camFollow) {
+            flixel::FlxPoint camPos(camFollow->x, camFollow->y);
+            flixel::FlxG::game->switchState(new NewFreeplayState(true, camPos));
+        } else {
+            flixel::FlxG::game->switchState(new NewFreeplayState(true, flixel::FlxPoint(0.0f, 0.0f)));
+        }
     });
     
     createMenuItem("options", "assets/images/mainmenu/options", []() {
@@ -86,6 +93,10 @@ void MainMenuState::create() {
         flixel::FlxG::camera->focusOn(flixel::FlxPoint(camFollow->x, camFollow->y));
     }
     
+    if (!Mix_PlayingMusic()) {
+        flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg", 0.0f, true);
+    }
+    
     onMenuItemChange();
 }
 
@@ -111,27 +122,30 @@ void MainMenuState::update(float elapsed) {
         camFollow->y = menuItems[selectedIndex]->y + menuItems[selectedIndex]->height / 2.0f;
     }
     
-    if (Mix_PlayingMusic() && Mix_VolumeMusic(-1) < static_cast<int>(0.8f * MIX_MAX_VOLUME)) {
-        int currentVolume = Mix_VolumeMusic(-1);
-        Mix_VolumeMusic(currentVolume + static_cast<int>(0.5f * elapsed * MIX_MAX_VOLUME));
+    if (flixel::FlxG::sound.music && Mix_PlayingMusic()) {
+        if (Mix_VolumeMusic(-1) < static_cast<int>(1.0f * MIX_MAX_VOLUME)) {
+            int currentVolume = Mix_VolumeMusic(-1);
+            int targetVolume = std::min(currentVolume + static_cast<int>(0.5f * elapsed * MIX_MAX_VOLUME), MIX_MAX_VOLUME);
+            Mix_VolumeMusic(targetVolume);
+        }
     }
     
     if (canSelect && !exiting) {
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_UP].justPressed()) {
+        if (flixel::FlxG::keys.keys[SDL_SCANCODE_UP].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_UP)) {
             changeSelection(-1);
         }
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_DOWN].justPressed()) {
+        if (flixel::FlxG::keys.keys[SDL_SCANCODE_DOWN].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN)) {
             changeSelection(1);
         }
         
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed()) {
+        if (flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_A)) {
             selectItem();
         }
         
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed()) {
-            flixel::FlxG::sound.play("assets/sounds/cancelMenu.ogg");
+        if (flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed() || flixel::FlxG::keys.keys[SDL_SCANCODE_BACKSPACE].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_BACK)) {
+            flixel::FlxG::sound.playAsChunk("assets/sounds/cancelMenu.ogg");
             startExitState([]() {
-                flixel::FlxG::game->switchState(new TitleState());
+                flixel::FlxG::game->switchState(new TitleState(true));
             });
         }
     }
@@ -187,7 +201,7 @@ void MainMenuState::createMenuItem(const std::string& name, const std::string& a
 }
 
 void MainMenuState::changeSelection(int change) {
-    flixel::FlxG::sound.play("assets/sounds/scrollMenu.ogg");
+    flixel::FlxG::sound.playAsChunk("assets/sounds/scrollMenu.ogg");
     
     selectedIndex += change;
     
@@ -203,16 +217,33 @@ void MainMenuState::changeSelection(int change) {
 
 void MainMenuState::selectItem() {
     if (selectedIndex >= 0 && selectedIndex < static_cast<int>(menuItems.size())) {
-        flixel::FlxG::sound.play("assets/sounds/confirmMenu.ogg");
+        flixel::FlxG::sound.playAsChunk("assets/sounds/confirmMenu.ogg");
         
         canSelect = false;
         
         if (menuItems[selectedIndex]->name == "freeplay") {
             magenta->visible = true;
+            flixel::effects::FlxFlicker::flicker(magenta, 1.1f, 0.15f, false, true);
         }
         
-        if (menuItems[selectedIndex]->callback) {
-            menuItems[selectedIndex]->callback();
+        auto* selectedItem = menuItems[selectedIndex];
+        flixel::effects::FlxFlicker::flicker(
+            selectedItem,
+            1.0f,
+            0.06f,
+            false,
+            false,
+            [selectedItem](flixel::effects::FlxFlicker* flick) {
+                if (selectedItem->callback) {
+                    selectedItem->callback();
+                }
+            }
+        );
+        
+        for (size_t i = 0; i < menuItems.size(); i++) {
+            if (static_cast<int>(i) != selectedItem->ID) {
+                flixel::tweens::tween(menuItems[i], {{"alpha", 0.0f}}, 0.4f, flixel::tweens::FlxEase::quadOut);
+            }
         }
     }
 }

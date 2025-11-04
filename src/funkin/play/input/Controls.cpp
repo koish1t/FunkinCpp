@@ -68,8 +68,7 @@ bool Controls::justPressed(int direction) const {
                           flixel::FlxG::keys.keys[arrowKeys[direction].alternate].justPressed();
     
     bool controllerPressed = flixel::FlxG::gamepads.justPressed(nxArrowKeys[direction].primary) ||
-                            flixel::FlxG::gamepads.justPressed(nxArrowKeys[direction].alternate);
-    
+                            flixel::FlxG::gamepads.justPressed(nxArrowKeys[direction].alternate);    
     return keyboardPressed || controllerPressed;
 }
 

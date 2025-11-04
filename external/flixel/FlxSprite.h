@@ -31,6 +31,8 @@ public:
     inline float getWidth() const { return width; }
     inline float getHeight() const { return height; }
     
+    void setGraphicSize(int Width = 0, int Height = 0);
+    
     FlxPoint scale;
 
     virtual void updateHitbox() override;
@@ -39,6 +41,8 @@ public:
 
     virtual void update(float elapsed) override;
     virtual void draw() override;
+    
+    void* getTweenTarget() { return this; }
     virtual void destroy() override;
 
     float offsetX = 0;
