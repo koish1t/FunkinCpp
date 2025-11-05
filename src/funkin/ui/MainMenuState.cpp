@@ -2,6 +2,7 @@
 #include "TitleState.h"
 #include "NewFreeplayState.h"
 #include "OptionsState.h"
+#include "CreditsState.h"
 #include "../play/PlayState.h"
 #include "../game/GameConfig.h"
 #include "../play/input/Controls.h"
@@ -72,7 +73,7 @@ void MainMenuState::create() {
     });
     
     createMenuItem("credits", "assets/images/mainmenu/credits", []() {
-        std::cout << "Credits selected (not implemented)" << std::endl;
+        flixel::FlxG::game->switchState(new CreditsState());
     });
     
     int spacing = 160;
@@ -226,10 +227,8 @@ void MainMenuState::selectItem() {
         
         canSelect = false;
         
-        if (menuItems[selectedIndex]->name == "freeplay") {
-            magenta->visible = true;
-            flixel::effects::FlxFlicker::flicker(magenta, 1.1f, 0.15f, false, true);
-        }
+        magenta->visible = true;
+        flixel::effects::FlxFlicker::flicker(magenta, 1.1f, 0.15f, false, true);
         
         auto* selectedItem = menuItems[selectedIndex];
         flixel::effects::FlxFlicker::flicker(
