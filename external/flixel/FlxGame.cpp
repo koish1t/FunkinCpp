@@ -3,9 +3,14 @@
 #include "FlxState.h"
 #include "tweens/FlxTween.h"
 #include "util/FlxTimer.h"
+#include <SDL2/SDL_mixer.h>
 #include <stdexcept>
+#include <iostream>
 
 namespace flixel {
+
+bool FlxGame::muted = false;
+bool FlxGame::zeroKeyPressed = false;
 
 FlxGame::FlxGame(int gameWidth, int gameHeight, int updateFramerate, int drawFramerate, const std::string& title)
     : currentState(nullptr)
@@ -75,6 +80,16 @@ void FlxGame::run() {
 }
 
 void FlxGame::update(float elapsed) {
+    const Uint8* keystate = SDL_GetKeyboardState(nullptr);
+    if (keystate[SDL_SCANCODE_0]) {
+        if (!zeroKeyPressed) {
+            toggleMute();
+            zeroKeyPressed = true;
+        }
+    } else {
+        zeroKeyPressed = false;
+    }
+    
     if (nextState) {
         if (currentState) {
             currentState->destroy();
@@ -184,6 +199,20 @@ void FlxGame::setTitle(const std::string& title) {
     windowTitle = title;
     if (FlxG::window) {
         SDL_SetWindowTitle(FlxG::window, title.c_str());
+    }
+}
+
+void FlxGame::toggleMute() {
+    muted = !muted;
+    
+    if (muted) {
+        Mix_Volume(-1, 0);
+        Mix_VolumeMusic(0);
+        std::cout << "[Audio] Muted all audio" << std::endl;
+    } else {
+        Mix_Volume(-1, MIX_MAX_VOLUME);
+        Mix_VolumeMusic(MIX_MAX_VOLUME);
+        std::cout << "[Audio] Unmuted all audio" << std::endl;
     }
 }
 }

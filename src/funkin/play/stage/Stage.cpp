@@ -95,7 +95,7 @@ flixel::FlxSprite* Stage::createAnimatedSprite(float x, float y, const std::stri
 }
 
 void Stage::buildDefaultStage() {
-    defaultZoom = 0.9f;
+    defaultZoom = 1.05f;
     
     auto bg = createSprite(-600, -200, "assets/images/stageback.png");
     bg->scrollFactor.set(0.9f, 0.9f);
