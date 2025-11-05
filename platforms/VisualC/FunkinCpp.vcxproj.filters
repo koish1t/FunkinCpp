@@ -216,6 +216,12 @@
     <ClCompile Include="..\..\src\funkin\ui\components\AtlasMenuItem.cpp">
       <Filter>Source Files\funkin\ui\components</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\funkin\ui\components\CheckBox.cpp">
+      <Filter>Source Files\funkin\ui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\ui\OptionsState.cpp">
+      <Filter>Source Files\funkin\ui</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\external\flixel\effects\FlxFlicker.cpp">
       <Filter>Source Files\flixel</Filter>
     </ClCompile>

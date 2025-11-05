@@ -9,7 +9,9 @@ static flixel::graphics::frames::FlxAtlasFrames* alphabetFrames = nullptr;
 
 Alphabet::Alphabet(const std::string& text, int x, int y) 
     : baseX(x)
-    , baseY(y) 
+    , baseY(y)
+    , currentText(text)
+    , camera(nullptr)
 {
     if (!alphabetFrames) {
         std::ifstream file("assets/images/alphabet.xml");
@@ -22,8 +24,25 @@ Alphabet::Alphabet(const std::string& text, int x, int y)
         );
     }
     
-    int curX = x;
-    int curY = y;
+    createLetters(text);
+}
+
+Alphabet::~Alphabet() {
+    clearLetters();
+}
+
+void Alphabet::clearLetters() {
+    for (auto* spr : letters) {
+        if (spr) {
+            delete spr;
+        }
+    }
+    letters.clear();
+}
+
+void Alphabet::createLetters(const std::string& text) {
+    int curX = baseX;
+    int curY = baseY;
     const int letterSpacing = 48;
     const int spaceWidth = 48;
     const int lineHeight = 60;
@@ -32,7 +51,7 @@ Alphabet::Alphabet(const std::string& text, int x, int y)
         char c = text[i];
         
         if (c == '\n') {
-            curX = x;
+            curX = baseX;
             curY += lineHeight;
             continue;
         }
@@ -75,13 +94,12 @@ Alphabet::Alphabet(const std::string& text, int x, int y)
     }
 }
 
-Alphabet::~Alphabet() {
-    for (auto* spr : letters) {
-        if (spr) {
-            delete spr;
-        }
-    }
-    letters.clear();
+void Alphabet::setText(const std::string& newText) {
+    if (currentText == newText) return;
+    
+    currentText = newText;
+    clearLetters();
+    createLetters(newText);
 }
 
 void Alphabet::screenCenter() {
@@ -117,6 +135,15 @@ void Alphabet::setVisible(bool visible) {
     }
 }
 
+void Alphabet::setScale(float scaleX, float scaleY) {
+    for (auto* spr : letters) {
+        if (spr) {
+            spr->scale.x = scaleX;
+            spr->scale.y = scaleY;
+        }
+    }
+}
+
 void Alphabet::update(float elapsed) {
     for (auto* spr : letters) {
         if (spr) {
@@ -128,6 +155,7 @@ void Alphabet::update(float elapsed) {
 void Alphabet::draw() {
     for (auto* spr : letters) {
         if (spr && spr->visible) {
+            if (camera) spr->camera = camera;
             spr->draw();
         }
     }

@@ -1,4 +1,6 @@
 #include "PauseHandler.h"
+#include "../game/GameConfig.h"
+#include "input/Controls.h"
 #include <flixel/FlxG.h>
 #include <SDL2/SDL.h>
 #include <iostream>
@@ -32,8 +34,8 @@ void PauseHandler::update(float elapsed, flixel::FlxSound* inst, flixel::FlxSoun
         pauseCooldown -= elapsed;
     }
 
-    bool pausePressed = flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() ||
-                       flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_START);
+    Controls* controls = GameConfig::getInstance()->controls;
+    bool pausePressed = controls->justPressedAction(ControlAction::PAUSE);
     
     if (pausePressed) {
         if (!subState) {

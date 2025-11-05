@@ -1,6 +1,8 @@
 #include "TitleState.h"
 #include "MainMenuState.h"
 #include "../play/song/Conductor.h"
+#include "../game/GameConfig.h"
+#include "../play/input/Controls.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
@@ -143,10 +145,12 @@ void TitleState::update(float elapsed) {
         if (whiteAlpha < 0.0f) whiteAlpha = 0.0f;
     }
     
-    if ((flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_A)) && !skippedIntro) {
+    Controls* controls = GameConfig::getInstance()->controls;
+    
+    if (controls->justPressedAction(ControlAction::ACCEPT) && !skippedIntro) {
         skipIntro();
     }
-    else if ((flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_A)) && skippedIntro && !transitioning) {
+    else if (controls->justPressedAction(ControlAction::ACCEPT) && skippedIntro && !transitioning) {
         if (enter) {
             enter->animation->play("ENTER PRESSED", true);
         }

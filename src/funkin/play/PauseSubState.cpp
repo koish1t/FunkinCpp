@@ -1,4 +1,6 @@
 #include "PauseSubState.h"
+#include "../game/GameConfig.h"
+#include "input/Controls.h"
 #include <flixel/FlxG.h>
 
 PauseSubState::PauseSubState() {
@@ -16,10 +18,9 @@ void PauseSubState::create() {
 void PauseSubState::update(float elapsed) {
     FlxSubState::update(elapsed);
     
-    bool unpausePressed = flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() ||
-                         flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed() ||
-                         flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_START) ||
-                         flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_BACK);
+    Controls* controls = GameConfig::getInstance()->controls;
+    bool unpausePressed = controls->justPressedAction(ControlAction::PAUSE) ||
+                         controls->justPressedAction(ControlAction::BACK);
     
     if (unpausePressed) {
         close();

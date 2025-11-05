@@ -180,6 +180,8 @@ void NoteSprite::setupSustainNote() {
     alpha = 0.6f;
 
     x += width / 2;
+    
+    flipY = GameConfig::getInstance()->isDownscroll();
 
     std::string colorPrefix;
     switch (noteData) {
@@ -235,16 +237,35 @@ void NoteSprite::update(float elapsed) {
     setPosition(x, y);
     visible = true;
     
-    if (isSustainNote && y + offsetY <= targetY + swagWidth / 2.0f &&
-        (!mustPress || (wasGoodHit || (prevNote && prevNote->wasGoodHit && !canBeHit)))) {
-        float clipY = targetY + swagWidth / 2.0f - y;
-        clipRect.x = 0;
-        clipRect.y = static_cast<int>(clipY / getScaleY());
-        clipRect.w = static_cast<int>(width * 2.0f);
-        clipRect.h = static_cast<int>(height * 2.0f) - clipRect.y;
+    bool isDownscroll = GameConfig::getInstance()->isDownscroll();
+    
+    if (isSustainNote) {
+        bool shouldClip = false;
         
-        if (clipRect.h > 0) {
-            useClipRect = true;
+        float effectiveOffsetY = isDownscroll ? -offsetY : offsetY;
+        
+        if (isDownscroll) {
+            shouldClip = (y + effectiveOffsetY >= targetY + swagWidth / 2.0f) &&
+                        (!mustPress || (wasGoodHit || (prevNote && prevNote->wasGoodHit && !canBeHit)));
+        } else {
+            shouldClip = (y + effectiveOffsetY <= targetY + swagWidth / 2.0f) &&
+                        (!mustPress || (wasGoodHit || (prevNote && prevNote->wasGoodHit && !canBeHit)));
+        }
+        
+        if (shouldClip) {
+            float clipAmount = isDownscroll ? (y - (targetY + swagWidth / 2.0f)) : (targetY + swagWidth / 2.0f - y);
+            clipRect.x = 0;
+            clipRect.y = isDownscroll ? 0 : static_cast<int>(clipAmount / getScaleY());
+            clipRect.w = static_cast<int>(width * 2.0f);
+            clipRect.h = isDownscroll ? 
+                        static_cast<int>(height * 2.0f) - static_cast<int>(clipAmount / getScaleY()) : 
+                        static_cast<int>(height * 2.0f) - clipRect.y;
+            
+            if (clipRect.h > 0) {
+                useClipRect = true;
+            } else {
+                useClipRect = false;
+            }
         } else {
             useClipRect = false;
         }

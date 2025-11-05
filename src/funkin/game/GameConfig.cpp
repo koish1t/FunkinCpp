@@ -1,10 +1,22 @@
 #include "GameConfig.h"
+#include "../play/input/Controls.h"
 #include <fstream>
 
 GameConfig* GameConfig::instance = nullptr;
 
-GameConfig::GameConfig() {
+GameConfig::GameConfig() : controls(nullptr) {
+    controls = new Controls();
     loadConfig();
+    if (controls) {
+        controls->loadFromConfig("assets/data/config.json");
+    }
+}
+
+GameConfig::~GameConfig() {
+    if (controls) {
+        delete controls;
+        controls = nullptr;
+    }
 }
 
 GameConfig* GameConfig::getInstance() {

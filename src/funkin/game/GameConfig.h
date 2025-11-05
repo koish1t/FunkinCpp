@@ -4,6 +4,8 @@
 #include <iostream>
 #include "../../../external/nlohmann/json.hpp"
 
+class Controls;
+
 class GameConfig {
 private:
     static GameConfig* instance;
@@ -12,9 +14,12 @@ private:
     bool ghostTapping;
 
     GameConfig();
+    ~GameConfig();
     void loadConfig();
 
 public:
+    Controls* controls;
+    
     static GameConfig* getInstance();
     
     bool isDownscroll() const { return downscroll; }

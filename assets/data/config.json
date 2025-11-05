@@ -1,34 +1,108 @@
 {
-    "mainBinds": {
-        "left": "D",
-        "down": "F",
-        "up": "J",
-        "right": "K"
-    },
     "altBinds": {
-        "left": "ArrowLeft",
-        "down": "ArrowDown",
-        "up": "ArrowUp",
-        "right": "ArrowRight"
+        "down": "DOWN",
+        "left": "LEFT",
+        "right": "RIGHT",
+        "up": "UP"
     },
-    "nxBinds": {
-        "left": "X",
-        "down": "A",
-        "up": "Y",
-        "right": "B"
-    },
-    "nxAltBinds": {
-        "left": "DPAD_LEFT",
-        "down": "DPAD_DOWN",
-        "up": "DPAD_UP",
-        "right": "DPAD_RIGHT"
+    "controlBinds": {
+        "ACCEPT": {
+            "keyAlternate": "SPACE",
+            "keyPrimary": "ENTER",
+            "padAlternate": "---",
+            "padPrimary": "A"
+        },
+        "BACK": {
+            "keyAlternate": "BACKSPACE",
+            "keyPrimary": "ESCAPE",
+            "padAlternate": "---",
+            "padPrimary": "B"
+        },
+        "NOTE_DOWN": {
+            "keyAlternate": "DOWN",
+            "keyPrimary": "F",
+            "padAlternate": "DOWN",
+            "padPrimary": "A"
+        },
+        "NOTE_LEFT": {
+            "keyAlternate": "LEFT",
+            "keyPrimary": "D",
+            "padAlternate": "LEFT",
+            "padPrimary": "X"
+        },
+        "NOTE_RIGHT": {
+            "keyAlternate": "RIGHT",
+            "keyPrimary": "K",
+            "padAlternate": "RIGHT",
+            "padPrimary": "B"
+        },
+        "NOTE_UP": {
+            "keyAlternate": "UP",
+            "keyPrimary": "J",
+            "padAlternate": "UP",
+            "padPrimary": "Y"
+        },
+        "PAUSE": {
+            "keyAlternate": "ENTER",
+            "keyPrimary": "ESCAPE",
+            "padAlternate": "---",
+            "padPrimary": "START"
+        },
+        "RESET": {
+            "keyAlternate": "---",
+            "keyPrimary": "R",
+            "padAlternate": "---",
+            "padPrimary": "Y"
+        },
+        "UI_DOWN": {
+            "keyAlternate": "S",
+            "keyPrimary": "DOWN",
+            "padAlternate": "---",
+            "padPrimary": "DOWN"
+        },
+        "UI_LEFT": {
+            "keyAlternate": "A",
+            "keyPrimary": "LEFT",
+            "padAlternate": "---",
+            "padPrimary": "LEFT"
+        },
+        "UI_RIGHT": {
+            "keyAlternate": "D",
+            "keyPrimary": "RIGHT",
+            "padAlternate": "---",
+            "padPrimary": "RIGHT"
+        },
+        "UI_UP": {
+            "keyAlternate": "W",
+            "keyPrimary": "UP",
+            "padAlternate": "---",
+            "padPrimary": "UP"
+        }
     },
     "gameConfig": {
         "downscroll": false,
         "ghostTapping": true
     },
+    "mainBinds": {
+        "down": "F",
+        "left": "D",
+        "right": "K",
+        "up": "J"
+    },
+    "nxAltBinds": {
+        "down": "DOWN",
+        "left": "LEFT",
+        "right": "RIGHT",
+        "up": "UP"
+    },
+    "nxBinds": {
+        "down": "A",
+        "left": "X",
+        "right": "B",
+        "up": "Y"
+    },
     "songConfig": {
-        "songName": "bopeebo",
-        "difficulty": "hard"
+        "difficulty": "hard",
+        "songName": "bopeebo"
     }
 }

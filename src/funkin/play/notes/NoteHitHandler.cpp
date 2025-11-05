@@ -39,17 +39,17 @@ void NoteHitHandler::handleInput() {
     std::vector<NoteSprite*> toHit;
     
     bool justHitArray[4] = {
-        controls->justPressed(0),
-        controls->justPressed(1),
-        controls->justPressed(2),
-        controls->justPressed(3)
+        controls->justPressedAction(ControlAction::NOTE_LEFT),
+        controls->justPressedAction(ControlAction::NOTE_DOWN),
+        controls->justPressedAction(ControlAction::NOTE_UP),
+        controls->justPressedAction(ControlAction::NOTE_RIGHT)
     };
     
     bool heldArray[4] = {
-        controls->pressed(0),
-        controls->pressed(1),
-        controls->pressed(2),
-        controls->pressed(3)
+        controls->pressedAction(ControlAction::NOTE_LEFT),
+        controls->pressedAction(ControlAction::NOTE_DOWN),
+        controls->pressedAction(ControlAction::NOTE_UP),
+        controls->pressedAction(ControlAction::NOTE_RIGHT)
     };
     
     if (boyfriend && (justHitArray[0] || justHitArray[1] || justHitArray[2] || justHitArray[3])) {
@@ -116,8 +116,15 @@ void NoteHitHandler::handleInput() {
         }
     }
     
+    ControlAction releaseActions[4] = {
+        ControlAction::NOTE_LEFT,
+        ControlAction::NOTE_DOWN,
+        ControlAction::NOTE_UP,
+        ControlAction::NOTE_RIGHT
+    };
+    
     for (int i = 0; i < 4; i++) {
-        if (controls->justReleased(i) && playerStrumline) {
+        if (controls->justReleasedAction(releaseActions[i]) && playerStrumline) {
             playerStrumline->playStatic(i);
         }
     }

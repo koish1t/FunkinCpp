@@ -39,7 +39,6 @@ PlayState::PlayState() {
     cameraManager = nullptr;
     pauseHandler = nullptr;
     renderer = nullptr;
-    controls = new Controls();
     healthBar = nullptr;
     NoteSprite::loadAssets();
     scoreText = new flixel::FlxText(0, 0, 0, "");
@@ -51,12 +50,7 @@ PlayState::PlayState() {
     
     int windowWidth = flixel::FlxG::width;
     int windowHeight = flixel::FlxG::height;
-    scoreText->setPosition(static_cast<float>(windowWidth / 2 - 100), static_cast<float>(windowHeight - 50));
     scoreText->setText("Score: 0 | Misses: 0 | Accuracy: 100.00%");
-
-    if (controls) {
-        controls->loadFromConfig("assets/data/config.json");
-    }
     
     startingSong = false;
     startedCountdown = false;
@@ -128,10 +122,6 @@ PlayState::~PlayState() {
     if (playerStrumline != nullptr) {
         delete playerStrumline;
         playerStrumline = nullptr;
-    }
-    if (controls != nullptr) {
-        delete controls;
-        controls = nullptr;
     }
     if (noteManager != nullptr) {
         delete noteManager;
@@ -264,17 +254,20 @@ void PlayState::create() {
     healthBar->setIcons("bf", "dad");
     healthBar->setHealth(1.0f);
     
+    float scoreTextY = GameConfig::getInstance()->isDownscroll() ? 10.0f : static_cast<float>(windowHeight - 50);
+    scoreText->setPosition(static_cast<float>(windowWidth / 2 - 100), scoreTextY);
+    
     noteManager = new NoteManager(camHUD);
     noteManager->generateNotes(SONG);
     
-    float strumYPos = GameConfig::getInstance()->isDownscroll() ? (windowWidth - 150.0f) : 50.0f;
+    float strumYPos = GameConfig::getInstance()->isDownscroll() ? (windowHeight - 150.0f) : 50.0f;
     float opponentX = 42.0f + 50.0f;
     float playerX = opponentX + (windowWidth / 2.0f);
     
     opponentStrumline = new Strumline(opponentX, strumYPos, 0, camHUD);
     playerStrumline = new Strumline(playerX, strumYPos, 1, camHUD);
     
-    noteHitHandler = new NoteHitHandler(controls, noteManager, playerStrumline, boyfriend, healthBar, popUpStuff, scoreText, vocals, camHUD);
+    noteHitHandler = new NoteHitHandler(GameConfig::getInstance()->controls, noteManager, playerStrumline, boyfriend, healthBar, popUpStuff, scoreText, vocals, camHUD);
     gameplayManager = new GameplayManager(noteManager, opponentStrumline, dad, gf, healthBar, vocals, SONG);
     noteUpdateHandler = new NoteUpdateHandler(noteManager, noteHitHandler, gameplayManager, gf);
     pauseHandler = new PauseHandler();

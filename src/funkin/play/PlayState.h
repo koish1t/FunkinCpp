@@ -88,8 +88,6 @@ private:
     HealthBar* healthBar;
     PopUpStuff* popUpStuff;
     
-    Controls* controls;
-    
     static const char* NOTE_STYLES[];
     static const char* NOTE_DIRS[];
 };

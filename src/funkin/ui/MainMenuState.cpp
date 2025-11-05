@@ -1,7 +1,10 @@
 #include "MainMenuState.h"
 #include "TitleState.h"
 #include "NewFreeplayState.h"
+#include "OptionsState.h"
 #include "../play/PlayState.h"
+#include "../game/GameConfig.h"
+#include "../play/input/Controls.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
 #include <flixel/sound/FlxSound.h>
@@ -65,7 +68,7 @@ void MainMenuState::create() {
     });
     
     createMenuItem("options", "assets/images/mainmenu/options", []() {
-        std::cout << "Options selected (not implemented)" << std::endl;
+        flixel::FlxG::game->switchState(new OptionsState());
     });
     
     createMenuItem("credits", "assets/images/mainmenu/credits", []() {
@@ -130,19 +133,21 @@ void MainMenuState::update(float elapsed) {
         }
     }
     
+    Controls* controls = GameConfig::getInstance()->controls;
+    
     if (canSelect && !exiting) {
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_UP].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_UP)) {
+        if (controls->justPressedAction(ControlAction::UI_UP)) {
             changeSelection(-1);
         }
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_DOWN].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN)) {
+        if (controls->justPressedAction(ControlAction::UI_DOWN)) {
             changeSelection(1);
         }
         
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_A)) {
+        if (controls->justPressedAction(ControlAction::ACCEPT)) {
             selectItem();
         }
         
-        if (flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed() || flixel::FlxG::keys.keys[SDL_SCANCODE_BACKSPACE].justPressed() || flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_B)) {
+        if (controls->justPressedAction(ControlAction::BACK)) {
             flixel::FlxG::sound.playAsChunk("assets/sounds/cancelMenu.ogg");
             startExitState([]() {
                 flixel::FlxG::game->switchState(new TitleState(true));

@@ -3,6 +3,8 @@
 #include "../play/song/Conductor.h"
 #include "../play/song/SongLoader.h"
 #include "../play/PlayState.h"
+#include "../game/GameConfig.h"
+#include "../play/input/Controls.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
@@ -116,18 +118,15 @@ void NewFreeplayState::update(float elapsed) {
        scoreDisplay->setNumber(lerpScore);
     }
     
-    bool upP = flixel::FlxG::keys.keys[SDL_SCANCODE_UP].justPressed() || 
-               flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_UP);
-    bool downP = flixel::FlxG::keys.keys[SDL_SCANCODE_DOWN].justPressed() || 
-                 flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-    bool leftP = flixel::FlxG::keys.keys[SDL_SCANCODE_LEFT].justPressed() || 
-                 flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-    bool rightP = flixel::FlxG::keys.keys[SDL_SCANCODE_RIGHT].justPressed() || 
-                  flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-    bool backP = flixel::FlxG::keys.keys[SDL_SCANCODE_ESCAPE].justPressed() || 
-                 flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_B);
-    bool accepted = flixel::FlxG::keys.keys[SDL_SCANCODE_RETURN].justPressed() || 
-                    flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_A);
+    Controls* controls = GameConfig::getInstance()->controls;
+    
+    bool upP = controls->justPressedAction(ControlAction::UI_UP);
+    bool downP = controls->justPressedAction(ControlAction::UI_DOWN);
+    bool leftP = controls->justPressedAction(ControlAction::UI_LEFT);
+    bool rightP = controls->justPressedAction(ControlAction::UI_RIGHT);
+    bool backP = controls->justPressedAction(ControlAction::BACK);
+    bool accepted = controls->justPressedAction(ControlAction::ACCEPT);
+    
     bool qP = flixel::FlxG::keys.keys[SDL_SCANCODE_Q].justPressed() || 
               flixel::FlxG::gamepads.justPressed(SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
     bool eP = flixel::FlxG::keys.keys[SDL_SCANCODE_E].justPressed() || 

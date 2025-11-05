@@ -12,11 +12,20 @@ public:
     void screenCenter();
     void setAlpha(float alpha);
     void setVisible(bool visible);
+    void setText(const std::string& newText);
+    void setScale(float scaleX, float scaleY);
     void update(float elapsed);
     void draw();
+    
+    int getY() const { return baseY; }
+    flixel::FlxCamera* camera;
     
 private:
     std::vector<flixel::FlxSprite*> letters;
     int baseX;
     int baseY;
+    std::string currentText;
+    
+    void createLetters(const std::string& text);
+    void clearLetters();
 };

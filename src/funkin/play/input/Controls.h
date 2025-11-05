@@ -3,6 +3,23 @@
 #include <SDL2/SDL.h>
 #include <string>
 #include <map>
+#include <vector>
+
+enum class ControlAction {
+    NOTE_LEFT = 0,
+    NOTE_DOWN = 1,
+    NOTE_UP = 2,
+    NOTE_RIGHT = 3,
+    UI_LEFT,
+    UI_DOWN,
+    UI_UP,
+    UI_RIGHT,
+    ACCEPT,
+    BACK,
+    PAUSE,
+    RESET,
+    COUNT
+};
 
 class Controls {
 public:
@@ -11,7 +28,7 @@ public:
         SDL_Scancode alternate;
     };
     
-    struct NXKeyBind {
+    struct GamepadBind {
         SDL_GameControllerButton primary;
         SDL_GameControllerButton alternate;
     };
@@ -19,18 +36,27 @@ public:
     Controls();
     
     void loadFromConfig(const std::string& configPath);
+    void saveToConfig(const std::string& configPath);
     
-    bool justPressed(int direction) const;
-    bool pressed(int direction) const;
-    bool justReleased(int direction) const;
+    bool justPressedAction(ControlAction action) const;
+    bool pressedAction(ControlAction action) const;
+    bool justReleasedAction(ControlAction action) const;
     
-    KeyBind getKeyBind(int direction) const;
-    NXKeyBind getNXKeyBind(int direction) const;
+    void rebindKey(ControlAction action, bool isPrimary, SDL_Scancode newKey);
+    void rebindGamepad(ControlAction action, bool isPrimary, SDL_GameControllerButton newButton);
+    
+    KeyBind getKeyBindForAction(ControlAction action) const;
+    GamepadBind getGamepadBindForAction(ControlAction action) const;
+    
+    std::string getActionName(ControlAction action) const;
+    static SDL_Scancode getScancodeFromString(const std::string& keyName);
+    static std::string getStringFromScancode(SDL_Scancode scancode);
+    static SDL_GameControllerButton getButtonFromString(const std::string& buttonName);
+    static std::string getStringFromButton(SDL_GameControllerButton button);
     
 private:
-    KeyBind arrowKeys[4];
-    NXKeyBind nxArrowKeys[4];
+    KeyBind keyBinds[static_cast<int>(ControlAction::COUNT)];
+    GamepadBind gamepadBinds[static_cast<int>(ControlAction::COUNT)];
     
-    SDL_Scancode getScancodeFromString(const std::string& keyName);
-    SDL_GameControllerButton getButtonFromString(const std::string& buttonName);
+    void setDefaultBindings();
 };
