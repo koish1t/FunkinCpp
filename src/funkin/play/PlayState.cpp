@@ -170,7 +170,7 @@ void PlayState::create() {
     startingSong = true;
     startedCountdown = false;
     
-    camGame = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 1.0f);
+    camGame = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 0.0f);
     camHUD = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 1.0f);
     
     setupHUDCamera();
@@ -211,6 +211,11 @@ void PlayState::create() {
                 sprite->camera = camGame;
             }
         }
+        float stageZoom = stage->getDefaultZoom();
+        camGame->zoom = stageZoom;
+        camGame->initialZoom = stageZoom;
+        camGame->updateFlashOffset();
+        camGame->updateScrollRect();
     }
     
     gf = new Character(400, 130, "gf", false);
@@ -229,7 +234,8 @@ void PlayState::create() {
         boyfriend->camera = camGame;
     }
     
-    cameraManager = new CameraManager(camGame, 1.05f);
+    float stageZoom = stage ? stage->getDefaultZoom() : 1.05f;
+    cameraManager = new CameraManager(camGame, stageZoom);
     cameraManager->initialize(boyfriend, dad);
     characterManager = new CharacterManager(gf, dad, boyfriend, gfSpeed);
     

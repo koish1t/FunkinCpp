@@ -24,7 +24,6 @@ void CameraManager::initialize(Character* bf, Character* dadChar) {
     if (boyfriend && camGame) {
         camFollow = new flixel::FlxObject(boyfriend->getMidpoint().x - 100, boyfriend->getMidpoint().y - 100, 1, 1);
         camGame->follow(camFollow, flixel::FlxCameraFollowStyle::LOCKON, 0.04f);
-        camGame->zoom = defaultCamZoom;
         camGame->focusOn(camFollow->getMidpoint());
     }
 }
