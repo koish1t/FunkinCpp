@@ -132,9 +132,18 @@ void TitleState::update(float elapsed) {
     
     FunkinState::update(elapsed);
     
-    if (gf) gf->update(elapsed);
-    if (logo) logo->update(elapsed);
-    if (enter) enter->update(elapsed);
+    if (gf) {
+        gf->update(elapsed);
+        if (gf->animation) gf->animation->update(elapsed);
+    }
+    if (logo) {
+        logo->update(elapsed);
+        if (logo->animation) logo->animation->update(elapsed);
+    }
+    if (enter) {
+        enter->update(elapsed);
+        if (enter->animation) enter->animation->update(elapsed);
+    }
     
     for (auto* alpha : alphabets) {
         if (alpha) alpha->update(elapsed);

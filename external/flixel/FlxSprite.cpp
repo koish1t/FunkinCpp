@@ -148,10 +148,6 @@ void FlxSprite::centerOrigin() {
 void FlxSprite::update(float elapsed) {
     FlxObject::update(elapsed);
     
-    if (animation) {
-        animation->update(elapsed);
-    }
-    
     velocity.x += acceleration.x * elapsed;
     velocity.y += acceleration.y * elapsed;
     x += velocity.x * elapsed;

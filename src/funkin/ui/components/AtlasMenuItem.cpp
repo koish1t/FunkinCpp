@@ -72,6 +72,10 @@ void AtlasMenuItem::changeAnim(const std::string& animName) {
 void AtlasMenuItem::update(float elapsed) {
     FlxSprite::update(elapsed);
     
+    if (animation) {
+        animation->update(elapsed);
+    }
+    
     if (frames && animation && !frames->frames.empty()) {
         int frameIdx = animation->getCurrentFrame();
         if (frameIdx >= 0 && frameIdx < static_cast<int>(frames->frames.size())) {

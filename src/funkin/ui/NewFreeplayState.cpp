@@ -307,11 +307,20 @@ void NewFreeplayState::update(float elapsed) {
     if (cover) cover->update(elapsed);
     if (topBar) topBar->update(elapsed);
     if (freeplayText) freeplayText->update(elapsed);
-    if (highscoreSprite) highscoreSprite->update(elapsed);
+    if (highscoreSprite) {
+        highscoreSprite->update(elapsed);
+        if (highscoreSprite->animation) highscoreSprite->animation->update(elapsed);
+    }
     if (clearPercentSprite) clearPercentSprite->update(elapsed);
     if (albumTitle) albumTitle->update(elapsed);
-    if (arrowLeft) arrowLeft->update(elapsed);
-    if (arrowRight) arrowRight->update(elapsed);
+    if (arrowLeft) {
+        arrowLeft->update(elapsed);
+        if (arrowLeft->animation) arrowLeft->animation->update(elapsed);
+    }
+    if (arrowRight) {
+        arrowRight->update(elapsed);
+        if (arrowRight->animation) arrowRight->animation->update(elapsed);
+    }
     if (difficulty) difficulty->update(elapsed);
     if (categoryTitle) categoryTitle->update(elapsed);
     if (miniArrowLeft) miniArrowLeft->update(elapsed);
@@ -319,6 +328,7 @@ void NewFreeplayState::update(float elapsed) {
     if (album) album->update(elapsed);
     if (dj) {
         dj->update(elapsed);
+        if (dj->animation) dj->animation->update(elapsed);
         
         if (dj->animation && dj->animation->current == "idle") {
             dj->offsetX = 0.0f;
@@ -956,6 +966,7 @@ void NewFreeplayState::djIntroFinish() {
 
 void NewFreeplayState::startFreeplaySong() {
     Conductor::songPosition = 0.0f;
+    Conductor::bpmChangeMap.clear();
     Conductor::changeBPM(145.0f);
     flixel::FlxG::sound.playMusic("assets/music/freeplayRandom.ogg", 0.9f, true);
     musicStartTicks = SDL_GetTicks();

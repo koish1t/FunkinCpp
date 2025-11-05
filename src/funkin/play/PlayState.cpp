@@ -192,6 +192,8 @@ void PlayState::loadSongConfig() {
 
 void PlayState::create() {
     Conductor::songPosition = 0;
+    curStep = 0;
+    curBeat = 0;
     startingSong = true;
     startedCountdown = false;
     
@@ -207,6 +209,7 @@ void PlayState::create() {
         return;
     }
     
+    Conductor::mapBPMChanges(SONG);
     Conductor::changeBPM(SONG.bpm);
     
     std::string stageName = SONG.stage;

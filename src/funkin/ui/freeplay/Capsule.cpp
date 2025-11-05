@@ -130,6 +130,7 @@ void Capsule::update(float elapsed) {
         capsuleSprite->x = x;
         capsuleSprite->y = y;
         capsuleSprite->update(elapsed);
+        if (capsuleSprite->animation) capsuleSprite->animation->update(elapsed);
     }
     
     if (text) {
@@ -142,6 +143,7 @@ void Capsule::update(float elapsed) {
         icon->x = x;
         icon->y = y;
         icon->update(elapsed);
+        if (icon->animation) icon->animation->update(elapsed);
     }
 
     flixel::FlxSprite::update(elapsed);
