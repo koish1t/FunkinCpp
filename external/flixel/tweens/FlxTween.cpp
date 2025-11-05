@@ -182,6 +182,31 @@ namespace flixel {
             varTween->type = type;
             varTween->targetValues = values;
             
+            FlxSprite* sprite = static_cast<FlxSprite*>(object);
+            for (const auto& pair : values) {
+                const std::string& propName = pair.first;
+                float targetValue = pair.second;
+                
+                if (propName == "alpha") {
+                    varTween->addProperty("alpha", &sprite->alpha, targetValue);
+                }
+                else if (propName == "x") {
+                    varTween->addProperty("x", &sprite->x, targetValue);
+                }
+                else if (propName == "y") {
+                    varTween->addProperty("y", &sprite->y, targetValue);
+                }
+                else if (propName == "angle") {
+                    varTween->addProperty("angle", &sprite->angle, targetValue);
+                }
+                else if (propName == "scaleX") {
+                    varTween->addProperty("scaleX", &sprite->scale.x, targetValue);
+                }
+                else if (propName == "scaleY") {
+                    varTween->addProperty("scaleY", &sprite->scale.y, targetValue);
+                }
+            }
+            
             varTween->start();
             tweens.push_back(varTween);
             

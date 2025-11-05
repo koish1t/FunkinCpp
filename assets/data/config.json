@@ -100,9 +100,5 @@
         "left": "X",
         "right": "B",
         "up": "Y"
-    },
-    "songConfig": {
-        "difficulty": "hard",
-        "songName": "bopeebo"
     }
 }

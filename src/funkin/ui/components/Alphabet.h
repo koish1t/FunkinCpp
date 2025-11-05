@@ -18,6 +18,12 @@ public:
     void draw();
     
     int getY() const { return baseY; }
+    void setY(int y) { baseY = y; }
+    
+    bool isMenuItem;
+    int targetY;
+    float alpha;
+    
     flixel::FlxCamera* camera;
     
 private:

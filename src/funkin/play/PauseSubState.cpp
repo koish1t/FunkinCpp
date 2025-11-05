@@ -1,32 +1,291 @@
 #include "PauseSubState.h"
+#include "PlayState.h"
+#include "../ui/NewFreeplayState.h"
 #include "../game/GameConfig.h"
 #include "input/Controls.h"
+#include "song/Conductor.h"
+#include "song/Song.h"
 #include <flixel/FlxG.h>
+#include <flixel/FlxGame.h>
+#include <flixel/math/FlxPoint.h>
+#include <flixel/tweens/FlxTween.h>
+#include <flixel/tweens/FlxEase.h>
+#include <SDL2/SDL_mixer.h>
+#include <iostream>
+#include <algorithm>
 
-PauseSubState::PauseSubState() {
-    pauseText = nullptr;
+PauseSubState::PauseSubState()
+    : bg(nullptr)
+    , levelInfo(nullptr)
+    , levelDifficulty(nullptr)
+    , deathCounter(nullptr)
+    , pauseMusic(nullptr)
+    , curSelected(0)
+{
+    pauseOG = {"RESUME", "RESTART SONG", "CHANGE DIFFICULTY", "EXIT TO MENU"};
+    difficultyChoices = {"EASY", "NORMAL", "HARD", "BACK"};
+    menuItems = pauseOG;
+}
+
+PauseSubState::~PauseSubState() {
+    destroy();
 }
 
 void PauseSubState::create() {
-    pauseText = new flixel::FlxText(0, 0, 0, "PAUSED");
-    pauseText->setFont("assets/fonts/monsterrat.ttf");
-    pauseText->setSize(64);
-    pauseText->setPosition(flixel::FlxG::width / 2 - pauseText->width / 2, flixel::FlxG::height / 2 - pauseText->height / 2);
-    add(pauseText);
+    pauseMusic = new flixel::FlxSound();
+    pauseMusic->loadStream("assets/music/breakfast.ogg", true);
+    pauseMusic->setVolume(0.0f);
+    pauseMusic->play();
+    
+    bg = new flixel::FlxSprite(0, 0);
+    bg->makeGraphic(flixel::FlxG::width, flixel::FlxG::height, {0, 0, 0, 255});
+    bg->alpha = 0.0f;
+    bg->scrollFactor.x = 0.0f;
+    bg->scrollFactor.y = 0.0f;
+    bg->camera = flixel::FlxG::camera;
+    
+    flixel::tweens::tween(bg, {{"alpha", 0.6f}}, 0.4f, flixel::tweens::FlxEase::quadInOut);
+    
+    levelInfo = new flixel::FlxText(20, 15, 0, PlayState::SONG.song.c_str());
+    levelInfo->setFont("assets/fonts/vcr.ttf");
+    levelInfo->setSize(32);
+    levelInfo->setColor(0xFFFFFFFF);
+    levelInfo->scrollFactor.x = 0.0f;
+    levelInfo->scrollFactor.y = 0.0f;
+    levelInfo->updateHitbox();
+    levelInfo->alpha = 0.0f;
+    levelInfo->camera = flixel::FlxG::camera;
+    
+    const char* difficultyStrings[] = {"EASY", "NORMAL", "HARD"};
+    std::string diffStr = (PlayState::storyDifficulty >= 0 && PlayState::storyDifficulty < 3) 
+        ? difficultyStrings[PlayState::storyDifficulty] 
+        : "NORMAL";
+    
+    levelDifficulty = new flixel::FlxText(20, 15 + 32, 0, diffStr.c_str());
+    levelDifficulty->setFont("assets/fonts/vcr.ttf");
+    levelDifficulty->setSize(32);
+    levelDifficulty->setColor(0xFFFFFFFF);
+    levelDifficulty->scrollFactor.x = 0.0f;
+    levelDifficulty->scrollFactor.y = 0.0f;
+    levelDifficulty->updateHitbox();
+    levelDifficulty->alpha = 0.0f;
+    levelDifficulty->camera = flixel::FlxG::camera;
+    
+    std::string deathText = "Blue balled: " + std::to_string(PlayState::deathCounter);
+    deathCounter = new flixel::FlxText(20, 15 + 64, 0, deathText.c_str());
+    deathCounter->setFont("assets/fonts/vcr.ttf");
+    deathCounter->setSize(32);
+    deathCounter->setColor(0xFFFFFFFF);
+    deathCounter->scrollFactor.x = 0.0f;
+    deathCounter->scrollFactor.y = 0.0f;
+    deathCounter->updateHitbox();
+    deathCounter->alpha = 0.0f;
+    deathCounter->camera = flixel::FlxG::camera;
+    
+    levelInfo->x = flixel::FlxG::width - (levelInfo->width + 20);
+    levelDifficulty->x = flixel::FlxG::width - (levelDifficulty->width + 20);
+    deathCounter->x = flixel::FlxG::width - (deathCounter->width + 20);
+    
+    flixel::tweens::tween(levelInfo, {{"alpha", 1.0f}, {"y", 20.0f}}, 0.4f, 
+        flixel::tweens::FlxEase::quadInOut, nullptr, nullptr, nullptr, 0.3f);
+    
+    flixel::tweens::tween(levelDifficulty, {{"alpha", 1.0f}, {"y", levelDifficulty->y + 5.0f}}, 0.4f, 
+        flixel::tweens::FlxEase::quadInOut, nullptr, nullptr, nullptr, 0.5f);
+    
+    flixel::tweens::tween(deathCounter, {{"alpha", 1.0f}, {"y", deathCounter->y + 5.0f}}, 0.4f, 
+        flixel::tweens::FlxEase::quadInOut, nullptr, nullptr, nullptr, 0.7f);
+    
+    regenMenu();
+}
+
+void PauseSubState::regenMenu() {
+    for (auto* item : grpMenuShit) {
+        if (item) delete item;
+    }
+    grpMenuShit.clear();
+    
+    for (size_t i = 0; i < menuItems.size(); i++) {
+        Alphabet* songText = new Alphabet(menuItems[i], 0, (70 * i) + 30);
+        songText->isMenuItem = true;
+        songText->targetY = i;
+        songText->camera = flixel::FlxG::camera;
+        grpMenuShit.push_back(songText);
+    }
+    
+    curSelected = 0;
+    changeSelection(0);
 }
 
 void PauseSubState::update(float elapsed) {
     FlxSubState::update(elapsed);
     
-    Controls* controls = GameConfig::getInstance()->controls;
-    bool unpausePressed = controls->justPressedAction(ControlAction::PAUSE) ||
-                         controls->justPressedAction(ControlAction::BACK);
+    if (pauseMusic && pauseMusic->get_volume() < 0.5f) {
+        pauseMusic->setVolume(pauseMusic->get_volume() + 0.01f * elapsed);
+    }
     
-    if (unpausePressed) {
-        close();
+    if (bg) bg->update(elapsed);
+    if (levelInfo) levelInfo->update(elapsed);
+    if (levelDifficulty) levelDifficulty->update(elapsed);
+    if (deathCounter) deathCounter->update(elapsed);
+    if (pauseMusic) pauseMusic->update(elapsed);
+    
+    for (auto* item : grpMenuShit) {
+        if (item) item->update(elapsed);
+    }
+    
+    Controls* controls = GameConfig::getInstance()->controls;
+    
+    if (controls->justPressedAction(ControlAction::BACK)) {
+        if (menuItems == difficultyChoices) {
+            menuItems = pauseOG;
+            regenMenu();
+        } else {
+            close();
+        }
+    }
+    
+    if (controls->justPressedAction(ControlAction::UI_UP)) {
+        changeSelection(-1);
+    }
+    if (controls->justPressedAction(ControlAction::UI_DOWN)) {
+        changeSelection(1);
+    }
+    
+    if (controls->justPressedAction(ControlAction::ACCEPT)) {
+        std::string daSelected = menuItems[curSelected];
+        
+        if (daSelected == "RESUME") {
+            close();
+        }
+        else if (daSelected == "EASY" || daSelected == "NORMAL" || daSelected == "HARD") {
+            int difficultyIndex;
+            if (daSelected == "EASY") {
+                difficultyIndex = 0;
+            }
+            else if (daSelected == "NORMAL") {
+                difficultyIndex = 1;
+            }
+            else {
+                difficultyIndex = 2;
+            }
+            
+            std::string songName = PlayState::SONG.song;
+            std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
+            
+            std::string formattedSongName = songName;
+            if (difficultyIndex == 0) {
+                formattedSongName += "-easy";
+            }
+            else if (difficultyIndex == 2) {
+                formattedSongName += "-hard";
+            }
+            
+            PlayState::SONG = Song::loadFromJson(formattedSongName, songName);
+            PlayState::storyDifficulty = difficultyIndex;            
+            flixel::FlxG::game->switchState(new PlayState());
+        }
+        else if (daSelected == "CHANGE DIFFICULTY") {
+            menuItems = difficultyChoices;
+            regenMenu();
+        }
+        else if (daSelected == "BACK") {
+            menuItems = pauseOG;
+            regenMenu();
+        }
+        else if (daSelected == "RESTART SONG") {
+            flixel::FlxG::game->switchState(new PlayState());
+        }
+        else if (daSelected == "EXIT TO MENU") {
+            PlayState::seenCutscene = false;
+            PlayState::deathCounter = 0;
+            
+            if (PlayState::isStoryMode) {
+                std::cout << "Story mode menu not implemented" << std::endl;
+            } else {
+                if (PlayState::instance && PlayState::instance->getCamFollow()) {
+                    flixel::FlxPoint camPos(
+                        PlayState::instance->getCamFollow()->x,
+                        PlayState::instance->getCamFollow()->y
+                    );
+                    flixel::FlxG::game->switchState(new NewFreeplayState(true, camPos));
+                } else {
+                    flixel::FlxG::game->switchState(new NewFreeplayState(true, flixel::FlxPoint(0.0f, 0.0f)));
+                }
+            }
+        }
     }
 }
 
 void PauseSubState::draw() {
+    if (bg) bg->draw();
+    if (levelInfo) levelInfo->draw();
+    if (levelDifficulty) levelDifficulty->draw();
+    if (deathCounter) deathCounter->draw();
+    
+    for (auto* item : grpMenuShit) {
+        if (item) item->draw();
+    }
+    
     FlxSubState::draw();
+}
+
+void PauseSubState::changeSelection(int change) {
+    if (change != 0) {
+        flixel::FlxG::sound.playAsChunk("assets/sounds/scrollMenu.ogg");
+    }
+    
+    curSelected += change;
+    
+    if (curSelected < 0) {
+        curSelected = static_cast<int>(menuItems.size()) - 1;
+    }
+    if (curSelected >= static_cast<int>(menuItems.size())) {
+        curSelected = 0;
+    }
+    
+    int bullShit = 0;
+    for (auto* item : grpMenuShit) {
+        if (item) {
+            item->targetY = bullShit - curSelected;
+            bullShit++;
+            
+            item->alpha = 0.6f;
+            
+            if (item->targetY == 0) {
+                item->alpha = 1.0f;
+            }
+        }
+    }
+}
+
+void PauseSubState::destroy() {
+    if (pauseMusic) {
+        pauseMusic->stop();
+        delete pauseMusic;
+        pauseMusic = nullptr;
+    }
+    
+    for (auto* item : grpMenuShit) {
+        if (item) delete item;
+    }
+    grpMenuShit.clear();
+    
+    if (bg) {
+        delete bg;
+        bg = nullptr;
+    }
+    if (levelInfo) {
+        delete levelInfo;
+        levelInfo = nullptr;
+    }
+    if (levelDifficulty) {
+        delete levelDifficulty;
+        levelDifficulty = nullptr;
+    }
+    if (deathCounter) {
+        delete deathCounter;
+        deathCounter = nullptr;
+    }
+    
+    FlxSubState::destroy();
 }

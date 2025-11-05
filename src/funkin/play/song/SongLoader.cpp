@@ -36,12 +36,14 @@ void SongLoader::loadSongAudio(const std::string& songName, flixel::FlxSound*& i
         inst = nullptr;
     }
     inst = new flixel::FlxSound();
-    if (!inst->loadEmbedded(instPath, false, false)) {
+    if (!inst->loadAsChunk(instPath, false, false)) {
         std::cerr << "Failed to preload instrumental: " << instPath << std::endl;
         delete inst;
         inst = nullptr;
     }
     if (inst) {
+        inst->setChannel(1);
+        inst->setVolume(1.0f);
         inst->stop();
     }
     

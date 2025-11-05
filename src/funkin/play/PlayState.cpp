@@ -6,15 +6,17 @@
 #include <random>
 #include "song/Song.h"
 #include "song/Conductor.h"
-#include <fstream>
 #include <map>
-#include "../../../external/nlohmann/json.hpp"
 #include <flixel/FlxG.h>
 #include <flixel/math/FlxMath.h>
 
 PlayState* PlayState::instance = nullptr;
 SwagSong PlayState::SONG;
 flixel::FlxSound* PlayState::inst = nullptr;
+int PlayState::deathCounter = 0;
+int PlayState::storyDifficulty = 1;
+bool PlayState::seenCutscene = false;
+bool PlayState::isStoryMode = false;
 
 const char* PlayState::NOTE_STYLES[] = {"purple", "blue", "green", "red"};
 const char* PlayState::NOTE_DIRS[] = {"LEFT", "DOWN", "UP", "RIGHT"};
@@ -159,37 +161,6 @@ PlayState::~PlayState() {
     destroy();
 }
 
-void PlayState::loadSongConfig() {
-    std::ifstream configFile("assets/data/config.json");
-    if (!configFile.is_open()) {
-        std::cerr << "Failed to open config.json" << std::endl;
-        SONG = SongLoader::loadSong("fnf2");
-        curSong = "fnf2";
-        SongLoader::loadSongAudio("fnf2", inst, vocals, SONG);
-        return;
-    }
-
-    try {
-        nlohmann::json config;
-        configFile >> config;
-
-        if (config.contains("songConfig")) {
-            auto songConfig = config["songConfig"];
-            std::string songName = songConfig["songName"].get<std::string>();
-            std::string difficulty = songConfig["difficulty"].get<std::string>();
-            
-            std::string fullSongName = difficulty.empty() ? songName : songName + "-" + difficulty;
-            SONG = SongLoader::loadSong(fullSongName);
-            curSong = fullSongName;
-            SongLoader::loadSongAudio(fullSongName, inst, vocals, SONG);
-        } else {
-            std::cerr << "No songConfig found in config.json, using default" << std::endl;
-        }
-    } catch (const std::exception& ex) {
-        std::cerr << "Failed to parse song config: " << ex.what() << std::endl;
-    }
-}
-
 void PlayState::create() {
     Conductor::songPosition = 0;
     curStep = 0;
@@ -202,7 +173,20 @@ void PlayState::create() {
     
     setupHUDCamera();
     
-    loadSongConfig();
+    if (SONG.song.empty()) {
+        std::cout << "You somehow loaded into PlayState without a song. Congrats I guess?" << std::endl;
+        return;
+    } else {
+        std::string baseSongName = SONG.song;
+        std::transform(baseSongName.begin(), baseSongName.end(), baseSongName.begin(), ::tolower);
+        curSong = baseSongName;
+        if (storyDifficulty == 0) {
+            curSong += "-easy";
+        } else if (storyDifficulty == 2) {
+            curSong += "-hard";
+        }
+        SongLoader::loadSongAudio(curSong, inst, vocals, SONG);
+    }
     
     if (!SONG.validScore) {
         std::cout << "Error: Failed to load song data!" << std::endl;

@@ -12,6 +12,9 @@ Alphabet::Alphabet(const std::string& text, int x, int y)
     , baseY(y)
     , currentText(text)
     , camera(nullptr)
+    , isMenuItem(false)
+    , targetY(0)
+    , alpha(1.0f)
 {
     if (!alphabetFrames) {
         std::ifstream file("assets/images/alphabet.xml");
@@ -67,6 +70,9 @@ void Alphabet::createLetters(const std::string& text) {
         spr->texture = alphabetFrames->texture;
         spr->ownsTexture = false;
         spr->animation = new flixel::animation::FlxAnimationController();
+        
+        spr->scrollFactor.x = 0.0f;
+        spr->scrollFactor.y = 0.0f;
         
         std::string animName;
         if (std::isdigit(c)) {
@@ -145,8 +151,33 @@ void Alphabet::setScale(float scaleX, float scaleY) {
 }
 
 void Alphabet::update(float elapsed) {
+    if (isMenuItem) {
+        float scaledY = targetY;
+        float targetYPos = (scaledY * 120.0f) + (flixel::FlxG::height * 0.48f);
+        float targetXPos = (targetY * 20.0f) + 90.0f;
+        
+        baseY += static_cast<int>((targetYPos - baseY) * 0.16f);
+        baseX += static_cast<int>((targetXPos - baseX) * 0.16f);
+        
+        int curX = baseX;
+        int curY = baseY;
+        const int letterSpacing = 48;
+        const int spaceWidth = 48;
+        
+        for (auto* spr : letters) {
+            if (spr) {
+                spr->y = curY;
+                spr->x = curX;
+                curX += letterSpacing;
+            } else {
+                curX += spaceWidth;
+            }
+        }
+    }
+    
     for (auto* spr : letters) {
         if (spr) {
+            spr->alpha = alpha;
             spr->update(elapsed);
         }
     }

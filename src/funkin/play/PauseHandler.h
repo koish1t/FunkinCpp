@@ -15,9 +15,6 @@ public:
                 std::function<void(flixel::FlxSubState*)> openSubStateFunc,
                 std::function<void()> closeSubStateFunc);
     
-    float getPauseCooldown() const { return pauseCooldown; }
-    
 private:
-    float pauseCooldown;
     bool wasPaused;
 };

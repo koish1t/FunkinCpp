@@ -38,6 +38,10 @@ public:
     static PlayState* instance;
     static SwagSong SONG;
     static flixel::FlxSound* inst;
+    static int deathCounter;
+    static int storyDifficulty;
+    static bool seenCutscene;
+    static bool isStoryMode;
 
     PlayState();
     ~PlayState() override;
@@ -47,12 +51,15 @@ public:
     void draw() override;
     void destroy() override;
 
-    void loadSongConfig();
     void startSong();
     void startCountdown();
     void updateCameraZoom();
     void setupHUDCamera();
     void beatHit();
+    
+    flixel::FlxObject* getCamFollow() const { 
+        return cameraManager ? cameraManager->getCamFollow() : nullptr; 
+    }
 
 private:
     flixel::FlxCamera* camGame;

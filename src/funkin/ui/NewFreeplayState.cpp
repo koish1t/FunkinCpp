@@ -14,11 +14,10 @@
 #include <flixel/text/FlxText.h>
 #include <flixel/tweens/FlxTweenUtil.h>
 #include <SDL2/SDL.h>
-#include <fstream>
 #include <sstream>
 #include <cmath>
 #include <algorithm>
-#include "../../../external/nlohmann/json.hpp"
+#include <fstream>
 
 NewFreeplayState::NewFreeplayState(bool _transitionFromMenu, flixel::FlxPoint camFollowPos)
     : transitionFromMenu(_transitionFromMenu), curSelected(0), curDifficulty(1), curCategory(0),
@@ -1322,29 +1321,15 @@ void NewFreeplayState::startSong() {
     
     std::string songName = categoryMap[categoryNames[curCategory]][curSelected]->song;
     
-    std::string difficulty = "";
-    if (curDifficulty == 0) difficulty = "easy";
-    else if (curDifficulty == 2) difficulty = "hard";
-    
-    nlohmann::json config;
-    std::ifstream configFileIn("assets/data/config.json");
-    if (configFileIn.is_open()) {
-        try {
-            configFileIn >> config;
-        } catch (const std::exception& ex) {
-            std::cerr << "Failed to parse existing config.json: " << ex.what() << std::endl;
-        }
-        configFileIn.close();
+    std::string formattedSongName = songName;
+    if (curDifficulty == 0) {
+        formattedSongName += "-easy";
+    } else if (curDifficulty == 2) {
+        formattedSongName += "-hard";
     }
     
-    config["songConfig"]["songName"] = songName;
-    config["songConfig"]["difficulty"] = difficulty;
-    
-    std::ofstream configFileOut("assets/data/config.json");
-    if (configFileOut.is_open()) {
-        configFileOut << config.dump(4);
-        configFileOut.close();
-    }
+    PlayState::SONG = Song::loadFromJson(formattedSongName, songName);
+    PlayState::storyDifficulty = curDifficulty;
     
     Conductor::songPosition = 0.0f;
     Conductor::changeBPM(100.0f);
