@@ -10,6 +10,7 @@ Character::Character(float x, float y, const std::string& character, bool isPlay
     , curCharacter(character)
     , isPlayer(isPlayer)
     , debugMode(false)
+    , stunned(false)
     , holdTimer(0.0f)
     , danced(false)
 {
@@ -75,6 +76,10 @@ void Character::setupBF() {
     auto singRIGHTmissFrames = frames->getFramesByPrefix("BF NOTE RIGHT MISS");
     auto singDOWNmissFrames = frames->getFramesByPrefix("BF NOTE DOWN MISS");
     auto heyFrames = frames->getFramesByPrefix("BF HEY");
+    auto firstDeathFrames = frames->getFramesByPrefix("BF dies");
+    auto deathLoopFrames = frames->getFramesByPrefix("BF Dead Loop");
+    auto deathConfirmFrames = frames->getFramesByPrefix("BF Dead confirm");
+    auto scaredFrames = frames->getFramesByPrefix("BF idle shaking");
     
     if (!idleFrames.empty()) animation->addByPrefix("idle", idleFrames, 24, false);
     if (!singUPFrames.empty()) animation->addByPrefix("singUP", singUPFrames, 24, false);
@@ -86,6 +91,10 @@ void Character::setupBF() {
     if (!singRIGHTmissFrames.empty()) animation->addByPrefix("singRIGHTmiss", singRIGHTmissFrames, 24, false);
     if (!singDOWNmissFrames.empty()) animation->addByPrefix("singDOWNmiss", singDOWNmissFrames, 24, false);
     if (!heyFrames.empty()) animation->addByPrefix("hey", heyFrames, 24, false);
+    if (!firstDeathFrames.empty()) animation->addByPrefix("firstDeath", firstDeathFrames, 24, false);
+    if (!deathLoopFrames.empty()) animation->addByPrefix("deathLoop", deathLoopFrames, 24, true);
+    if (!deathConfirmFrames.empty()) animation->addByPrefix("deathConfirm", deathConfirmFrames, 24, false);
+    if (!scaredFrames.empty()) animation->addByPrefix("scared", scaredFrames, 24, false);
     
     addOffset("idle", -5, 0);
     addOffset("singUP", -29, 27);
@@ -97,6 +106,10 @@ void Character::setupBF() {
     addOffset("singLEFTmiss", 12, 24);
     addOffset("singDOWNmiss", -11, -19);
     addOffset("hey", 7, 4);
+    addOffset("firstDeath", 37, 11);
+    addOffset("deathLoop", 37, 5);
+    addOffset("deathConfirm", 37, 69);
+    addOffset("scared", -4, 0);
     
     playAnim("idle");
     flipX = true;

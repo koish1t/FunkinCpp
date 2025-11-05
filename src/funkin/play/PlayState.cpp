@@ -42,6 +42,8 @@ PlayState::PlayState() {
     pauseHandler = nullptr;
     renderer = nullptr;
     healthBar = nullptr;
+    persistentUpdate = true;
+    persistentDraw = true;
     NoteSprite::loadAssets();
     scoreText = new flixel::FlxText(0, 0, 0, "");
     scoreText->setFont("assets/fonts/vcr.ttf");
@@ -304,6 +306,21 @@ void PlayState::update(float elapsed) {
         
         if (healthBar) {
             healthBar->update(elapsed);
+            
+            if (healthBar->getHealth() <= 0.0f && !subState && boyfriend) {
+                boyfriend->stunned = true;
+                persistentUpdate = false;
+                persistentDraw = false;
+                
+                if (inst) {
+                    inst->stop();
+                }
+                if (vocals) {
+                    vocals->stop();
+                }
+                
+                openSubState(new GameOverSubState(boyfriend->x, boyfriend->y, camGame));
+            }
         }
 
         if (!startingSong && musicStartTicks > 0) {

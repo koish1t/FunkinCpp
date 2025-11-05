@@ -18,6 +18,7 @@ public:
     std::string curCharacter;
     bool isPlayer;
     bool debugMode;
+    bool stunned;
     float holdTimer;
     
 private:

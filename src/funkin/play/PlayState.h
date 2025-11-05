@@ -10,6 +10,7 @@
 #include "song/Conductor.h"
 #include "../game/GameConfig.h"
 #include "PauseSubState.h"
+#include "GameOverSubState.h"
 #include "stage/Stage.h"
 #include "character/Character.h"
 #include "character/CharacterManager.h"
@@ -60,6 +61,9 @@ public:
     flixel::FlxObject* getCamFollow() const { 
         return cameraManager ? cameraManager->getCamFollow() : nullptr; 
     }
+    
+    bool persistentUpdate;
+    bool persistentDraw;
 
 private:
     flixel::FlxCamera* camGame;
