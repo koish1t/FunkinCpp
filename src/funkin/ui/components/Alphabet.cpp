@@ -1,6 +1,7 @@
 #include "Alphabet.h"
 #include <flixel/FlxG.h>
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
+#include <SDL2/SDL.h>
 #include <cctype>
 #include <fstream>
 #include <sstream>
@@ -90,13 +91,16 @@ void Alphabet::createLetters(const std::string& text) {
         
         auto frameIndices = alphabetFrames->getFramesByPrefix(animName);
         if (!frameIndices.empty()) {
-            spr->animation->addByPrefix(animName, frameIndices, 24, false);
+            spr->animation->addByPrefix(animName, frameIndices, 24, true);
             spr->animation->play(animName);
             spr->updateHitbox();
+            letters.push_back(spr);
+            curX += letterSpacing;
+        } else {
+            delete spr;
+            letters.push_back(nullptr);
+            curX += letterSpacing;
         }
-        
-        letters.push_back(spr);
-        curX += letterSpacing;
     }
 }
 
@@ -126,6 +130,7 @@ void Alphabet::screenCenter() {
 }
 
 void Alphabet::setAlpha(float alpha) {
+    this->alpha = alpha;
     for (auto* spr : letters) {
         if (spr) {
             spr->alpha = alpha;
@@ -146,6 +151,15 @@ void Alphabet::setScale(float scaleX, float scaleY) {
         if (spr) {
             spr->scale.x = scaleX;
             spr->scale.y = scaleY;
+        }
+    }
+}
+
+void Alphabet::setCamera(flixel::FlxCamera* cam) {
+    camera = cam;
+    for (auto* spr : letters) {
+        if (spr) {
+            spr->camera = cam;
         }
     }
 }
@@ -177,8 +191,12 @@ void Alphabet::update(float elapsed) {
     
     for (auto* spr : letters) {
         if (spr) {
-            spr->alpha = alpha;
+            spr->alpha = this->alpha;
+            spr->visible = true;
             spr->update(elapsed);
+            if (spr->animation) {
+                spr->animation->update(elapsed);
+            }
         }
     }
 }
@@ -186,8 +204,11 @@ void Alphabet::update(float elapsed) {
 void Alphabet::draw() {
     for (auto* spr : letters) {
         if (spr && spr->visible) {
-            if (camera) spr->camera = camera;
             spr->draw();
         }
+    }
+    
+    if (!letters.empty() && letters[0] && letters[0]->texture) {
+        SDL_SetTextureAlphaMod(letters[0]->texture, 255);
     }
 }

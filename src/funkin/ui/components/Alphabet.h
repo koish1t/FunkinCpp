@@ -14,6 +14,7 @@ public:
     void setVisible(bool visible);
     void setText(const std::string& newText);
     void setScale(float scaleX, float scaleY);
+    void setCamera(flixel::FlxCamera* cam);
     void update(float elapsed);
     void draw();
     

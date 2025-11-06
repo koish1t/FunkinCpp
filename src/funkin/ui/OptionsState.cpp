@@ -57,6 +57,7 @@ void OptionsState::create() {
     
     for (auto* item : menuItems) {
         item->screenCenter();
+        item->setCamera(flixel::FlxG::camera);
     }
     
     loadPreferences();
@@ -157,30 +158,30 @@ void OptionsState::create() {
     controlBindLabelsAlt.push_back(new Alphabet("", 800, yPos));
     
     if (deviceLabel) {
-        deviceLabel->camera = controlsCamera;
+        deviceLabel->setCamera(controlsCamera);
         deviceLabel->setScale(0.8f, 0.8f);
     }
     for (auto* header : controlHeaders) {
         if (header) {
-            header->camera = controlsCamera;
+            header->setCamera(controlsCamera);
             header->setScale(0.75f, 0.75f);
         }
     }
     for (auto* label : controlLabels) {
         if (label) {
-            label->camera = controlsCamera;
+            label->setCamera(controlsCamera);
             label->setScale(0.7f, 0.7f);
         }
     }
     for (auto* label : controlBindLabels) {
         if (label) {
-            label->camera = controlsCamera;
+            label->setCamera(controlsCamera);
             label->setScale(0.7f, 0.7f);
         }
     }
     for (auto* label : controlBindLabelsAlt) {
         if (label) {
-            label->camera = controlsCamera;
+            label->setCamera(controlsCamera);
             label->setScale(0.7f, 0.7f);
         }
     }
@@ -200,12 +201,12 @@ void OptionsState::update(float elapsed) {
     if (currentSubMenu == SubMenu::None) {
         for (size_t i = 0; i < menuItems.size(); i++) {
             if (menuItems[i]) {
-                menuItems[i]->update(elapsed);
                 if (static_cast<int>(i) == selectedIndex) {
                     menuItems[i]->setAlpha(1.0f);
                 } else {
                     menuItems[i]->setAlpha(0.6f);
                 }
+                menuItems[i]->update(elapsed);
             }
         }
         
