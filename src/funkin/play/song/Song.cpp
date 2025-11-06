@@ -31,7 +31,7 @@ SwagSong Song::loadFromJson(const std::string& songName, const std::string& fold
     std::transform(lowerFolder.begin(), lowerFolder.end(), lowerFolder.begin(), ::tolower);
     std::transform(lowerSongName.begin(), lowerSongName.end(), lowerSongName.begin(), ::tolower);
     
-    std::string path = "assets/data/";
+    std::string path = "assets/songs/";
     if (!lowerFolder.empty()) {
         path += lowerFolder + "/";
     }
