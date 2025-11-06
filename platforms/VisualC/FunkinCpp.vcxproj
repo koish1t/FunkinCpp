@@ -219,12 +219,15 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
     <ClCompile Include="..\..\src\funkin\ui\components\Alphabet.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\components\AtlasMenuItem.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\components\CheckBox.cpp" />
+    <ClCompile Include="..\..\src\funkin\ui\components\MenuCharacter.cpp" />
+    <ClCompile Include="..\..\src\funkin\ui\components\MenuItem.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\CreditsState.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\freeplay\Capsule.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\freeplay\DigitDisplay.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\MainMenuState.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\NewFreeplayState.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\OptionsState.cpp" />
+    <ClCompile Include="..\..\src\funkin\ui\StoryMenuState.cpp" />
     <ClCompile Include="..\..\src\funkin\ui\TitleState.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
   </ItemGroup>

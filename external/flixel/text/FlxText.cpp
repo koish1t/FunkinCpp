@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cerrno>
+#include <vector>
 
 namespace flixel {
 
@@ -267,16 +268,76 @@ void FlxText::regenGraphic() {
     }
     
     SDL_Color textColor = {
-        static_cast<Uint8>((color >> 24) & 0xFF),
         static_cast<Uint8>((color >> 16) & 0xFF),
         static_cast<Uint8>((color >> 8) & 0xFF),
-        static_cast<Uint8>(color & 0xFF)
+        static_cast<Uint8>(color & 0xFF),
+        static_cast<Uint8>((color >> 24) & 0xFF)
     };
     
-    if (wordWrap && fieldWidth > 0) {
-        textSurface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), textColor, static_cast<Uint32>(fieldWidth));
+    bool hasNewlines = text.find('\n') != std::string::npos;
+    
+    if (hasNewlines) {
+        std::vector<std::string> lines;
+        std::string currentLine;
+        for (char c : text) {
+            if (c == '\n') {
+                lines.push_back(currentLine.empty() ? " " : currentLine);
+                currentLine.clear();
+            } else {
+                currentLine += c;
+            }
+        }
+        if (!currentLine.empty() || lines.empty()) {
+            lines.push_back(currentLine.empty() ? " " : currentLine);
+        }
+        
+        std::vector<SDL_Surface*> lineSurfaces;
+        int totalWidth = 0;
+        int totalHeight = 0;
+        
+        for (const auto& line : lines) {
+            SDL_Surface* lineSurface = TTF_RenderText_Blended(font, line.c_str(), textColor);
+            if (lineSurface) {
+                lineSurfaces.push_back(lineSurface);
+                totalWidth = std::max(totalWidth, lineSurface->w);
+                totalHeight += lineSurface->h;
+            }
+        }
+        
+        if (lineSurfaces.empty()) {
+            std::cout << "Failed to render text: " << TTF_GetError() << std::endl;
+            return;
+        }
+        
+        textSurface = SDL_CreateRGBSurface(0, totalWidth, totalHeight, 32, 
+                                            0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+        
+        if (!textSurface) {
+            for (auto* surf : lineSurfaces) {
+                SDL_FreeSurface(surf);
+            }
+            std::cout << "Failed to create combined surface: " << SDL_GetError() << std::endl;
+            return;
+        }
+        
+        SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_BLEND);
+        
+        SDL_FillRect(textSurface, nullptr, SDL_MapRGBA(textSurface->format, 0, 0, 0, 0));
+        
+        int yOffset = 0;
+        for (auto* lineSurface : lineSurfaces) {
+            SDL_Rect destRect = {0, yOffset, lineSurface->w, lineSurface->h};
+            SDL_SetSurfaceBlendMode(lineSurface, SDL_BLENDMODE_NONE);
+            SDL_BlitSurface(lineSurface, nullptr, textSurface, &destRect);
+            yOffset += lineSurface->h;
+            SDL_FreeSurface(lineSurface);
+        }
     } else {
-        textSurface = TTF_RenderText_Blended(font, text.c_str(), textColor);
+        if (wordWrap && fieldWidth > 0) {
+            textSurface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), textColor, static_cast<Uint32>(fieldWidth));
+        } else {
+            textSurface = TTF_RenderText_Blended(font, text.c_str(), textColor);
+        }
     }
     
     if (!textSurface) {

@@ -90,6 +90,11 @@ void FlxGame::update(float elapsed) {
         zeroKeyPressed = false;
     }
     
+    if (muted) {
+        Mix_Volume(-1, 0);
+        Mix_VolumeMusic(0);
+    }
+    
     if (nextState) {
         if (currentState) {
             currentState->destroy();

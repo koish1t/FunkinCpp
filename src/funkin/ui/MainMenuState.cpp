@@ -1,4 +1,5 @@
 #include "MainMenuState.h"
+#include "StoryMenuState.h"
 #include "TitleState.h"
 #include "NewFreeplayState.h"
 #include "OptionsState.h"
@@ -56,7 +57,7 @@ void MainMenuState::create() {
     magenta->camera = flixel::FlxG::camera;
     
     createMenuItem("storymode", "assets/images/mainmenu/storymode", []() {
-        std::cout << "Story Mode selected (not implemented)" << std::endl;
+        flixel::FlxG::game->switchState(new StoryMenuState());
     });
     
     createMenuItem("freeplay", "assets/images/mainmenu/freeplay", [this]() {

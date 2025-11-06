@@ -1,5 +1,6 @@
 #include "PauseSubState.h"
 #include "PlayState.h"
+#include "../ui/StoryMenuState.h"
 #include "../ui/NewFreeplayState.h"
 #include "../game/GameConfig.h"
 #include "input/Controls.h"
@@ -200,7 +201,7 @@ void PauseSubState::update(float elapsed) {
             PlayState::deathCounter = 0;
             
             if (PlayState::isStoryMode) {
-                std::cout << "Story mode menu not implemented" << std::endl;
+                flixel::FlxG::game->switchState(new StoryMenuState());
             } else {
                 if (PlayState::instance && PlayState::instance->getCamFollow()) {
                     flixel::FlxPoint camPos(

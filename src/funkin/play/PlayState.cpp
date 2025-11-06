@@ -17,6 +17,9 @@ int PlayState::deathCounter = 0;
 int PlayState::storyDifficulty = 1;
 bool PlayState::seenCutscene = false;
 bool PlayState::isStoryMode = false;
+std::vector<std::string> PlayState::storyPlaylist;
+int PlayState::storyWeek = 0;
+int PlayState::campaignScore = 0;
 
 const char* PlayState::NOTE_STYLES[] = {"purple", "blue", "green", "red"};
 const char* PlayState::NOTE_DIRS[] = {"LEFT", "DOWN", "UP", "RIGHT"};
