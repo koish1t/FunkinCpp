@@ -82,6 +82,8 @@ void NewFreeplayState::create() {
     addScrollingText("BOYFRIEND ", 455.0f, -3.8f, 60, 0xFFFEA400);
     
     addSong("bopeebo", "Bopeebo", "dad", 1, "vol1", {"ALL", "Week 1"});
+    addSong("fresh", "Fresh", "dad", 1, "vol1", {"ALL", "Week 1"});
+    addSong("dadbattle", "Dad Battle", "dad", 1, "vol1", {"ALL", "Week 1"});
     addSong("fnf2", "FNF2", "bf", 2, "vol1", {"ALL", "Extras"});
     addSong("shitton-of-notes", "A shitton of notes", "bf", 2, "vol1", {"ALL", "Extras"});
     
