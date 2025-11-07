@@ -1,4 +1,5 @@
 #include "NoteHitHandler.h"
+#include "../PlayState.h"
 #include "../song/Conductor.h"
 #include "../../game/GameConfig.h"
 #include <flixel/FlxG.h>
@@ -178,7 +179,10 @@ void NoteHitHandler::goodNoteHit(NoteSprite* note) {
                 healthBar->setHealth(healthBar->getHealth() + 0.05f);
             }
             combo++;
-            score += judgement.score;
+            
+            if (!PlayState::practiceMode) {
+                score += judgement.score;
+            }
             
             if (popUpStuff) {
                 popUpStuff->popUpScore(judgement.rating, combo, Conductor::crochet, camHUD);

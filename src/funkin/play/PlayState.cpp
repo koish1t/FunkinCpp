@@ -21,6 +21,7 @@ int PlayState::deathCounter = 0;
 int PlayState::storyDifficulty = 1;
 bool PlayState::seenCutscene = false;
 bool PlayState::isStoryMode = false;
+bool PlayState::practiceMode = false;
 std::vector<std::string> PlayState::storyPlaylist;
 int PlayState::storyWeek = 0;
 int PlayState::campaignScore = 0;
@@ -332,7 +333,7 @@ void PlayState::update(float elapsed) {
         if (healthBar) {
             healthBar->update(elapsed);
             
-            if (healthBar->getHealth() <= 0.0f && !subState && boyfriend) {
+            if (healthBar->getHealth() <= 0.0f && !practiceMode && !subState && boyfriend) {
                 boyfriend->stunned = true;
                 persistentUpdate = false;
                 persistentDraw = false;

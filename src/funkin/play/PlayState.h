@@ -43,6 +43,7 @@ public:
     static int storyDifficulty;
     static bool seenCutscene;
     static bool isStoryMode;
+    static bool practiceMode;
     static std::vector<std::string> storyPlaylist;
     static int storyWeek;
     static int campaignScore;

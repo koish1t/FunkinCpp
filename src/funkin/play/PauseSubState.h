@@ -32,5 +32,6 @@ private:
     flixel::FlxText* levelInfo;
     flixel::FlxText* levelDifficulty;
     flixel::FlxText* deathCounter;
+    flixel::FlxText* practiceText;
     flixel::FlxSound* pauseMusic;
 };

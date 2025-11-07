@@ -20,10 +20,11 @@ PauseSubState::PauseSubState()
     , levelInfo(nullptr)
     , levelDifficulty(nullptr)
     , deathCounter(nullptr)
+    , practiceText(nullptr)
     , pauseMusic(nullptr)
     , curSelected(0)
 {
-    pauseOG = {"RESUME", "RESTART SONG", "CHANGE DIFFICULTY", "EXIT TO MENU"};
+    pauseOG = {"RESUME", "RESTART SONG", "CHANGE DIFFICULTY", "TOGGLE PRACTICE MODE", "EXIT TO MENU"};
     difficultyChoices = {"EASY", "NORMAL", "HARD", "BACK"};
     menuItems = pauseOG;
 }
@@ -83,9 +84,20 @@ void PauseSubState::create() {
     deathCounter->alpha = 0.0f;
     deathCounter->camera = flixel::FlxG::camera;
     
+    practiceText = new flixel::FlxText(20, 15 + 64 + 32, 0, "PRACTICE MODE");
+    practiceText->setFont("assets/fonts/vcr.ttf");
+    practiceText->setSize(32);
+    practiceText->setColor(0xFFFFFFFF);
+    practiceText->scrollFactor.x = 0.0f;
+    practiceText->scrollFactor.y = 0.0f;
+    practiceText->updateHitbox();
+    practiceText->visible = PlayState::practiceMode;
+    practiceText->camera = flixel::FlxG::camera;
+    
     levelInfo->x = flixel::FlxG::width - (levelInfo->width + 20);
     levelDifficulty->x = flixel::FlxG::width - (levelDifficulty->width + 20);
     deathCounter->x = flixel::FlxG::width - (deathCounter->width + 20);
+    practiceText->x = flixel::FlxG::width - (practiceText->width + 20);
     
     flixel::tweens::tween(levelInfo, {{"alpha", 1.0f}, {"y", 20.0f}}, 0.4f, 
         flixel::tweens::FlxEase::quadInOut, nullptr, nullptr, nullptr, 0.3f);
@@ -128,6 +140,7 @@ void PauseSubState::update(float elapsed) {
     if (levelInfo) levelInfo->update(elapsed);
     if (levelDifficulty) levelDifficulty->update(elapsed);
     if (deathCounter) deathCounter->update(elapsed);
+    if (practiceText) practiceText->update(elapsed);
     if (pauseMusic) pauseMusic->update(elapsed);
     
     for (auto* item : grpMenuShit) {
@@ -189,6 +202,10 @@ void PauseSubState::update(float elapsed) {
             menuItems = difficultyChoices;
             regenMenu();
         }
+        else if (daSelected == "TOGGLE PRACTICE MODE") {
+            PlayState::practiceMode = !PlayState::practiceMode;
+            practiceText->visible = PlayState::practiceMode;
+        }
         else if (daSelected == "BACK") {
             menuItems = pauseOG;
             regenMenu();
@@ -222,6 +239,7 @@ void PauseSubState::draw() {
     if (levelInfo) levelInfo->draw();
     if (levelDifficulty) levelDifficulty->draw();
     if (deathCounter) deathCounter->draw();
+    if (practiceText && practiceText->visible) practiceText->draw();
     
     for (auto* item : grpMenuShit) {
         if (item) item->draw();
@@ -286,6 +304,10 @@ void PauseSubState::destroy() {
     if (deathCounter) {
         delete deathCounter;
         deathCounter = nullptr;
+    }
+    if (practiceText) {
+        delete practiceText;
+        practiceText = nullptr;
     }
     
     FlxSubState::destroy();
