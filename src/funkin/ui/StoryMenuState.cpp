@@ -179,7 +179,7 @@ void StoryMenuState::create() {
         
         if (!grpWeekText.empty()) {
             leftArrow->x = grpWeekText[0]->x + grpWeekText[0]->width + 10;
-            leftArrow->y = grpWeekText[0]->y + 10;
+            leftArrow->y = 490.0f;
         }
         
         if (leftArrow->frames && !leftArrow->frames->frames.empty()) {
@@ -313,20 +313,6 @@ void StoryMenuState::update(float elapsed) {
         if (character) character->update(elapsed);
     }
     
-    if (!grpWeekText.empty() && grpWeekText[0]) {
-        if (leftArrow) {
-            leftArrow->x = grpWeekText[0]->x + grpWeekText[0]->width + 10;
-            leftArrow->y = grpWeekText[0]->y + 10;
-        }
-        if (sprDifficulty && leftArrow) {
-            sprDifficulty->x = leftArrow->x + 130;
-            sprDifficulty->y = leftArrow->y;
-        }
-        if (rightArrow && sprDifficulty) {
-            rightArrow->x = sprDifficulty->x + sprDifficulty->width + 50;
-            rightArrow->y = leftArrow->y;
-        }
-    }
     
     if (leftArrow) {
         leftArrow->update(elapsed);
