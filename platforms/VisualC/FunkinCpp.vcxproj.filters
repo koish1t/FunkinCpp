@@ -240,5 +240,11 @@
     <ClCompile Include="..\..\external\flixel\util\FlxTimer.cpp">
       <Filter>Source Files\flixel</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\funkin\ui\CreditsState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\play\scoring\Highscore.cpp">
+      <Filter>Source Files\funkin\play\scoring</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

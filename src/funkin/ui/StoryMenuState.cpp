@@ -2,6 +2,7 @@
 #include "MainMenuState.h"
 #include "../play/PlayState.h"
 #include "../play/song/Song.h"
+#include "../play/scoring/Highscore.h"
 #include "../game/GameConfig.h"
 #include "../play/input/Controls.h"
 #include <flixel/FlxG.h>
@@ -679,8 +680,7 @@ void StoryMenuState::updateText() {
         txtTracklist->x -= flixel::FlxG::width * 0.35f;
     }
     
-    // intendedScore = Highscore::getWeekScore(curWeek, curDifficulty);
-    intendedScore = 0;
+    intendedScore = Highscore::getWeekScore(curWeek, curDifficulty);
 }
 
 void StoryMenuState::updateAvailableDifficulties() {

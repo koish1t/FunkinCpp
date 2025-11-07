@@ -1,6 +1,7 @@
 #include "TitleState.h"
 #include "MainMenuState.h"
 #include "../play/song/Conductor.h"
+#include "../play/scoring/Highscore.h"
 #include "../game/GameConfig.h"
 #include "../play/input/Controls.h"
 #include <flixel/FlxG.h>
@@ -30,7 +31,8 @@ TitleState::~TitleState() {
 }
 
 void TitleState::create() {
-    Conductor::changeBPM(102.0f);
+    Conductor::changeBPM(102.0f);    
+    Highscore::load();
     
     if (!flixel::FlxG::sound.music || !Mix_PlayingMusic()) {
         flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg", 1.0f, true);

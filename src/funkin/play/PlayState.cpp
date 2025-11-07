@@ -6,6 +6,7 @@
 #include <random>
 #include "song/Song.h"
 #include "song/Conductor.h"
+#include "scoring/Highscore.h"
 #include <map>
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
@@ -403,14 +404,31 @@ void PlayState::endSong() {
         vocals->setVolume(0.0f);
     }
     
+    int songScore = noteHitHandler ? noteHitHandler->getScore() : 0;
+    float accuracy = 0.0f;
+    if (noteHitHandler) {
+        int totalHits = noteHitHandler->getSicks() + noteHitHandler->getGoods() + 
+                        noteHitHandler->getBads() + noteHitHandler->getShits();
+        int totalNotes = totalHits + noteHitHandler->getMisses();
+        if (totalNotes > 0) {
+            accuracy = static_cast<float>(totalHits) / static_cast<float>(totalNotes);
+        }
+    }
+    
     if (isStoryMode) {
-        campaignScore += noteHitHandler ? noteHitHandler->getScore() : 0;
+        campaignScore += songScore;
+        
+        std::string songName = SONG.song;
+        std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
+        Highscore::saveScore(songName, songScore, storyDifficulty, accuracy);
         
         if (!storyPlaylist.empty()) {
             storyPlaylist.erase(storyPlaylist.begin());
         }
         
         if (storyPlaylist.empty()) {
+            Highscore::saveWeekScore(storyWeek, campaignScore, storyDifficulty, accuracy);
+            
             if (flixel::FlxG::sound.music) {
                 flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg");
             }
@@ -438,6 +456,10 @@ void PlayState::endSong() {
             flixel::FlxG::game->switchState(new PlayState());
         }
     } else {
+        std::string songName = SONG.song;
+        std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
+        Highscore::saveScore(songName, songScore, storyDifficulty, accuracy);
+        
         if (flixel::FlxG::sound.music) {
             flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg");
         }

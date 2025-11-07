@@ -3,6 +3,7 @@
 #include "../play/song/Conductor.h"
 #include "../play/song/SongLoader.h"
 #include "../play/PlayState.h"
+#include "../play/scoring/Highscore.h"
 #include "../game/GameConfig.h"
 #include "../play/input/Controls.h"
 #include <flixel/FlxG.h>
@@ -573,8 +574,9 @@ void NewFreeplayState::createFreeplayStuff() {
     scoreDisplay->scrollFactor.y = 0.0f;
     scoreDisplay->camera = camMenu;
     
-    percentDisplay = new DigitDisplay(1170.0f, 87.0f, "menu/freeplay/clearText", 3, 1.0f, 3.0f, 0, true);
+    percentDisplay = new DigitDisplay(1150.0f, 87.0f, "menu/freeplay/clearText", 3, 1.0f, 3.0f, 0, true);
     percentDisplay->tweenNumber(100, 1.0f);
+    percentDisplay->setDigitOffset(1, -16.0f);
     percentDisplay->scrollFactor.x = 0.0f;
     percentDisplay->scrollFactor.y = 0.0f;
     percentDisplay->camera = camMenu;
@@ -1097,14 +1099,15 @@ void NewFreeplayState::changeCategory(int change) {
 }
 
 void NewFreeplayState::updateScore() {
-    intendedScore = 0;
-    
     if (categoryNames.size() > 0 && curCategory < static_cast<int>(categoryNames.size())) {
         for (size_t i = 0; i < categoryMap[categoryNames[curCategory]].size(); i++) {
             if (static_cast<int>(i) == curSelected) {
                 categoryMap[categoryNames[curCategory]][i]->select();
                 
-                auto capsule = categoryMap[categoryNames[curCategory]][i];
+                auto capsule = categoryMap[categoryNames[curCategory]][i];               
+                std::string songName = capsule->song;
+                std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
+                intendedScore = Highscore::getScore(songName, curDifficulty);
                 camTarget.x = capsule->x + 400.0f;
                 camTarget.y = capsule->y + 200.0f;
             } else {
@@ -1115,8 +1118,15 @@ void NewFreeplayState::updateScore() {
 }
 
 void NewFreeplayState::updateAccuracy() {
-    if (percentDisplay) {
-        percentDisplay->tweenNumber(100, 0.8f);
+    if (percentDisplay && categoryNames.size() > 0 && curCategory < static_cast<int>(categoryNames.size())) {
+        if (curSelected >= 0 && curSelected < static_cast<int>(categoryMap[categoryNames[curCategory]].size())) {
+            auto capsule = categoryMap[categoryNames[curCategory]][curSelected];            
+            std::string songName = capsule->song;
+            std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
+            float accuracy = Highscore::getAccuracy(songName, curDifficulty);            
+            int accuracyPercent = static_cast<int>(accuracy * 100.0f);
+            percentDisplay->tweenNumber(accuracyPercent, 0.8f);
+        }
     }
 }
 
