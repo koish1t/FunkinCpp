@@ -236,6 +236,11 @@ void PlayState::create() {
         dad->camera = camGame;
     }
     
+    if (SONG.player2 == "gf") {
+        dad->setPosition(gf->x, gf->y);
+        gf->visible = false;
+    }
+    
     boyfriend = new Character(770, 450, SONG.player1, true);
     if (camGame) {
         boyfriend->camera = camGame;

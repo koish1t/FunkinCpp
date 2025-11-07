@@ -488,6 +488,17 @@ void StoryMenuState::destroy() {
 }
 
 void StoryMenuState::loadWeeks() {
+    // titsorial
+    WeekData twotorial;
+    twotorial.songs = { "Tutorial" };
+    twotorial.weekCharacters = { "dad", "bf", "gf" };
+    twotorial.weekName = "HOW TO FUNK!";
+    twotorial.weekFileName = "tutorial";
+    twotorial.difficulties = { 0, 1, 2 };
+    twotorial.unlocked = true;
+
+    weekData.push_back(twotorial);
+    // week 1
     WeekData week1;
     week1.songs = {"Bopeebo", "Fresh", "DadBattle"};
     week1.weekCharacters = {"dad", "bf", "gf"};

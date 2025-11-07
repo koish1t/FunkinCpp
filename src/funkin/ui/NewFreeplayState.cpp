@@ -82,6 +82,7 @@ void NewFreeplayState::create() {
     addScrollingText("HOT BLOODED IN MORE WAYS THAN ONE ", 397.0f, 6.8f, 43, 0xFFFFF383);
     addScrollingText("BOYFRIEND ", 455.0f, -3.8f, 60, 0xFFFEA400);
     
+    addSong("tutorial", "Tutorial", "gf", 0, "vol1", { "ALL", "Tutorial" });
     addSong("bopeebo", "Bopeebo", "dad", 1, "vol1", {"ALL", "Week 1"});
     addSong("fresh", "Fresh", "dad", 1, "vol1", {"ALL", "Week 1"});
     addSong("dadbattle", "Dad Battle", "dad", 1, "vol1", {"ALL", "Week 1"});
