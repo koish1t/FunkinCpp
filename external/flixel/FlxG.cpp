@@ -269,6 +269,9 @@ void FlxG::init(FlxGame* gameInstance, int gameWidth, int gameHeight) {
     if (!renderer) {
         throw std::runtime_error("Failed to create renderer: " + std::string(SDL_GetError()));
     }
+    
+    SDL_RenderSetLogicalSize(renderer, width, height);
+    SDL_RenderSetIntegerScale(renderer, SDL_FALSE);
 
     try {
         setCursor("assets/images/ui/cursor.png", 0, 0);
@@ -300,10 +303,7 @@ void FlxG::reset() {
     sound.reset();
 }
 
-void FlxG::resizeGame(int newWidth, int newHeight) {
-    width = newWidth;
-    height = newHeight;
-}
+void FlxG::resizeGame(int newWidth, int newHeight) {}
 
 void FlxG::resizeWindow(int newWidth, int newHeight) {
     SDL_SetWindowSize(window, newWidth, newHeight);
