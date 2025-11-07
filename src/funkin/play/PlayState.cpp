@@ -225,18 +225,18 @@ void PlayState::create() {
         camGame->updateScrollRect();
     }
     
-    gf = new Character(400, 130, "gf", false);
+    gf = new Character(400, 130, SONG.gfVersion, false);
     gf->scrollFactor.set(0.95f, 0.95f);
     if (camGame) {
         gf->camera = camGame;
     }
     
-    dad = new Character(100, 100, "dad", false);
+    dad = new Character(100, 100, SONG.player2, false);
     if (camGame) {
         dad->camera = camGame;
     }
     
-    boyfriend = new Character(770, 450, "bf", true);
+    boyfriend = new Character(770, 450, SONG.player1, true);
     if (camGame) {
         boyfriend->camera = camGame;
     }

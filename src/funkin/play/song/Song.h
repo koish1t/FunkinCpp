@@ -11,6 +11,7 @@ struct SwagSong {
     float speed = 1.0f;
     std::string player1 = "bf";
     std::string player2 = "dad";
+    std::string gfVersion = "gf";
     std::string stage = "";
     bool validScore = false;
 };
@@ -24,7 +25,7 @@ public:
     float speed = 1.0f;
     std::string player1 = "bf";
     std::string player2 = "dad";
-
+    std::string gfVersion = "gf";
     Song(const std::string& song, const std::vector<SwagSection>& notes, int bpm);
 
     static SwagSong loadFromJson(const std::string& jsonInput, const std::string& folder = "");

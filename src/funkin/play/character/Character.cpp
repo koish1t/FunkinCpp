@@ -33,6 +33,9 @@ void Character::loadCharacter() {
         setupGF();
     } else if (curCharacter == "dad") {
         setupDad();
+    } else {
+        curCharacter = "dad";
+        setupDad();
     }
 }
 

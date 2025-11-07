@@ -74,7 +74,15 @@ SwagSong Song::parseJSONshit(const std::string& rawJson) {
         swagShit.needsVoices = songData.value("needsVoices", true);
         swagShit.speed = songData.value("speed", 1.0f);
         swagShit.player1 = songData.value("player1", "bf");
+        if (swagShit.player1.empty()) swagShit.player1 = "bf";
         swagShit.player2 = songData.value("player2", "dad");
+        if (swagShit.player2.empty()) swagShit.player2 = "dad";        
+        swagShit.gfVersion = songData.value("gfVersion", "");
+        if (swagShit.gfVersion.empty()) {
+            swagShit.gfVersion = songData.value("player3", "gf");
+        }
+        if (swagShit.gfVersion.empty()) swagShit.gfVersion = "gf";
+        
         swagShit.stage = songData.value("stage", "");
         
         if (songData.contains("notes") && songData["notes"].is_array()) {
