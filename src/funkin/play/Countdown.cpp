@@ -43,6 +43,10 @@ void Countdown::update(float elapsed) {
         nextStep();
     }
     
+    if (sound) {
+        sound->update(elapsed);
+    }
+    
     if (sprite) {
         spriteTimer += elapsed;
         float progress = spriteTimer / interval;

@@ -56,6 +56,7 @@ public:
     void destroy() override;
 
     void startSong();
+    void endSong();
     void startCountdown();
     void updateCameraZoom();
     void setupHUDCamera();

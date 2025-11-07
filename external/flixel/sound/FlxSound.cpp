@@ -79,7 +79,7 @@ void FlxSound::update(float elapsed)
     bool wasPlaying = playing;
     bool isCurrentlyPlaying = get_playing();
     
-    if (!isStream && wasPlaying && !isCurrentlyPlaying)
+    if (wasPlaying && !isCurrentlyPlaying)
     {
         playing = false;
         stopped();

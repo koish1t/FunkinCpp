@@ -102,6 +102,8 @@ void FlxGame::update(float elapsed) {
         }
         currentState = nextState;
         nextState = nullptr;
+        FlxG::keys.reset();
+        FlxG::gamepads.reset();
         currentState->create();
     }
 

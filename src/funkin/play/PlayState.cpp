@@ -8,7 +8,10 @@
 #include "song/Conductor.h"
 #include <map>
 #include <flixel/FlxG.h>
+#include <flixel/FlxGame.h>
 #include <flixel/math/FlxMath.h>
+#include "../ui/StoryMenuState.h"
+#include "../ui/NewFreeplayState.h"
 
 PlayState* PlayState::instance = nullptr;
 SwagSong PlayState::SONG;
@@ -291,6 +294,13 @@ void PlayState::update(float elapsed) {
             camHUD->update(elapsed);
         }
         
+        if (inst) {
+            inst->update(elapsed);
+        }
+        if (vocals) {
+            vocals->update(elapsed);
+        }
+        
         if (popUpStuff) {
             popUpStuff->update(elapsed, Conductor::crochet);
         }
@@ -371,13 +381,67 @@ void PlayState::startSong() {
     }
     
     if (inst) {
+        inst->onComplete = [this]() {
+            this->endSong();
+        };
         inst->play();
-        } else {
-        std::cerr << "Error: Instrumental not loaded!" << std::endl;
     }
     
     if (vocals) {
         vocals->play();
+    }
+}
+
+void PlayState::endSong() {
+    seenCutscene = false;
+    deathCounter = 0;
+    
+    if (inst) {
+        inst->setVolume(0.0f);
+    }
+    if (vocals) {
+        vocals->setVolume(0.0f);
+    }
+    
+    if (isStoryMode) {
+        campaignScore += noteHitHandler ? noteHitHandler->getScore() : 0;
+        
+        if (!storyPlaylist.empty()) {
+            storyPlaylist.erase(storyPlaylist.begin());
+        }
+        
+        if (storyPlaylist.empty()) {
+            if (flixel::FlxG::sound.music) {
+                flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg");
+            }
+            
+            flixel::FlxG::game->switchState(new StoryMenuState());
+        } else {
+            std::string difficulty = "";
+            if (storyDifficulty == 0) {
+                difficulty = "-easy";
+            } else if (storyDifficulty == 2) {
+                difficulty = "-hard";
+            }
+            
+            std::string nextSong = storyPlaylist[0];
+            std::transform(nextSong.begin(), nextSong.end(), nextSong.begin(), ::tolower);
+            
+            if (inst) {
+                inst->stop();
+            }
+            if (vocals) {
+                vocals->stop();
+            }
+            
+            SONG = Song::loadFromJson(nextSong + difficulty, nextSong);
+            flixel::FlxG::game->switchState(new PlayState());
+        }
+    } else {
+        if (flixel::FlxG::sound.music) {
+            flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg");
+        }
+        flixel::FlxG::game->switchState(new NewFreeplayState(true, flixel::FlxPoint(0.0f, 0.0f)));
     }
 }
 

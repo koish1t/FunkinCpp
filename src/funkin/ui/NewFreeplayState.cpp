@@ -354,6 +354,10 @@ void NewFreeplayState::update(float elapsed) {
     }
     
     FunkinState::update(elapsed);
+
+    if (flixel::FlxG::camera) {
+        flixel::FlxG::camera->update(elapsed);
+    }
 }
 
 void NewFreeplayState::draw() {
@@ -1332,6 +1336,7 @@ void NewFreeplayState::startSong() {
     
     PlayState::SONG = Song::loadFromJson(formattedSongName, songName);
     PlayState::storyDifficulty = curDifficulty;
+    PlayState::isStoryMode = false;
     
     Conductor::songPosition = 0.0f;
     Conductor::changeBPM(100.0f);

@@ -127,6 +127,12 @@ void MainMenuState::update(float elapsed) {
         camFollow->y = menuItems[selectedIndex]->y + menuItems[selectedIndex]->height / 2.0f;
     }
     
+    if (flixel::FlxG::camera) {
+        if (flixel::FlxG::camera->scroll.y < 0.0f) {
+            flixel::FlxG::camera->scroll.y = 0.0f;
+        }
+    }
+    
     if (flixel::FlxG::sound.music && Mix_PlayingMusic()) {
         if (Mix_VolumeMusic(-1) < static_cast<int>(1.0f * MIX_MAX_VOLUME)) {
             int currentVolume = Mix_VolumeMusic(-1);
@@ -170,6 +176,17 @@ void MainMenuState::draw() {
 }
 
 void MainMenuState::destroy() {
+    if (magenta && flixel::effects::FlxFlicker::isFlickering(magenta)) {
+        flixel::effects::FlxFlicker::stopFlickering(magenta);
+        magenta->visible = false;
+    }
+    
+    for (auto* item : menuItems) {
+        if (item && flixel::effects::FlxFlicker::isFlickering(item)) {
+            flixel::effects::FlxFlicker::stopFlickering(item);
+        }
+    }
+    
     for (auto* item : menuItems) {
         if (item) {
             delete item;
@@ -194,9 +211,6 @@ void MainMenuState::destroy() {
 }
 
 void MainMenuState::beatHit() {
-    if (magenta) {
-        magenta->visible = !magenta->visible;
-    }
 }
 
 void MainMenuState::createMenuItem(const std::string& name, const std::string& atlas, std::function<void()> callback) {

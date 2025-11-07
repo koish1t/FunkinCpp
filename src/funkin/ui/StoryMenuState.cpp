@@ -274,6 +274,10 @@ void StoryMenuState::create() {
 void StoryMenuState::update(float elapsed) {
     FunkinState::update(elapsed);
     
+    if (flixel::FlxG::camera) {
+        flixel::FlxG::camera->update(elapsed);
+    }
+    
     lerpScore = flixel::math::lerp(lerpScore, static_cast<float>(intendedScore), 0.5f);
     std::string scoreStr = "WEEK SCORE: " + std::to_string(static_cast<int>(std::round(lerpScore)));
     scoreText->setText(scoreStr);
@@ -484,7 +488,7 @@ void StoryMenuState::destroy() {
 
 void StoryMenuState::loadWeeks() {
     WeekData week1;
-    week1.songs = {"Bopeebo", "Fresh", "Dad Battle"};
+    week1.songs = {"Bopeebo", "Fresh", "DadBattle"};
     week1.weekCharacters = {"dad", "bf", "gf"};
     week1.weekName = "DADDY DEAREST";
     week1.weekFileName = "week1";
@@ -615,6 +619,9 @@ void StoryMenuState::selectWeek() {
         
         flixel::util::FlxTimer* timer = new flixel::util::FlxTimer();
         timer->start(1.5f, [](flixel::util::FlxTimer* tmr) {
+            if (flixel::FlxG::sound.music) {
+                flixel::FlxG::sound.music->stop();
+            }
             flixel::FlxG::game->switchState(new PlayState());
             delete tmr;
         });
