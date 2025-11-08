@@ -56,11 +56,11 @@ void MainMenuState::create() {
     magenta->visible = false;
     magenta->camera = flixel::FlxG::camera;
     
-    createMenuItem("storymode", "assets/images/mainmenu/storymode", []() {
+    createMenuItem("storymode", "assets/images/menu/mainmenu/storymode", []() {
         flixel::FlxG::game->switchState(new StoryMenuState());
     });
     
-    createMenuItem("freeplay", "assets/images/mainmenu/freeplay", [this]() {
+    createMenuItem("freeplay", "assets/images/menu/mainmenu/freeplay", [this]() {
         if (camFollow) {
             flixel::FlxPoint camPos(camFollow->x, camFollow->y);
             flixel::FlxG::game->switchState(new NewFreeplayState(true, camPos));
@@ -69,11 +69,11 @@ void MainMenuState::create() {
         }
     });
     
-    createMenuItem("options", "assets/images/mainmenu/options", []() {
+    createMenuItem("options", "assets/images/menu/mainmenu/options", []() {
         flixel::FlxG::game->switchState(new OptionsState());
     });
     
-    createMenuItem("credits", "assets/images/mainmenu/credits", []() {
+    createMenuItem("credits", "assets/images/menu/mainmenu/credits", []() {
         flixel::FlxG::game->switchState(new CreditsState());
     });
     
