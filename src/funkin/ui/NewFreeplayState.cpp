@@ -642,7 +642,7 @@ void NewFreeplayState::createFreeplayStuff() {
     difficulty->camera = camMenu;
     
     std::string fontLetters = "AaBbCcDdEeFfGgHhiIJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:1234567890";
-    categoryFont = flixel::FlxBitmapFont::fromMonospace("assets/images/ui/resultFont.png", fontLetters, 49, 62);
+    categoryFont = flixel::FlxBitmapFont::fromMonospace("assets/images/menu/freeplay/resultFont.png", fontLetters, 49, 62);
     
     categoryTitle = new flixel::FlxBitmapText(categoryFont);
     categoryTitle->letterSpacing = -15;

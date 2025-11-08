@@ -87,8 +87,8 @@ void StoryMenuState::create() {
     blackBar->scrollFactor.set(0, 0);
     blackBar->camera = flixel::FlxG::camera;
     
-    std::string xmlPath = "assets/images/campaign_menu_UI_assets.xml";
-    std::string pngPath = "assets/images/campaign_menu_UI_assets.png";
+    std::string xmlPath = "assets/images/menu/story/campaign_menu_UI_assets.xml";
+    std::string pngPath = "assets/images/menu/story/campaign_menu_UI_assets.png";
     
     flixel::graphics::frames::FlxAtlasFrames* ui_tex = nullptr;
     std::ifstream xmlFile(xmlPath);
