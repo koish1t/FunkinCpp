@@ -925,7 +925,7 @@ void NewFreeplayState::fakeMainMenuSetup() {
     std::vector<std::string> menuItemNames = {"storymode", "freeplay", "options", "credits"};
     
     for (size_t i = 0; i < menuItemNames.size(); i++) {
-        AtlasMenuItem* item = new AtlasMenuItem(menuItemNames[i], "assets/images/mainmenu/" + menuItemNames[i], nullptr);
+        AtlasMenuItem* item = new AtlasMenuItem(menuItemNames[i], "assets/images/menu/mainmenu/" + menuItemNames[i], nullptr);
         item->ID = static_cast<int>(i);
         item->centered = true;
         item->changeAnim("idle");

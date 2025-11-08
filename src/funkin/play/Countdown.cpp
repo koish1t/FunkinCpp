@@ -88,7 +88,7 @@ void Countdown::nextStep() {
             break;
             
         case 1:
-            createSprite("assets/images/ready.png");
+            createSprite("assets/images/play/countdown/ready.png");
             if (sound) delete sound;
             sound = new flixel::FlxSound();
             sound->loadAsChunk("assets/sounds/intro2" + soundExt, false, false);
@@ -96,7 +96,7 @@ void Countdown::nextStep() {
             break;
             
         case 2:
-            createSprite("assets/images/set.png");
+            createSprite("assets/images/play/countdown/set.png");
             if (sound) delete sound;
             sound = new flixel::FlxSound();
             sound->loadAsChunk("assets/sounds/intro1" + soundExt, false, false);
@@ -104,7 +104,7 @@ void Countdown::nextStep() {
             break;
             
         case 3:
-            createSprite("assets/images/go.png");
+            createSprite("assets/images/play/countdown/go.png");
             if (sound) delete sound;
             sound = new flixel::FlxSound();
             sound->loadAsChunk("assets/sounds/introGo" + soundExt, false, false);
