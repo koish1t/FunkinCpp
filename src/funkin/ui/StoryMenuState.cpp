@@ -275,9 +275,11 @@ void StoryMenuState::create() {
 void StoryMenuState::update(float elapsed) {
     FunkinState::update(elapsed);
     
-    if (flixel::FlxG::camera) {
-        flixel::FlxG::camera->update(elapsed);
+    if (!flixel::FlxG::camera) {
+        flixel::FlxG::camera = new flixel::FlxCamera(0.0f, 0.0f, flixel::FlxG::width, flixel::FlxG::height, 1.0f);
     }
+    
+    flixel::FlxG::camera->update(elapsed);
     
     lerpScore = flixel::math::lerp(lerpScore, static_cast<float>(intendedScore), 0.5f);
     std::string scoreStr = "WEEK SCORE: " + std::to_string(static_cast<int>(std::round(lerpScore)));

@@ -12,14 +12,14 @@ HealthBar::HealthBar(float x, float y, flixel::FlxCamera* camera)
     if (camera) background->camera = camera;
     
     redBar = new flixel::FlxSprite();
-    redBar->makeGraphic(593, 11, {255, 0, 0, 255});
+    redBar->makeGraphic(593, 11, {175, 102, 206, 255});
     redBar->setPosition(background->x + 4, background->y + 4);
     redBar->scrollFactor.x = 0.0f;
     redBar->scrollFactor.y = 0.0f;
     if (camera) redBar->camera = camera;
     
     greenBar = new flixel::FlxSprite();
-    greenBar->makeGraphic(593, 11, {0, 255, 0, 255});
+    greenBar->makeGraphic(593, 11, {49, 176, 209, 255});
     greenBar->setPosition(background->x + 4, background->y + 4);
     greenBar->scrollFactor.x = 0.0f;
     greenBar->scrollFactor.y = 0.0f;
@@ -58,6 +58,16 @@ void HealthBar::setIcons(const std::string& player, const std::string& opponent)
     iconP2->scrollFactor.x = 0.0f;
     iconP2->scrollFactor.y = 0.0f;
     if (camera) iconP2->camera = camera;
+}
+
+void HealthBar::setColors(int player1R, int player1G, int player1B, int player2R, int player2G, int player2B) {
+    if (greenBar) {
+        greenBar->makeGraphic(593, 11, {static_cast<uint8_t>(player1R), static_cast<uint8_t>(player1G), static_cast<uint8_t>(player1B), 255});
+    }
+    
+    if (redBar) {
+        redBar->makeGraphic(593, 11, {static_cast<uint8_t>(player2R), static_cast<uint8_t>(player2G), static_cast<uint8_t>(player2B), 255});
+    }
 }
 
 void HealthBar::update(float elapsed) {

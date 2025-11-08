@@ -223,15 +223,15 @@ void PauseSubState::update(float elapsed) {
             if (PlayState::isStoryMode) {
                 flixel::FlxG::game->switchState(new StoryMenuState());
             } else {
-                if (PlayState::instance && PlayState::instance->getCamFollow()) {
-                    flixel::FlxPoint camPos(
-                        PlayState::instance->getCamFollow()->x,
-                        PlayState::instance->getCamFollow()->y
-                    );
-                    flixel::FlxG::game->switchState(new NewFreeplayState(true, camPos));
-                } else {
-                    flixel::FlxG::game->switchState(new NewFreeplayState(true, flixel::FlxPoint(0.0f, 0.0f)));
+                flixel::FlxPoint camPos(0.0f, 0.0f);
+                if (PlayState::instance) {
+                    flixel::FlxObject* camFollow = PlayState::instance->getCamFollow();
+                    if (camFollow) {
+                        camPos.x = camFollow->x;
+                        camPos.y = camFollow->y;
+                    }
                 }
+                flixel::FlxG::game->switchState(new NewFreeplayState(true, camPos));
             }
         }
     }

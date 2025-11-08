@@ -21,11 +21,16 @@ public:
     bool stunned;
     float holdTimer;
     
+    int healthColorR;
+    int healthColorG;
+    int healthColorB;
+    
 private:
     std::map<std::string, std::vector<float>> animOffsets;
     bool danced;
     
     void loadCharacter();
+    bool loadFromJSON(const std::string& character);
     void setupBF();
     void setupGF();
     void setupDad();

@@ -74,6 +74,8 @@ PlayState::PlayState() {
 }
 
 PlayState::~PlayState() {
+    ScriptManager::getInstance()->clear();
+    
     if (vocals != nullptr) {
         delete vocals;
         vocals = nullptr;
@@ -95,6 +97,8 @@ PlayState::~PlayState() {
         delete renderer;
         renderer = nullptr;
     }
+    
+    flixel::FlxG::camera = nullptr;
     
     if (camGame != nullptr) {
         delete camGame;
@@ -273,7 +277,9 @@ void PlayState::create() {
     float healthBarX = (windowWidth - 601) / 2.0f;
     
     healthBar = new HealthBar(healthBarX, healthBarY, camHUD);
-    healthBar->setIcons("bf", "dad");
+    healthBar->setIcons(SONG.player1, SONG.player2);
+    healthBar->setColors(boyfriend->healthColorR, boyfriend->healthColorG, boyfriend->healthColorB,
+                        dad->healthColorR, dad->healthColorG, dad->healthColorB);
     healthBar->setHealth(1.0f);
     
     float scoreTextY = GameConfig::getInstance()->isDownscroll() ? 10.0f : static_cast<float>(windowHeight - 50);
