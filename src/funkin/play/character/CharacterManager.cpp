@@ -28,8 +28,10 @@ void CharacterManager::beatHit(int curBeat, int curStep, const SwagSong& song) {
     if (boyfriend && boyfriend->animation) {
         std::string currentAnim = boyfriend->animation->current;
         bool isSinging = (currentAnim.length() >= 4 && currentAnim.substr(0, 4) == "sing");
+        bool isSpecialAnim = (currentAnim == "hey" || currentAnim == "scared" || currentAnim == "firstDeath" || 
+                             currentAnim == "deathLoop" || currentAnim == "deathConfirm");
         
-        if (!isSinging) {
+        if (!isSinging && !isSpecialAnim) {
             boyfriend->dance();
         }
     }

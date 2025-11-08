@@ -3,6 +3,7 @@
 #include "../ui/StoryMenuState.h"
 #include "../ui/NewFreeplayState.h"
 #include "../game/GameConfig.h"
+#include "../scripting/ScriptManager.h"
 #include "input/Controls.h"
 #include "song/Conductor.h"
 #include "song/Song.h"
@@ -34,6 +35,12 @@ PauseSubState::~PauseSubState() {
 }
 
 void PauseSubState::create() {
+    ScriptManager::getInstance()->callAll(ScriptCallback::ON_PAUSE);
+    
+    closeCallback = []() {
+        ScriptManager::getInstance()->callAll(ScriptCallback::ON_RESUME);
+    };
+    
     pauseMusic = new flixel::FlxSound();
     pauseMusic->loadStream("assets/music/breakfast.ogg", true);
     pauseMusic->setVolume(0.0f);
@@ -54,7 +61,6 @@ void PauseSubState::create() {
     levelInfo->setColor(0xFFFFFFFF);
     levelInfo->scrollFactor.x = 0.0f;
     levelInfo->scrollFactor.y = 0.0f;
-    levelInfo->updateHitbox();
     levelInfo->alpha = 0.0f;
     levelInfo->camera = flixel::FlxG::camera;
     
@@ -69,7 +75,6 @@ void PauseSubState::create() {
     levelDifficulty->setColor(0xFFFFFFFF);
     levelDifficulty->scrollFactor.x = 0.0f;
     levelDifficulty->scrollFactor.y = 0.0f;
-    levelDifficulty->updateHitbox();
     levelDifficulty->alpha = 0.0f;
     levelDifficulty->camera = flixel::FlxG::camera;
     
@@ -80,7 +85,6 @@ void PauseSubState::create() {
     deathCounter->setColor(0xFFFFFFFF);
     deathCounter->scrollFactor.x = 0.0f;
     deathCounter->scrollFactor.y = 0.0f;
-    deathCounter->updateHitbox();
     deathCounter->alpha = 0.0f;
     deathCounter->camera = flixel::FlxG::camera;
     
@@ -90,14 +94,13 @@ void PauseSubState::create() {
     practiceText->setColor(0xFFFFFFFF);
     practiceText->scrollFactor.x = 0.0f;
     practiceText->scrollFactor.y = 0.0f;
-    practiceText->updateHitbox();
     practiceText->visible = PlayState::practiceMode;
     practiceText->camera = flixel::FlxG::camera;
     
-    levelInfo->x = flixel::FlxG::width - (levelInfo->width + 20);
-    levelDifficulty->x = flixel::FlxG::width - (levelDifficulty->width + 20);
-    deathCounter->x = flixel::FlxG::width - (deathCounter->width + 20);
-    practiceText->x = flixel::FlxG::width - (practiceText->width + 20);
+    levelInfo->x = flixel::FlxG::width - (levelInfo->getWidth() + 80);
+    levelDifficulty->x = flixel::FlxG::width - (levelDifficulty->getWidth() + 80);
+    deathCounter->x = flixel::FlxG::width - (deathCounter->getWidth() + 80);
+    practiceText->x = flixel::FlxG::width - (practiceText->getWidth() + 80);
     
     flixel::tweens::tween(levelInfo, {{"alpha", 1.0f}, {"y", 20.0f}}, 0.4f, 
         flixel::tweens::FlxEase::quadInOut, nullptr, nullptr, nullptr, 0.3f);
@@ -154,7 +157,7 @@ void PauseSubState::update(float elapsed) {
             menuItems = pauseOG;
             regenMenu();
         } else {
-            close();
+        close();
         }
     }
     
@@ -220,15 +223,15 @@ void PauseSubState::update(float elapsed) {
             if (PlayState::isStoryMode) {
                 flixel::FlxG::game->switchState(new StoryMenuState());
             } else {
-                if (PlayState::instance && PlayState::instance->getCamFollow()) {
-                    flixel::FlxPoint camPos(
-                        PlayState::instance->getCamFollow()->x,
-                        PlayState::instance->getCamFollow()->y
-                    );
-                    flixel::FlxG::game->switchState(new NewFreeplayState(true, camPos));
-                } else {
-                    flixel::FlxG::game->switchState(new NewFreeplayState(true, flixel::FlxPoint(0.0f, 0.0f)));
+                flixel::FlxPoint camPos(0.0f, 0.0f);
+                if (PlayState::instance) {
+                    flixel::FlxObject* camFollow = PlayState::instance->getCamFollow();
+                    if (camFollow) {
+                        camPos.x = camFollow->x;
+                        camPos.y = camFollow->y;
+                    }
                 }
+                flixel::FlxG::game->switchState(new NewFreeplayState(true, camPos));
             }
         }
     }

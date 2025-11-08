@@ -68,12 +68,14 @@ PlayState::PlayState() {
     startedCountdown = false;
     musicStartTicks = 0;
     gfSpeed = 1;
-    
+
     countdown = new Countdown();
     popUpStuff = new PopUpStuff();
 }
 
 PlayState::~PlayState() {
+    ScriptManager::getInstance()->clear();
+    
     if (vocals != nullptr) {
         delete vocals;
         vocals = nullptr;
@@ -95,6 +97,8 @@ PlayState::~PlayState() {
         delete renderer;
         renderer = nullptr;
     }
+    
+    flixel::FlxG::camera = nullptr;
     
     if (camGame != nullptr) {
         delete camGame;
@@ -181,6 +185,8 @@ void PlayState::create() {
     camGame = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 0.0f);
     camHUD = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 1.0f);
     
+    flixel::FlxG::camera = camGame;
+    
     setupHUDCamera();
     
     if (SONG.song.empty()) {
@@ -237,15 +243,27 @@ void PlayState::create() {
         dad->camera = camGame;
     }
     
-    if (SONG.player2 == "gf") {
-        dad->setPosition(gf->x, gf->y);
-        gf->visible = false;
-    }
-    
     boyfriend = new Character(770, 450, SONG.player1, true);
     if (camGame) {
         boyfriend->camera = camGame;
     }
+    
+    ScriptManager::getInstance()->clear();
+    ScriptManager::getInstance()->loadScriptsFromDirectory("assets/scripts");
+    
+    std::string songName = SONG.song;
+    std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
+    ScriptManager::getInstance()->loadSongScripts(songName);
+    
+    std::vector<std::string> characterNames = {SONG.player1, SONG.player2, SONG.gfVersion};
+    ScriptManager::getInstance()->loadCharacterScripts(characterNames);
+    
+    std::string stageScriptName = SONG.stage;
+    if (!stageScriptName.empty()) {
+        ScriptManager::getInstance()->loadStageScripts(stageScriptName);
+    }
+    
+    ScriptManager::getInstance()->callAll(ScriptCallback::ON_CREATE);
     
     float stageZoom = stage ? stage->getDefaultZoom() : 1.05f;
     cameraManager = new CameraManager(camGame, stageZoom);
@@ -259,7 +277,9 @@ void PlayState::create() {
     float healthBarX = (windowWidth - 601) / 2.0f;
     
     healthBar = new HealthBar(healthBarX, healthBarY, camHUD);
-    healthBar->setIcons("bf", "dad");
+    healthBar->setIcons(SONG.player1, SONG.player2);
+    healthBar->setColors(boyfriend->healthColorR, boyfriend->healthColorG, boyfriend->healthColorB,
+                        dad->healthColorR, dad->healthColorG, dad->healthColorB);
     healthBar->setHealth(1.0f);
     
     float scoreTextY = GameConfig::getInstance()->isDownscroll() ? 10.0f : static_cast<float>(windowHeight - 50);
@@ -286,6 +306,9 @@ void PlayState::create() {
 
 void PlayState::update(float elapsed) {
     FunkinState::update(elapsed);
+    
+    ScriptManager::getInstance()->callAll(ScriptCallback::ON_UPDATE, {elapsed});
+    ScriptManager::getInstance()->updateScriptObjects(elapsed);
     
     if (pauseHandler) {
         pauseHandler->update(elapsed, inst, vocals, Conductor::songPosition, musicStartTicks, subState,
@@ -383,6 +406,8 @@ void PlayState::startSong() {
     startingSong = false;
     musicStartTicks = SDL_GetTicks();
     
+    ScriptManager::getInstance()->callAll(ScriptCallback::ON_SONG_START);
+    
     if (cameraManager) {
         cameraManager->setCamZooming(true);
     }
@@ -402,6 +427,8 @@ void PlayState::startSong() {
 void PlayState::endSong() {
     seenCutscene = false;
     deathCounter = 0;
+    
+    ScriptManager::getInstance()->callAll(ScriptCallback::ON_SONG_END);
     
     if (inst) {
         inst->setVolume(0.0f);
@@ -476,6 +503,8 @@ void PlayState::endSong() {
 void PlayState::startCountdown() {
     startedCountdown = true;
     
+    ScriptManager::getInstance()->callAll(ScriptCallback::ON_COUNTDOWN_STARTED);
+    
     if (countdown) {
         countdown->start(Conductor::crochet);
     }
@@ -488,6 +517,7 @@ void PlayState::draw() {
         renderer->draw(stage, gf, dad, boyfriend, opponentStrumline, playerStrumline,
                       noteManager, healthBar, scoreText, popUpStuff, countdown, subState);
     }
+    ScriptManager::getInstance()->drawScriptObjects();
 }
 
 void PlayState::destroy() {
@@ -503,6 +533,8 @@ void PlayState::setupHUDCamera() {
 }
 
 void PlayState::beatHit() {
+    ScriptManager::getInstance()->callAll(ScriptCallback::ON_BEAT_HIT, {curBeat});
+    
     if (characterManager) {
         characterManager->beatHit(curBeat, curStep, SONG);
     }

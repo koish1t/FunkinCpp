@@ -1,4 +1,5 @@
 #include "Countdown.h"
+#include "../scripting/ScriptManager.h"
 #include <flixel/FlxCamera.h>
 #include <iostream>
 
@@ -71,6 +72,8 @@ flixel::FlxSprite* Countdown::getCurrentSprite() {
 }
 
 void Countdown::nextStep() {
+    ScriptManager::getInstance()->callAll(ScriptCallback::ON_COUNTDOWN_TICK, {step});
+    
     if (sprite) {
         delete sprite;
         sprite = nullptr;

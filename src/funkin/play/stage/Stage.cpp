@@ -1,6 +1,11 @@
 #include "Stage.h"
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include "../../../../external/nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 Stage::Stage(const std::string& stageName) {
     curStage = stageName;
@@ -50,29 +55,112 @@ std::string Stage::getStageFromSong(const std::string& songName) {
 }
 
 void Stage::buildStage() {
+    if (loadFromJSON(curStage)) {
+        return;
+    }
+    
     if (curStage == "stage") {
         buildDefaultStage();
     }
-    else if (curStage == "spooky") {
-        buildSpookyStage();
+    else {
+        buildDefaultStage();
     }
-    else if (curStage == "philly") {
-        buildPhillyStage();
+}
+
+bool Stage::loadFromJSON(const std::string& stageName) {
+    std::string jsonPath = "assets/data/stages/" + stageName + ".json";
+    std::ifstream file(jsonPath);
+    
+    if (!file.is_open()) {
+        return false;
     }
-    else if (curStage == "limo") {
-        buildLimoStage();
-    }
-    else if (curStage == "mall") {
-        buildMallStage();
-    }
-    else if (curStage == "mallEvil") {
-        buildMallEvilStage();
-    }
-    else if (curStage == "school") {
-        buildSchoolStage();
-    }
-    else if (curStage == "schoolEvil") {
-        buildSchoolEvilStage();
+    
+    try {
+        json stageData;
+        file >> stageData;
+        file.close();
+        
+        defaultZoom = stageData.value("defaultZoom", 1.05f);
+        
+        if (stageData.contains("sprites")) {
+            for (const auto& spriteData : stageData["sprites"]) {
+                std::string type = spriteData.value("type", "static");
+                std::string imagePath = spriteData.value("imagePath", "");
+                
+                if (imagePath.empty()) continue;
+                
+                float x = 0.0f, y = 0.0f;
+                if (spriteData.contains("position") && spriteData["position"].is_array() && spriteData["position"].size() >= 2) {
+                    x = spriteData["position"][0].get<float>();
+                    y = spriteData["position"][1].get<float>();
+                }
+                
+                flixel::FlxSprite* sprite = nullptr;
+                
+                if (type == "animated" && spriteData.contains("xmlPath")) {
+                    std::string xmlPath = spriteData["xmlPath"].get<std::string>();
+                    sprite = createAnimatedSprite(x, y, imagePath, xmlPath);
+                    
+                    if (spriteData.contains("animations")) {
+                        for (const auto& anim : spriteData["animations"]) {
+                            std::string animName = anim.value("name", "");
+                            std::string prefix = anim.value("prefix", "");
+                            int frameRate = anim.value("frameRate", 24);
+                            bool loop = anim.value("loop", false);
+                            
+                            if (!animName.empty() && !prefix.empty()) {
+                                auto frames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow(imagePath, xmlPath);
+                                auto animFrames = frames->getFramesByPrefix(prefix);
+                                if (!animFrames.empty()) {
+                                    sprite->animation->addByPrefix(animName, animFrames, frameRate, loop);
+                                }
+                            }
+                        }
+                        
+                        std::string startAnim = spriteData.value("startingAnimation", "");
+                        if (!startAnim.empty() && sprite->animation) {
+                            sprite->animation->play(startAnim);
+                        }
+                    }
+                } else {
+                    sprite = createSprite(x, y, imagePath);
+                }
+                
+                if (sprite) {
+                    if (spriteData.contains("scrollFactor") && spriteData["scrollFactor"].is_array() && spriteData["scrollFactor"].size() >= 2) {
+                        float scrollX = spriteData["scrollFactor"][0].get<float>();
+                        float scrollY = spriteData["scrollFactor"][1].get<float>();
+                        sprite->scrollFactor.set(scrollX, scrollY);
+                    }
+                    
+                    if (spriteData.contains("scale") && spriteData["scale"].is_array() && spriteData["scale"].size() >= 2) {
+                        float scaleX = spriteData["scale"][0].get<float>();
+                        float scaleY = spriteData["scale"][1].get<float>();
+                        sprite->setScale(scaleX, scaleY);
+                    }
+                    
+                    if (spriteData.value("updateHitbox", false)) {
+                        sprite->updateHitbox();
+                    }
+                    
+                    if (spriteData.contains("active")) {
+                        sprite->active = spriteData["active"].get<bool>();
+                    }
+                    
+                    if (spriteData.contains("visible")) {
+                        sprite->visible = spriteData["visible"].get<bool>();
+                    }
+                }
+            }
+        }
+        
+        std::cout << "Loaded stage from JSON: " << stageName << std::endl;
+        return true;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Error parsing stage JSON for " << stageName << ": " << e.what() << std::endl;
+        file.close();
+        return false;
     }
 }
 
@@ -113,188 +201,3 @@ void Stage::buildDefaultStage() {
     stageCurtains->scrollFactor.set(1.3f, 1.3f);
     stageCurtains->active = false;
 }
-
-void Stage::buildSpookyStage() {
-    defaultZoom = 1.05f;
-    
-    auto halloweenBG = createAnimatedSprite(-200, -100, "assets/images/halloween_bg.png", "assets/images/halloween_bg.xml");
-    auto frames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow("assets/images/halloween_bg.png", "assets/images/halloween_bg.xml");
-    
-    auto idleFrames = frames->getFramesByPrefix("halloweem bg0");
-    if (!idleFrames.empty()) {
-        halloweenBG->animation->addByPrefix("idle", idleFrames, 24, true);
-        halloweenBG->animation->play("idle");
-    }
-}
-
-void Stage::buildPhillyStage() {
-    defaultZoom = 1.05f;
-    
-    auto bg = createSprite(-100, 0, "assets/images/philly/sky.png");
-    bg->scrollFactor.set(0.1f, 0.1f);
-    
-    auto city = createSprite(-10, 0, "assets/images/philly/city.png");
-    city->scrollFactor.set(0.3f, 0.3f);
-    city->setScale(0.85f, 0.85f);
-    city->updateHitbox();
-    
-    for (int i = 0; i < 5; i++) {
-        auto light = createSprite(city->x, city->y, "assets/images/philly/win" + std::to_string(i) + ".png");
-        light->scrollFactor.set(0.3f, 0.3f);
-        light->visible = false;
-        light->setScale(0.85f, 0.85f);
-        light->updateHitbox();
-    }
-    
-    auto streetBehind = createSprite(-40, 50, "assets/images/philly/behindTrain.png");
-    
-    auto phillyTrain = createSprite(2000, 360, "assets/images/philly/train.png");
-    
-    auto street = createSprite(-40, 50, "assets/images/philly/street.png");
-}
-
-void Stage::buildLimoStage() {
-    defaultZoom = 0.9f;
-    
-    auto skyBG = createSprite(-120, -50, "assets/images/limo/limoSunset.png");
-    skyBG->scrollFactor.set(0.1f, 0.1f);
-    
-    auto bgLimo = createAnimatedSprite(-200, 480, "assets/images/limo/bgLimo.png", "assets/images/limo/bgLimo.xml");
-    auto frames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow("assets/images/limo/bgLimo.png", "assets/images/limo/bgLimo.xml");
-    auto driveFrames = frames->getFramesByPrefix("background limo pink");
-    if (!driveFrames.empty()) {
-        bgLimo->animation->addByPrefix("drive", driveFrames, 24, true);
-        bgLimo->animation->play("drive");
-    }
-    bgLimo->scrollFactor.set(0.4f, 0.4f);
-    
-    auto limo = createAnimatedSprite(-120, 550, "assets/images/limo/limoDrive.png", "assets/images/limo/limoDrive.xml");
-    auto limoFrames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow("assets/images/limo/limoDrive.png", "assets/images/limo/limoDrive.xml");
-    auto limoStageFrames = limoFrames->getFramesByPrefix("Limo stage");
-    if (!limoStageFrames.empty()) {
-        limo->animation->addByPrefix("drive", limoStageFrames, 24, true);
-        limo->animation->play("drive");
-    }
-}
-
-void Stage::buildMallStage() {
-    defaultZoom = 0.8f;
-    
-    auto bg = createSprite(-1000, -500, "assets/images/christmas/bgWalls.png");
-    bg->scrollFactor.set(0.2f, 0.2f);
-    bg->active = false;
-    bg->setScale(0.8f, 0.8f);
-    bg->updateHitbox();
-    
-    auto upperBoppers = createAnimatedSprite(-240, -90, "assets/images/christmas/upperBop.png", "assets/images/christmas/upperBop.xml");
-    auto frames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow("assets/images/christmas/upperBop.png", "assets/images/christmas/upperBop.xml");
-    auto bopFrames = frames->getFramesByPrefix("Upper Crowd Bob");
-    if (!bopFrames.empty()) {
-        upperBoppers->animation->addByPrefix("bop", bopFrames, 24, false);
-    }
-    upperBoppers->scrollFactor.set(0.33f, 0.33f);
-    upperBoppers->setScale(0.85f, 0.85f);
-    upperBoppers->updateHitbox();
-    
-    auto bgEscalator = createSprite(-1100, -600, "assets/images/christmas/bgEscalator.png");
-    bgEscalator->scrollFactor.set(0.3f, 0.3f);
-    bgEscalator->active = false;
-    bgEscalator->setScale(0.9f, 0.9f);
-    bgEscalator->updateHitbox();
-    
-    auto tree = createSprite(370, -250, "assets/images/christmas/christmasTree.png");
-    tree->scrollFactor.set(0.4f, 0.4f);
-    
-    auto bottomBoppers = createAnimatedSprite(-300, 140, "assets/images/christmas/bottomBop.png", "assets/images/christmas/bottomBop.xml");
-    auto bottomFrames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow("assets/images/christmas/bottomBop.png", "assets/images/christmas/bottomBop.xml");
-    auto bottomBopFrames = bottomFrames->getFramesByPrefix("Bottom Level Boppers");
-    if (!bottomBopFrames.empty()) {
-        bottomBoppers->animation->addByPrefix("bop", bottomBopFrames, 24, false);
-    }
-    bottomBoppers->scrollFactor.set(0.9f, 0.9f);
-    bottomBoppers->updateHitbox();
-    
-    auto fgSnow = createSprite(-600, 700, "assets/images/christmas/fgSnow.png");
-    fgSnow->active = false;
-    
-    auto santa = createAnimatedSprite(-840, 150, "assets/images/christmas/santa.png", "assets/images/christmas/santa.xml");
-    auto santaFrames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow("assets/images/christmas/santa.png", "assets/images/christmas/santa.xml");
-    auto santaIdleFrames = santaFrames->getFramesByPrefix("santa idle in fear");
-    if (!santaIdleFrames.empty()) {
-        santa->animation->addByPrefix("idle", santaIdleFrames, 24, false);
-    }
-}
-
-void Stage::buildMallEvilStage() {
-    defaultZoom = 1.05f;
-    
-    auto bg = createSprite(-400, -500, "assets/images/christmas/evilBG.png");
-    bg->scrollFactor.set(0.2f, 0.2f);
-    bg->active = false;
-    bg->setScale(0.8f, 0.8f);
-    bg->updateHitbox();
-    
-    auto evilTree = createSprite(300, -300, "assets/images/christmas/evilTree.png");
-    evilTree->scrollFactor.set(0.2f, 0.2f);
-    
-    auto evilSnow = createSprite(-200, 700, "assets/images/christmas/evilSnow.png");
-}
-
-void Stage::buildSchoolStage() {
-    defaultZoom = 1.05f;
-    
-    auto bgSky = createSprite(0, 0, "assets/images/weeb/weebSky.png");
-    bgSky->scrollFactor.set(0.1f, 0.1f);
-    
-    int repositionShit = -200;
-    
-    auto bgSchool = createSprite(repositionShit, 0, "assets/images/weeb/weebSchool.png");
-    bgSchool->scrollFactor.set(0.6f, 0.9f);
-    
-    auto bgStreet = createSprite(repositionShit, 0, "assets/images/weeb/weebStreet.png");
-    bgStreet->scrollFactor.set(0.95f, 0.95f);
-    
-    auto fgTrees = createSprite(repositionShit + 170, 130, "assets/images/weeb/weebTreesBack.png");
-    fgTrees->scrollFactor.set(0.9f, 0.9f);
-    
-    auto treeLeaves = createAnimatedSprite(repositionShit, -40, "assets/images/weeb/petals.png", "assets/images/weeb/petals.xml");
-    auto frames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow("assets/images/weeb/petals.png", "assets/images/weeb/petals.xml");
-    auto leavesFrames = frames->getFramesByPrefix("PETALS ALL");
-    if (!leavesFrames.empty()) {
-        treeLeaves->animation->addByPrefix("leaves", leavesFrames, 24, true);
-        treeLeaves->animation->play("leaves");
-    }
-    treeLeaves->scrollFactor.set(0.85f, 0.85f);
-    
-    int widShit = bgSky->width * 6;
-    
-    bgSky->setScale(widShit / static_cast<float>(bgSky->width), widShit / static_cast<float>(bgSky->width));
-    bgSchool->setScale(widShit / static_cast<float>(bgSchool->width), widShit / static_cast<float>(bgSchool->width));
-    bgStreet->setScale(widShit / static_cast<float>(bgStreet->width), widShit / static_cast<float>(bgStreet->width));
-    fgTrees->setScale((widShit * 0.8f) / static_cast<float>(fgTrees->width), (widShit * 0.8f) / static_cast<float>(fgTrees->width));
-    treeLeaves->setScale(widShit / static_cast<float>(treeLeaves->width), widShit / static_cast<float>(treeLeaves->width));
-    
-    fgTrees->updateHitbox();
-    bgSky->updateHitbox();
-    bgSchool->updateHitbox();
-    bgStreet->updateHitbox();
-    treeLeaves->updateHitbox();
-}
-
-void Stage::buildSchoolEvilStage() {
-    defaultZoom = 1.05f;
-    
-    float posX = 400;
-    float posY = 200;
-    
-    auto bg = createAnimatedSprite(posX, posY, "assets/images/weeb/animatedEvilSchool.png", "assets/images/weeb/animatedEvilSchool.xml");
-    auto frames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow("assets/images/weeb/animatedEvilSchool.png", "assets/images/weeb/animatedEvilSchool.xml");
-    auto idleFrames = frames->getFramesByPrefix("background 2");
-    if (!idleFrames.empty()) {
-        bg->animation->addByPrefix("idle", idleFrames, 24, true);
-        bg->animation->play("idle");
-    }
-    bg->scrollFactor.set(0.8f, 0.9f);
-    bg->setScale(6, 6);
-}
-

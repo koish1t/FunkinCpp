@@ -4,6 +4,9 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "../../../../external/nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 Character::Character(float x, float y, const std::string& character, bool isPlayer)
     : FlxSprite(x, y)
@@ -13,6 +16,9 @@ Character::Character(float x, float y, const std::string& character, bool isPlay
     , stunned(false)
     , holdTimer(0.0f)
     , danced(false)
+    , healthColorR(255)
+    , healthColorG(255)
+    , healthColorB(255)
 {
     loadCharacter();
     dance();
@@ -27,6 +33,10 @@ Character::~Character() {
 }
 
 void Character::loadCharacter() {
+    if (loadFromJSON(curCharacter)) {
+        return;
+    }
+    
     if (curCharacter == "bf") {
         setupBF();
     } else if (curCharacter == "gf") {
@@ -34,8 +44,108 @@ void Character::loadCharacter() {
     } else if (curCharacter == "dad") {
         setupDad();
     } else {
+        std::cerr << "Unknown character: " << curCharacter << ", defaulting to dad" << std::endl;
         curCharacter = "dad";
         setupDad();
+    }
+}
+
+bool Character::loadFromJSON(const std::string& character) {
+    std::string jsonPath = "assets/data/characters/" + character + ".json";
+    std::ifstream file(jsonPath);
+    
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    try {
+        json charData;
+        file >> charData;
+        file.close();
+        
+        std::string assetPath = charData.value("assetPath", "assets/images/BOYFRIEND");
+        std::string xmlPath = assetPath + ".xml";
+        std::string pngPath = assetPath + ".png";
+        
+        std::ifstream xmlFile(xmlPath);
+        if (!xmlFile.is_open()) {
+            std::cerr << "Failed to load character XML: " << xmlPath << std::endl;
+            return false;
+        }
+        
+        std::stringstream buffer;
+        buffer << xmlFile.rdbuf();
+        std::string xmlText = buffer.str();
+        xmlFile.close();
+        
+        auto tex = flixel::graphics::frames::FlxAtlasFrames::fromSparrow(pngPath, xmlText);
+        frames = tex;
+        
+        if (frames && !frames->frames.empty()) {
+            const auto& firstFrame = frames->frames[0];
+            frameWidth = firstFrame.sourceSize.w;
+            frameHeight = firstFrame.sourceSize.h;
+            width = static_cast<float>(frameWidth);
+            height = static_cast<float>(frameHeight);
+        }
+        
+        texture = tex->texture;
+        ownsTexture = false;
+        animation = new flixel::animation::FlxAnimationController();
+        
+        if (charData.contains("animations")) {
+            for (const auto& anim : charData["animations"]) {
+                std::string animName = anim.value("name", "");
+                std::string prefix = anim.value("prefix", "");
+                int frameRate = anim.value("frameRate", 24);
+                bool loop = anim.value("loop", false);
+                
+                if (anim.contains("indices")) {
+                    std::vector<int> indices = anim["indices"].get<std::vector<int>>();
+                    auto animFrames = frames->getFramesByPrefix(prefix);
+                    if (!animFrames.empty()) {
+                        animation->addByIndices(animName, animFrames, indices, frameRate, loop);
+                    }
+                } else {
+                    auto animFrames = frames->getFramesByPrefix(prefix);
+                    if (!animFrames.empty()) {
+                        animation->addByPrefix(animName, animFrames, frameRate, loop);
+                    }
+                }
+                
+                if (anim.contains("offsets") && anim["offsets"].is_array() && anim["offsets"].size() >= 2) {
+                    float offsetX = anim["offsets"][0].get<float>();
+                    float offsetY = anim["offsets"][1].get<float>();
+                    addOffset(animName, offsetX, offsetY);
+                }
+            }
+        }
+        
+        if (charData.contains("flipX")) {
+            flipX = charData["flipX"].get<bool>();
+        }
+        
+        if (charData.contains("scale")) {
+            float scaleVal = charData["scale"].get<float>();
+            scale.set(scaleVal, scaleVal);
+        }
+        
+        if (charData.contains("healthColor") && charData["healthColor"].is_array() && charData["healthColor"].size() >= 3) {
+            healthColorR = charData["healthColor"][0].get<int>();
+            healthColorG = charData["healthColor"][1].get<int>();
+            healthColorB = charData["healthColor"][2].get<int>();
+        }
+        
+        std::string startAnim = charData.value("startingAnimation", "idle");
+        playAnim(startAnim);
+        
+        std::cout << "Loaded character from JSON: " << character << std::endl;
+        return true;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Error parsing character JSON for " << character << ": " << e.what() << std::endl;
+        file.close();
+        return false;
     }
 }
 
@@ -78,7 +188,7 @@ void Character::setupBF() {
     auto singLEFTmissFrames = frames->getFramesByPrefix("BF NOTE LEFT MISS");
     auto singRIGHTmissFrames = frames->getFramesByPrefix("BF NOTE RIGHT MISS");
     auto singDOWNmissFrames = frames->getFramesByPrefix("BF NOTE DOWN MISS");
-    auto heyFrames = frames->getFramesByPrefix("BF HEY");
+    auto heyFrames = frames->getFramesByPrefix("BF HEY!!");
     auto firstDeathFrames = frames->getFramesByPrefix("BF dies");
     auto deathLoopFrames = frames->getFramesByPrefix("BF Dead Loop");
     auto deathConfirmFrames = frames->getFramesByPrefix("BF Dead confirm");
@@ -254,7 +364,12 @@ void Character::update(float elapsed) {
         holdTimer += elapsed;
         
         if (holdTimer >= Conductor::stepCrochet * 4 * 0.001f && animation) {
-            if (animation->current.rfind("sing", 0) == 0) {
+            std::string currentAnim = animation->current;
+            bool shouldReturnToIdle = (currentAnim.rfind("sing", 0) == 0) || 
+                                     (currentAnim == "hey") || 
+                                     (currentAnim == "scared");
+            
+            if (shouldReturnToIdle) {
                 dance();
             }
         }
@@ -292,6 +407,15 @@ void Character::dance() {
 
 void Character::playAnim(const std::string& animName, bool force, bool reversed, int frame) {
     if (animation) {
+        if (!force) {
+            std::string currentAnim = animation->current;
+            bool isSpecialAnim = (currentAnim == "hey" || currentAnim == "scared");
+            
+            if (isSpecialAnim && holdTimer < Conductor::stepCrochet * 4 * 0.001f) {
+                return;
+            }
+        }
+        
         animation->play(animName, force);
         
         if (animOffsets.find(animName) != animOffsets.end()) {
@@ -302,6 +426,8 @@ void Character::playAnim(const std::string& animName, bool force, bool reversed,
             offsetX = 0;
             offsetY = 0;
         }
+        
+        holdTimer = 0.0f;
         
         if (curCharacter == "gf") {
             if (animName == "singLEFT") {

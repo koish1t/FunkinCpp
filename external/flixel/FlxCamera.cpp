@@ -294,7 +294,7 @@ void FlxCamera::updateShake(float elapsed) {
                 if (pixelPerfect) {
                     shakePixels = std::round(shakePixels);
                 }
-                x += shakePixels * zoom;
+                scroll.x += shakePixels * zoom;
             }
             
             if (static_cast<int>(_fxShakeAxes) & static_cast<int>(util::FlxAxes::Y)) {
@@ -302,7 +302,7 @@ void FlxCamera::updateShake(float elapsed) {
                 if (pixelPerfect) {
                     shakePixels = std::round(shakePixels);
                 }
-                y += shakePixels * zoom;
+                scroll.y += shakePixels * zoom;
             }
         }
     }
@@ -430,8 +430,10 @@ void FlxCamera::fill(util::FlxColor color, bool blendAlpha, float fxAlpha) {
 
     SDL_SetTextureColorMod(_fill, color.red(), color.green(), color.blue());
     
+    Uint8 finalAlpha = static_cast<Uint8>(color.alpha() * fxAlpha);
+    
     if (blendAlpha) {
-        SDL_SetTextureAlphaMod(_fill, static_cast<Uint8>(color.alpha() * fxAlpha * 255));
+        SDL_SetTextureAlphaMod(_fill, finalAlpha);
         SDL_SetTextureBlendMode(_fill, SDL_BLENDMODE_BLEND);
     } else {
         SDL_SetTextureAlphaMod(_fill, 255);
@@ -439,10 +441,10 @@ void FlxCamera::fill(util::FlxColor color, bool blendAlpha, float fxAlpha) {
     }
 
     SDL_Rect dest = {
-        static_cast<int>(x),
-        static_cast<int>(y),
-        width,
-        height
+        0,
+        0,
+        FlxG::width,
+        FlxG::height
     };
 
     SDL_RenderCopy(renderer, _fill, nullptr, &dest);
@@ -450,17 +452,11 @@ void FlxCamera::fill(util::FlxColor color, bool blendAlpha, float fxAlpha) {
 
 void FlxCamera::drawFX() {
     if (_fxFlashAlpha > 0.0f) {
-        util::FlxColor flashColor = _fxFlashColor;
-        Uint8 alpha = static_cast<Uint8>(flashColor.alpha() * _fxFlashAlpha);
-        flashColor.setAlpha(alpha);
-        fill(flashColor);
+        fill(_fxFlashColor, true, _fxFlashAlpha);
     }
 
     if (_fxFadeAlpha > 0.0f) {
-        util::FlxColor fadeColor = _fxFadeColor;
-        Uint8 alpha = static_cast<Uint8>(fadeColor.alpha() * _fxFadeAlpha);
-        fadeColor.setAlpha(alpha);
-        fill(fadeColor);
+        fill(_fxFadeColor, true, _fxFadeAlpha);
     }
 }
 

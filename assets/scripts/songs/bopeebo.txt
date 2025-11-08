@@ -1,0 +1,50 @@
+// Bopeebo Script
+
+// onCreate is called when the PlayState is created
+function onCreate
+end function
+
+// onUpdate is called every frame
+function onUpdate
+end function
+
+// onBeatHit is called every beat
+function onBeatHit
+    var beat, 0
+    set beat, getCurrentBeat
+    
+    var beatMod, 0
+    set beatMod, mod beat 8
+    
+    if beatMod == 7
+        playCharAnim bf, hey, true
+    endif
+end function
+
+// onStepHit is called every step
+function onStepHit
+end function
+
+// onCountdownTick is called for each countdown tick (3, 2, 1, GO)
+function onCountdownTick
+end function
+
+// onSongStart is called when the song starts
+function onSongStart
+end function
+
+// onNoteHit is called when a note is hit
+function onNoteHit
+end function
+
+// onNoteMiss is called when a note is missed
+function onNoteMiss
+end function
+
+// onPause is called when the game is paused
+function onPause
+end function
+
+// onResume is called when the game is resumed
+function onResume
+end function
