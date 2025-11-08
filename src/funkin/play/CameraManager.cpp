@@ -7,6 +7,7 @@ CameraManager::CameraManager(flixel::FlxCamera* camGame, float defaultZoom)
     , dad(nullptr)
     , defaultCamZoom(defaultZoom)
     , camZooming(false)
+    , lastMustHit(true)
 {
 }
 
@@ -35,9 +36,14 @@ void CameraManager::update(float elapsed, int curSection, const SwagSong& song) 
     
     bool mustHit = song.notes[curSection].mustHitSection;
     
-    if (mustHit && boyfriend) {
-        camFollow->setPosition(boyfriend->getMidpoint().x - 100, boyfriend->getMidpoint().y - 100);
-    } else if (!mustHit && dad) {
-        camFollow->setPosition(dad->getMidpoint().x + 150, dad->getMidpoint().y - 100);
+    if (mustHit != lastMustHit) {
+        lastMustHit = mustHit;
+
+        if (mustHit && boyfriend) {
+            camFollow->setPosition(boyfriend->getMidpoint().x - 100, boyfriend->getMidpoint().y - 100);
+        }
+        else if (!mustHit && dad) {
+            camFollow->setPosition(dad->getMidpoint().x + 150, dad->getMidpoint().y - 100);
+        }
     }
 }

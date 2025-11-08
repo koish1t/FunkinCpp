@@ -25,4 +25,5 @@ private:
     Character* dad;
     float defaultCamZoom;
     bool camZooming;
+    bool lastMustHit;
 };
