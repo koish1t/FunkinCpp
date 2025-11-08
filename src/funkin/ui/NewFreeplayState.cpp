@@ -569,7 +569,7 @@ void NewFreeplayState::createFreeplayStuff() {
     clearPercentSprite->scrollFactor.y = 0.0f;
     clearPercentSprite->camera = camMenu;
     
-    scoreDisplay = new DigitDisplay(956.0f, 178.0f, "digital_numbers", 7, 0.4f, -25.0f);
+    scoreDisplay = new DigitDisplay(956.0f, 178.0f, "menu/freeplay/digital_numbers", 7, 0.4f, -25.0f);
     scoreDisplay->setDigitOffset(1, 45.0f);
     scoreDisplay->scrollFactor.x = 0.0f;
     scoreDisplay->scrollFactor.y = 0.0f;
@@ -642,7 +642,7 @@ void NewFreeplayState::createFreeplayStuff() {
     difficulty->camera = camMenu;
     
     std::string fontLetters = "AaBbCcDdEeFfGgHhiIJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:1234567890";
-    categoryFont = flixel::FlxBitmapFont::fromMonospace("assets/images/ui/resultFont.png", fontLetters, 49, 62);
+    categoryFont = flixel::FlxBitmapFont::fromMonospace("assets/images/menu/freeplay/resultFont.png", fontLetters, 49, 62);
     
     categoryTitle = new flixel::FlxBitmapText(categoryFont);
     categoryTitle->letterSpacing = -15;
@@ -925,7 +925,7 @@ void NewFreeplayState::fakeMainMenuSetup() {
     std::vector<std::string> menuItemNames = {"storymode", "freeplay", "options", "credits"};
     
     for (size_t i = 0; i < menuItemNames.size(); i++) {
-        AtlasMenuItem* item = new AtlasMenuItem(menuItemNames[i], "assets/images/mainmenu/" + menuItemNames[i], nullptr);
+        AtlasMenuItem* item = new AtlasMenuItem(menuItemNames[i], "assets/images/menu/mainmenu/" + menuItemNames[i], nullptr);
         item->ID = static_cast<int>(i);
         item->centered = true;
         item->changeAnim("idle");

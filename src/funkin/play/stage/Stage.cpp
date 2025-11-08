@@ -185,17 +185,17 @@ flixel::FlxSprite* Stage::createAnimatedSprite(float x, float y, const std::stri
 void Stage::buildDefaultStage() {
     defaultZoom = 1.05f;
     
-    auto bg = createSprite(-600, -200, "assets/images/stageback.png");
+    auto bg = createSprite(-600, -200, "assets/images/stages/stage/stageback.png");
     bg->scrollFactor.set(0.9f, 0.9f);
     bg->active = false;
     
-    auto stageFront = createSprite(-650, 600, "assets/images/stagefront.png");
+    auto stageFront = createSprite(-650, 600, "assets/images/stages/stage/stagefront.png");
     stageFront->setScale(1.1f, 1.1f);
     stageFront->updateHitbox();
     stageFront->scrollFactor.set(0.9f, 0.9f);
     stageFront->active = false;
     
-    auto stageCurtains = createSprite(-500, -300, "assets/images/stagecurtains.png");
+    auto stageCurtains = createSprite(-500, -300, "assets/images/stages/stage/stagecurtains.png");
     stageCurtains->setScale(0.9f, 0.9f);
     stageCurtains->updateHitbox();
     stageCurtains->scrollFactor.set(1.3f, 1.3f);

@@ -1,6 +1,6 @@
 {
 	"name": "bf",
-	"assetPath": "assets/images/BOYFRIEND",
+	"assetPath": "assets/images/chars/BOYFRIEND",
 	"startingAnimation": "idle",
 	"flipX": true,
 	"antialiasing": true,
