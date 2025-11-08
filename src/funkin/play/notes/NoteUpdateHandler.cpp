@@ -1,5 +1,6 @@
 #include "NoteUpdateHandler.h"
 #include "../song/Conductor.h"
+#include "../../scripting/ScriptManager.h"
 
 NoteUpdateHandler::NoteUpdateHandler(NoteManager* noteManager, NoteHitHandler* noteHitHandler,
                                      GameplayManager* gameplayManager, Character* gf)
@@ -22,6 +23,8 @@ void NoteUpdateHandler::updateNotes(float elapsed, Character* boyfriend, flixel:
             note->update(elapsed);
 
             if (note->mustPress && note->tooLate && !note->wasGoodHit) {
+                ScriptManager::getInstance()->callAll(ScriptCallback::ON_NOTE_MISS, {note->noteData});
+                
                 if (gameplayManager && boyfriend) {
                     gameplayManager->noteMiss(note->noteData, boyfriend, vocals);
                 }

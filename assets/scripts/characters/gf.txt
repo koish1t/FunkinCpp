@@ -1,0 +1,55 @@
+// GF Character Script
+
+// onCreate is called when the PlayState is created
+function onCreate
+    // basically checks if dad is gf and if he is the game moves dad to gf's pos before hiding og gf
+    var player2, ""
+    set player2, getPlayer2
+    
+    if player2 == "gf"
+        // gets geef's pos
+        var gfX, 0.0
+        var gfY, 0.0
+        set gfX, getCharX gf
+        set gfY, getCharY gf
+        
+        setCharPos dad, gfX, gfY        
+        setCharVisible gf, false
+    endif
+end function
+
+// onUpdate is called every frame
+function onUpdate
+end function
+
+// onBeatHit is called every beat
+function onBeatHit
+end function
+
+// onStepHit is called every step
+function onStepHit
+end function
+
+// onCountdownTick is called for each countdown tick (3, 2, 1, GO)
+function onCountdownTick
+end function
+
+// onSongStart is called when the song starts
+function onSongStart
+end function
+
+// onNoteHit is called when a note is hit
+function onNoteHit
+end function
+
+// onNoteMiss is called when a note is missed
+function onNoteMiss
+end function
+
+// onPause is called when the game is paused
+function onPause
+end function
+
+// onResume is called when the game is resumed
+function onResume
+end function

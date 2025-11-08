@@ -78,7 +78,7 @@ void Character::setupBF() {
     auto singLEFTmissFrames = frames->getFramesByPrefix("BF NOTE LEFT MISS");
     auto singRIGHTmissFrames = frames->getFramesByPrefix("BF NOTE RIGHT MISS");
     auto singDOWNmissFrames = frames->getFramesByPrefix("BF NOTE DOWN MISS");
-    auto heyFrames = frames->getFramesByPrefix("BF HEY");
+    auto heyFrames = frames->getFramesByPrefix("BF HEY!!");
     auto firstDeathFrames = frames->getFramesByPrefix("BF dies");
     auto deathLoopFrames = frames->getFramesByPrefix("BF Dead Loop");
     auto deathConfirmFrames = frames->getFramesByPrefix("BF Dead confirm");
@@ -254,7 +254,12 @@ void Character::update(float elapsed) {
         holdTimer += elapsed;
         
         if (holdTimer >= Conductor::stepCrochet * 4 * 0.001f && animation) {
-            if (animation->current.rfind("sing", 0) == 0) {
+            std::string currentAnim = animation->current;
+            bool shouldReturnToIdle = (currentAnim.rfind("sing", 0) == 0) || 
+                                     (currentAnim == "hey") || 
+                                     (currentAnim == "scared");
+            
+            if (shouldReturnToIdle) {
                 dance();
             }
         }
@@ -292,6 +297,15 @@ void Character::dance() {
 
 void Character::playAnim(const std::string& animName, bool force, bool reversed, int frame) {
     if (animation) {
+        if (!force) {
+            std::string currentAnim = animation->current;
+            bool isSpecialAnim = (currentAnim == "hey" || currentAnim == "scared");
+            
+            if (isSpecialAnim && holdTimer < Conductor::stepCrochet * 4 * 0.001f) {
+                return;
+            }
+        }
+        
         animation->play(animName, force);
         
         if (animOffsets.find(animName) != animOffsets.end()) {
@@ -302,6 +316,8 @@ void Character::playAnim(const std::string& animName, bool force, bool reversed,
             offsetX = 0;
             offsetY = 0;
         }
+        
+        holdTimer = 0.0f;
         
         if (curCharacter == "gf") {
             if (animName == "singLEFT") {

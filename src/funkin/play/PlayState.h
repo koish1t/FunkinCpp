@@ -29,6 +29,7 @@
 #include "CameraManager.h"
 #include "PauseHandler.h"
 #include "PlayStateRenderer.h"
+#include "../scripting/ScriptManager.h"
 #include <flixel/FlxSprite.h>
 #include <flixel/text/FlxText.h>
 #include <flixel/sound/FlxSound.h>
@@ -66,6 +67,17 @@ public:
     flixel::FlxObject* getCamFollow() const { 
         return cameraManager ? cameraManager->getCamFollow() : nullptr; 
     }
+    
+    Character* getBoyfriend() const { return boyfriend; }
+    Character* getDad() const { return dad; }
+    Character* getGf() const { return gf; }
+    HealthBar* getHealthBar() const { return healthBar; }
+    NoteHitHandler* getNoteHitHandler() const { return noteHitHandler; }
+    flixel::FlxText* getScoreText() const { return scoreText; }
+    flixel::FlxCamera* getCamGame() const { return camGame; }
+    flixel::FlxCamera* getCamHUD() const { return camHUD; }
+    int getCurBeat() const { return curBeat; }
+    int getCurStep() const { return curStep; }
     
     bool persistentUpdate;
     bool persistentDraw;

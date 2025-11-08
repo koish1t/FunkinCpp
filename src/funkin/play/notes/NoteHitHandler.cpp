@@ -2,6 +2,7 @@
 #include "../PlayState.h"
 #include "../song/Conductor.h"
 #include "../../game/GameConfig.h"
+#include "../../scripting/ScriptManager.h"
 #include <flixel/FlxG.h>
 #include <cmath>
 #include <algorithm>
@@ -164,6 +165,8 @@ void NoteHitHandler::goodNoteHit(NoteSprite* note) {
             float safeZoneOffset = (10.0f / 60.0f) * 1000.0f;
             
             Scoring::Judgement judgement = Scoring::judgeNote(noteDiff, safeZoneOffset);
+            
+            ScriptManager::getInstance()->callAll(ScriptCallback::ON_NOTE_HIT, {note->noteData, judgement.rating});
             
             if (judgement.rating == "shit") {
                 shits++;

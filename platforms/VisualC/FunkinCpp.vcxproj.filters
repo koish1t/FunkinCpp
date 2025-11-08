@@ -58,6 +58,9 @@
     <Filter Include="Source Files\funkin\ui\freeplay">
       <UniqueIdentifier>{6fe61f65-7c20-4184-98c6-1bfccb6bf08f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\funkin\scripting">
+      <UniqueIdentifier>{1c660779-bffd-49cc-b79a-af46ac2f855d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -245,6 +248,15 @@
     </ClCompile>
     <ClCompile Include="..\..\src\funkin\play\scoring\Highscore.cpp">
       <Filter>Source Files\funkin\play\scoring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\scripting\Script.cpp">
+      <Filter>Source Files\funkin\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\scripting\ScriptAPI.cpp">
+      <Filter>Source Files\funkin\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\funkin\scripting\ScriptManager.cpp">
+      <Filter>Source Files\funkin\scripting</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

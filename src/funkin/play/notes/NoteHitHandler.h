@@ -35,6 +35,15 @@ public:
     void resetCombo() { combo = 0; }
     void updateScore() { updateScoreText(); }
     
+    void setScore(int value) { score = value; }
+    void setMisses(int value) { misses = value; }
+    void setCombo(int value) { combo = value; }
+    void decrementScore(int amount) { score -= amount; if (score < 0) score = 0; }    
+    void setSicks(int value) { sicks = value; }
+    void setGoods(int value) { goods = value; }
+    void setBads(int value) { bads = value; }
+    void setShits(int value) { shits = value; }
+    
 private:
     Controls* controls;
     NoteManager* noteManager;
