@@ -569,7 +569,7 @@ void NewFreeplayState::createFreeplayStuff() {
     clearPercentSprite->scrollFactor.y = 0.0f;
     clearPercentSprite->camera = camMenu;
     
-    scoreDisplay = new DigitDisplay(956.0f, 178.0f, "digital_numbers", 7, 0.4f, -25.0f);
+    scoreDisplay = new DigitDisplay(956.0f, 178.0f, "menu/freeplay/digital_numbers", 7, 0.4f, -25.0f);
     scoreDisplay->setDigitOffset(1, 45.0f);
     scoreDisplay->scrollFactor.x = 0.0f;
     scoreDisplay->scrollFactor.y = 0.0f;

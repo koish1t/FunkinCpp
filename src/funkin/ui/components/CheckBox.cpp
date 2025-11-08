@@ -11,12 +11,12 @@ CheckBox::CheckBox(float x, float y, bool checked)
 {
     visible = true;
     
-    std::ifstream file("assets/images/checkboxThingie.xml");
+    std::ifstream file("assets/images/genUI/checkboxThingie.xml");
     std::string xmlText((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     file.close();
     
     auto checkboxFrames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow(
-        "assets/images/checkboxThingie.png",
+        "assets/images/genUI/checkboxThingie.png",
         xmlText
     );
     
