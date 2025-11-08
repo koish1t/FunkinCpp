@@ -1,6 +1,6 @@
 {
 	"name": "dad",
-	"assetPath": "assets/images/DADDY_DEAREST",
+	"assetPath": "assets/images/chars/DADDY_DEAREST",
 	"startingAnimation": "idle",
 	"flipX": false,
 	"antialiasing": true,

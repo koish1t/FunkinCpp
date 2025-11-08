@@ -63,7 +63,7 @@ bool Character::loadFromJSON(const std::string& character) {
         file >> charData;
         file.close();
         
-        std::string assetPath = charData.value("assetPath", "assets/images/BOYFRIEND");
+        std::string assetPath = charData.value("assetPath", "assets/images/chars/BOYFRIEND");
         std::string xmlPath = assetPath + ".xml";
         std::string pngPath = assetPath + ".png";
         
@@ -150,7 +150,7 @@ bool Character::loadFromJSON(const std::string& character) {
 }
 
 void Character::setupBF() {
-    std::ifstream file("assets/images/BOYFRIEND.xml");
+    std::ifstream file("assets/images/chars/BOYFRIEND.xml");
     if (!file.is_open()) {
         std::cerr << "Failed to load BOYFRIEND.xml" << std::endl;
         return;
@@ -162,7 +162,7 @@ void Character::setupBF() {
     file.close();
     
     auto tex = flixel::graphics::frames::FlxAtlasFrames::fromSparrow(
-        "assets/images/BOYFRIEND.png",
+        "assets/images/chars/BOYFRIEND.png",
         xmlText
     );
     
@@ -229,7 +229,7 @@ void Character::setupBF() {
 }
 
 void Character::setupGF() {
-    std::ifstream file("assets/images/GF_assets.xml");
+    std::ifstream file("assets/images/chars/GF_assets.xml");
     if (!file.is_open()) {
         std::cerr << "Failed to load GF_assets.xml" << std::endl;
         return;
@@ -241,7 +241,7 @@ void Character::setupGF() {
     file.close();
     
     auto tex = flixel::graphics::frames::FlxAtlasFrames::fromSparrow(
-        "assets/images/GF_assets.png",
+        "assets/images/chars/GF_assets.png",
         xmlText
     );
     
@@ -292,7 +292,7 @@ void Character::setupGF() {
 }
 
 void Character::setupDad() {
-    std::ifstream file("assets/images/DADDY_DEAREST.xml");
+    std::ifstream file("assets/images/chars/DADDY_DEAREST.xml");
     if (!file.is_open()) {
         std::cerr << "Failed to load DADDY_DEAREST.xml" << std::endl;
         return;
@@ -304,7 +304,7 @@ void Character::setupDad() {
     file.close();
     
     auto tex = flixel::graphics::frames::FlxAtlasFrames::fromSparrow(
-        "assets/images/DADDY_DEAREST.png",
+        "assets/images/chars/DADDY_DEAREST.png",
         xmlText
     );
     

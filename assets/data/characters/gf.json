@@ -1,6 +1,6 @@
 {
 	"name": "gf",
-	"assetPath": "assets/images/GF_assets",
+	"assetPath": "assets/images/chars/GF_assets",
 	"startingAnimation": "danceRight",
 	"flipX": false,
 	"antialiasing": true,
