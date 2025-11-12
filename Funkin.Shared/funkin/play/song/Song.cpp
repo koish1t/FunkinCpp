@@ -1,5 +1,5 @@
 #include "Song.h"
-#include "../../../../external/nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
 #include <filesystem>

@@ -2,7 +2,7 @@
 
 #include <string>
 #include <iostream>
-#include "../../../external/nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 class Controls;
 

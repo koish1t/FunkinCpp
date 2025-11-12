@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <memory>
-#include "../../src/imports.h"
+#include "../../imports.h"
 
 namespace flixel {
 

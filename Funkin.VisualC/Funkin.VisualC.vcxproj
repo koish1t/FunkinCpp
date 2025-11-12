@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{3fb2d31a-773f-4db1-a47e-ee55cd04d8b4}</ProjectGuid>
-    <RootNamespace>FunkinCpp</RootNamespace>
+    <ProjectGuid>{e61db06c-7357-4d02-82bb-98f316a7151a}</ProjectGuid>
+    <RootNamespace>FunkinVisualC</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -56,6 +56,7 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
+    <Import Project="..\Funkin.Shared\Funkin.Shared.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -70,12 +71,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>Funkin</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>Funkin</TargetName>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>Funkin</TargetName>
   </PropertyGroup>
@@ -89,18 +84,12 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>../../external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Funkin.Shared/external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../external/lib/x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2_Image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>xcopy /Y /E "$(ProjectDir)..\..\assets" "$(OutDir)assets\"
-xcopy /Y "$(ProjectDir)..\..\external\lib\x86\*.dll" "$(OutDir)"</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -111,18 +100,12 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x86\*.dll" "$(OutDir)"</Command>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>../../external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Funkin.Shared/external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../external/lib/x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2_Image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>xcopy /Y /E "$(ProjectDir)..\..\assets" "$(OutDir)assets\"
-xcopy /Y "$(ProjectDir)..\..\external\lib\x86\*.dll" "$(OutDir)"</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -131,19 +114,14 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x86\*.dll" "$(OutDir)"</Command>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>../../external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Funkin.Shared/external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../external/lib/x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../Funkin.Shared/external/lib/x64</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2_Image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>xcopy /Y /E "$(ProjectDir)..\..\assets" "$(OutDir)assets\"
-xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
-</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -154,86 +132,17 @@ xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>../../external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Funkin.Shared/external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../external/lib/x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../Funkin.Shared/external/lib/x64</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2_Image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>xcopy /Y /E "$(ProjectDir)..\..\assets" "$(OutDir)assets\"
-xcopy /Y "$(ProjectDir)..\..\external\lib\x64\*.dll" "$(OutDir)"
-</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\external\flixel\addons\FlxBackdrop.cpp" />
-    <ClCompile Include="..\..\external\flixel\animation\FlxAnimationController.cpp" />
-    <ClCompile Include="..\..\external\flixel\effects\FlxFlicker.cpp" />
-    <ClCompile Include="..\..\external\flixel\FlxBasic.cpp" />
-    <ClCompile Include="..\..\external\flixel\FlxCamera.cpp" />
-    <ClCompile Include="..\..\external\flixel\FlxG.cpp" />
-    <ClCompile Include="..\..\external\flixel\FlxGame.cpp" />
-    <ClCompile Include="..\..\external\flixel\FlxObject.cpp" />
-    <ClCompile Include="..\..\external\flixel\FlxSprite.cpp" />
-    <ClCompile Include="..\..\external\flixel\FlxState.cpp" />
-    <ClCompile Include="..\..\external\flixel\FlxSubState.cpp" />
-    <ClCompile Include="..\..\external\flixel\graphics\frames\FlxAtlasFrames.cpp" />
-    <ClCompile Include="..\..\external\flixel\input\FlxGamepad.cpp" />
-    <ClCompile Include="..\..\external\flixel\sound\FlxSound.cpp" />
-    <ClCompile Include="..\..\external\flixel\sound\FlxSoundGroup.cpp" />
-    <ClCompile Include="..\..\external\flixel\text\FlxBitmapText.cpp" />
-    <ClCompile Include="..\..\external\flixel\text\FlxText.cpp" />
-    <ClCompile Include="..\..\external\flixel\tweens\FlxTween.cpp" />
-    <ClCompile Include="..\..\external\flixel\util\FlxTimer.cpp" />
-    <ClCompile Include="..\..\external\tinyxml2.cpp" />
-    <ClCompile Include="..\..\src\funkin\FunkinState.cpp" />
-    <ClCompile Include="..\..\src\funkin\game\GameConfig.cpp" />
-    <ClCompile Include="..\..\src\funkin\game\Section.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\CameraManager.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\character\Character.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\character\CharacterManager.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\components\HealthBar.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\components\HealthIcon.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\components\PopUpStuff.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\Countdown.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\GameplayManager.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\input\Controls.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\notes\NoteHitHandler.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\notes\NoteManager.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\notes\NoteSprite.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\notes\NoteUpdateHandler.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\notes\Strumline.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\GameOverSubState.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\PauseHandler.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\PauseSubState.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\PlayState.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\PlayStateRenderer.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\scoring\Highscore.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\scoring\Scoring.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\song\Conductor.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\song\Song.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\song\SongLoader.cpp" />
-    <ClCompile Include="..\..\src\funkin\play\stage\Stage.cpp" />
-    <ClCompile Include="..\..\src\funkin\scripting\Script.cpp" />
-    <ClCompile Include="..\..\src\funkin\scripting\ScriptAPI.cpp" />
-    <ClCompile Include="..\..\src\funkin\scripting\ScriptManager.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\components\Alphabet.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\components\AtlasMenuItem.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\components\CheckBox.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\components\MenuCharacter.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\components\MenuItem.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\CreditsState.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\freeplay\Capsule.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\freeplay\DigitDisplay.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\MainMenuState.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\NewFreeplayState.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\OptionsState.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\StoryMenuState.cpp" />
-    <ClCompile Include="..\..\src\funkin\ui\TitleState.cpp" />
-    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

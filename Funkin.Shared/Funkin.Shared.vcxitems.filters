@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="funkin">
+      <UniqueIdentifier>{7be70f61-30d1-44bf-997a-fe10b6273490}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\ui">
+      <UniqueIdentifier>{a715a28b-9cff-445e-b9d8-4b7ba1e5be81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\ui\freeplay">
+      <UniqueIdentifier>{e96bc431-71a2-40d8-8176-213242d3021b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\ui\components">
+      <UniqueIdentifier>{c8482bd5-01f2-46b2-b618-4fbb5e7e48fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\scripting">
+      <UniqueIdentifier>{fb161ec6-accf-4c09-b84a-ce42a19db3a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\play">
+      <UniqueIdentifier>{50875347-b077-443b-9eda-6353fef01c1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\play\stage">
+      <UniqueIdentifier>{7e6015a1-43d3-40d5-a81d-34bdf5a13383}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\play\song">
+      <UniqueIdentifier>{2fe4f7fc-b07b-4288-9642-aee37c5396bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\play\scoring">
+      <UniqueIdentifier>{eab164ee-ed62-4b84-99e2-e043587060ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\play\notes">
+      <UniqueIdentifier>{9457bf3c-fab6-474a-a0c7-66515eefa9c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\play\input">
+      <UniqueIdentifier>{ab9bf055-3917-4f07-a242-c0a1c18bfbb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\play\components">
+      <UniqueIdentifier>{4a130af3-262c-4199-8fde-0ab51b781622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\play\character">
+      <UniqueIdentifier>{1970c167-db9b-4553-8136-6d8863be365e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="funkin\game">
+      <UniqueIdentifier>{bda56026-b219-4968-a8cb-dc659abedd5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="flixel">
+      <UniqueIdentifier>{68082d53-a334-45be-ae12-6a34fc44a26b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tinyxml2">
+      <UniqueIdentifier>{f876d8ab-17ed-41af-829d-d3db8ed17616}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\FunkinState.cpp">
+      <Filter>funkin</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\CreditsState.cpp">
+      <Filter>funkin\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\MainMenuState.cpp">
+      <Filter>funkin\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\NewFreeplayState.cpp">
+      <Filter>funkin\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\OptionsState.cpp">
+      <Filter>funkin\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\StoryMenuState.cpp">
+      <Filter>funkin\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\TitleState.cpp">
+      <Filter>funkin\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\freeplay\Capsule.cpp">
+      <Filter>funkin\ui\freeplay</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\freeplay\DigitDisplay.cpp">
+      <Filter>funkin\ui\freeplay</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\components\Alphabet.cpp">
+      <Filter>funkin\ui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\components\AtlasMenuItem.cpp">
+      <Filter>funkin\ui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\components\CheckBox.cpp">
+      <Filter>funkin\ui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\components\MenuCharacter.cpp">
+      <Filter>funkin\ui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\ui\components\MenuItem.cpp">
+      <Filter>funkin\ui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\scripting\Script.cpp">
+      <Filter>funkin\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\scripting\ScriptAPI.cpp">
+      <Filter>funkin\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\scripting\ScriptManager.cpp">
+      <Filter>funkin\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\CameraManager.cpp">
+      <Filter>funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\Countdown.cpp">
+      <Filter>funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\GameOverSubState.cpp">
+      <Filter>funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\GameplayManager.cpp">
+      <Filter>funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\PauseHandler.cpp">
+      <Filter>funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\PauseSubState.cpp">
+      <Filter>funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\PlayState.cpp">
+      <Filter>funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\PlayStateRenderer.cpp">
+      <Filter>funkin\play</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\stage\Stage.cpp">
+      <Filter>funkin\play\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\song\Conductor.cpp">
+      <Filter>funkin\play\song</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\song\Song.cpp">
+      <Filter>funkin\play\song</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\song\SongLoader.cpp">
+      <Filter>funkin\play\song</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\scoring\Highscore.cpp">
+      <Filter>funkin\play\scoring</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\scoring\Scoring.cpp">
+      <Filter>funkin\play\scoring</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\notes\NoteHitHandler.cpp">
+      <Filter>funkin\play\notes</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\notes\NoteManager.cpp">
+      <Filter>funkin\play\notes</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\notes\NoteSprite.cpp">
+      <Filter>funkin\play\notes</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\notes\NoteUpdateHandler.cpp">
+      <Filter>funkin\play\notes</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\notes\Strumline.cpp">
+      <Filter>funkin\play\notes</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\input\Controls.cpp">
+      <Filter>funkin\play\input</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\components\HealthBar.cpp">
+      <Filter>funkin\play\components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\components\HealthIcon.cpp">
+      <Filter>funkin\play\components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\components\PopUpStuff.cpp">
+      <Filter>funkin\play\components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\character\Character.cpp">
+      <Filter>funkin\play\character</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\play\character\CharacterManager.cpp">
+      <Filter>funkin\play\character</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\game\GameConfig.cpp">
+      <Filter>funkin\game</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)funkin\game\Section.cpp">
+      <Filter>funkin\game</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\FlxBasic.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\FlxCamera.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\FlxG.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\FlxGame.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\FlxObject.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\FlxSprite.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\FlxState.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\FlxSubState.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\util\FlxTimer.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\tweens\FlxTween.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\text\FlxBitmapText.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\text\FlxText.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\sound\FlxSound.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\sound\FlxSoundGroup.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\input\FlxGamepad.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\graphics\frames\FlxAtlasFrames.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\effects\FlxFlicker.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\animation\FlxAnimationController.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\flixel\addons\FlxBackdrop.cpp">
+      <Filter>flixel</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)external\tinyxml2.cpp">
+      <Filter>tinyxml2</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
