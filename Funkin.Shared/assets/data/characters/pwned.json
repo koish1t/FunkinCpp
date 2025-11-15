@@ -1,0 +1,49 @@
+{
+	"name": "pwned",
+	"assetPath": "assets/images/chars/pwnfnf",
+	"startingAnimation": "idle",
+	"flipX": false,
+	"antialiasing": true,
+	"scale": 1.0,
+	"healthIcon": "pwned",
+	"healthColor": [119, 136, 153],
+	"position": [100, 100],
+	"cameraPosition": [0, 0],
+	"animations": [
+		{
+			"name": "idle",
+			"prefix": "idle",
+			"frameRate": 24,
+			"loop": true,
+			"offsets": [0, 27]
+		},
+		{
+			"name": "singUP",
+			"prefix": "up",
+			"frameRate": 24,
+			"loop": false,
+			"offsets": [0, 27]
+		},
+		{
+			"name": "singRIGHT",
+			"prefix": "right",
+			"frameRate": 24,
+			"loop": false,
+			"offsets": [0, 27]
+		},
+		{
+			"name": "singLEFT",
+			"prefix": "left",
+			"frameRate": 24,
+			"loop": false,
+			"offsets": [0, 27]
+		},
+		{
+			"name": "singDOWN",
+			"prefix": "down",
+			"frameRate": 24,
+			"loop": false,
+			"offsets": [0, 27]
+		}
+	]
+}
