@@ -9,14 +9,6 @@ TOPDIR ?= $(CURDIR)
 include $(DEVKITPRO)/libnx/switch_rules
 
 #---------------------------------------------------------------------------------
-# Build options (set to ON/OFF as needed)
-#---------------------------------------------------------------------------------
-REV01 := ON
-JAPANESE := OFF
-FIX_BUGS := OFF
-SPLASH := OFF
-
-#---------------------------------------------------------------------------------
 # TARGET is the name of the output
 # BUILD is the directory where object files & intermediate files will be placed
 # SOURCES is a list of directories containing source code
@@ -46,9 +38,9 @@ SPLASH := OFF
 #---------------------------------------------------------------------------------
 TARGET		:=	funkin
 BUILD		:=	build
-SOURCES		:=	../../src ../../external/flixel ../../external/flixel/animation ../../external/flixel/addons ../../external/flixel/tweens ../../external/flixel/sound ../../external/flixel/text ../../external/flixel/input ../../external/flixel/graphics/frames ../../external/flixel/effects ../../external/flixel/util ../../external ../../src/funkin ../../src/funkin/game ../../src/funkin/play ../../src/funkin/play/character ../../src/funkin/play/components ../../src/funkin/play/input ../../src/funkin/play/notes ../../src/funkin/play/scoring ../../src/funkin/play/song ../../src/funkin/play/stage ../../src/funkin/ui ../../src/funkin/scripting ../../src/funkin/ui/components ../../src/funkin/ui/freeplay
+SOURCES		:=	../Funkin.Shared ../Funkin.Shared/external/flixel ../Funkin.Shared/external/flixel/animation ../Funkin.Shared/external/flixel/addons ../Funkin.Shared/external/flixel/tweens ../Funkin.Shared/external/flixel/sound ../Funkin.Shared/external/flixel/text ../Funkin.Shared/external/flixel/input ../Funkin.Shared/external/flixel/graphics/frames ../Funkin.Shared/external/flixel/effects ../Funkin.Shared/external/flixel/util ../Funkin.Shared/external ../Funkin.Shared/funkin ../Funkin.Shared/funkin/game ../Funkin.Shared/funkin/play ../Funkin.Shared/funkin/play/character ../Funkin.Shared/funkin/play/components ../Funkin.Shared/funkin/play/input ../Funkin.Shared/funkin/play/notes ../Funkin.Shared/funkin/play/scoring ../Funkin.Shared/funkin/play/song ../Funkin.Shared/funkin/play/stage ../Funkin.Shared/funkin/ui ../Funkin.Shared/funkin/scripting ../Funkin.Shared/funkin/ui/components ../Funkin.Shared/funkin/ui/freeplay
 DATA		:=	data
-INCLUDES	:=	../../src ../../external/flixel ../../external/flixel/effects ../../external/flixel/util ../../external ../../src/funkin ../../src/funkin/game ../../src/funkin/play ../../src/funkin/play/character ../../src/funkin/play/components ../../src/funkin/play/input ../../src/funkin/play/notes ../../src/funkin/play/scoring ../../src/funkin/play/song ../../src/funkin/play/stage ../../src/funkin/ui ../../src/funkin/scripting ../../src/funkin/ui/components ../../src/funkin/ui/freeplay
+INCLUDES	:=	../Funkin.Shared ../Funkin.Shared/external/flixel ../Funkin.Shared/external/flixel/effects ../Funkin.Shared/external/flixel/util ../Funkin.Shared/external ../Funkin.Shared/funkin ../Funkin.Shared/funkin/game ../Funkin.Shared/funkin/play ../Funkin.Shared/funkin/play/character ../Funkin.Shared/funkin/play/components ../Funkin.Shared/funkin/play/input ../Funkin.Shared/funkin/play/notes ../Funkin.Shared/funkin/play/scoring ../Funkin.Shared/funkin/play/song ../Funkin.Shared/funkin/play/stage ../Funkin.Shared/funkin/ui ../Funkin.Shared/funkin/scripting ../Funkin.Shared/funkin/ui/components ../Funkin.Shared/funkin/ui/freeplay
 ROMFS	:=	romfs
 
 APP_TITLE := "Friday Night Funkin'"
@@ -71,29 +63,6 @@ CFLAGS	+=	`aarch64-none-elf-pkg-config SDL2 SDL2_image SDL2_mixer SDL2_ttf --cfl
 CFLAGS += -DSCP_BACKEND_SDL2
 
 CFLAGS += -DSCP_LIL_ENDIAN
-
-# Revision flag
-ifeq ($(REV01),ON)
-	CFLAGS += -DSCP_REV01
-else
-	CFLAGS += -DSCP_REV00
-endif
-
-# Region flag
-ifeq ($(JAPANESE),ON)
-	CFLAGS += -DSCP_JP
-endif
-
-# Bug fix flag
-ifeq ($(FIX_BUGS),ON)
-	CFLAGS += -DSCP_FIX_BUGS
-endif
-
-# Splash screen flag
-ifeq ($(SPLASH),ON)
-	CFLAGS += -DSCP_SPLASH
-endif
-
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions
 
 ASFLAGS	:=	-g $(ARCH)
