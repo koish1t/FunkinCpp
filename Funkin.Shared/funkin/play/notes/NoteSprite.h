@@ -22,24 +22,28 @@ public:
     static void unloadAssets();
     static float getTargetY();
 
-    NoteSprite(float strumTime, int noteData, NoteSprite* prevNote = nullptr, bool sustainNote = false);
+    NoteSprite(float strumTime, int noteData);
     ~NoteSprite();
 
     void update(float elapsed) override;
-    void setupNote();
-    void setupSustainNote();
+    void draw() override;
 
     float strumTime;
     int noteData;
-    float sustainLength;
-    bool mustPress;
-    bool isSustainNote;
-    bool canBeHit;
-    bool wasGoodHit;
-    bool tooLate;
-    float noteScore;
-    NoteSprite* prevNote;
-    NoteSprite* parentNote;
-    float yOffset = 0.0f;
+    float sustainLength = 0.0f;
+    bool mustPress = false;
+    bool canBeHit = false;
+    bool wasGoodHit = false;
+    bool tooLate = false;
+    float noteScore = 1.0f;
     bool kill = false;
+
+private:
+    int headFrameIndex = -1;
+    int bodyFrameIndex = -1;
+    int tailFrameIndex = -1;
+
+    void cacheFrameIndices();
+    void drawFrame(int frameIndex, float drawX, float drawY, float scaleX, float scaleY);
+    float getHoldClipAmount() const;
 };

@@ -1,6 +1,7 @@
 #include "NoteUpdateHandler.h"
 #include "../song/Conductor.h"
 #include "../../scripting/ScriptManager.h"
+#include "../../game/GameConfig.h"
 
 NoteUpdateHandler::NoteUpdateHandler(NoteManager* noteManager, NoteHitHandler* noteHitHandler,
                                      GameplayManager* gameplayManager, Character* gf)
@@ -39,14 +40,16 @@ void NoteUpdateHandler::updateNotes(float elapsed, Character* boyfriend, flixel:
                 note->kill = true;
             }
 
-            if (note->y < -note->height) {
-                if (note->isSustainNote && note->wasGoodHit) {
+            if (note->wasGoodHit && note->sustainLength > 0) {
+                float sustainEndTime = note->strumTime + note->sustainLength;
+                if (Conductor::songPosition >= sustainEndTime) {
                     note->kill = true;
                 }
             }
 
             if (note->kill || note->strumTime < Conductor::songPosition - 5000) {
                 it = notes.erase(it);
+                delete note;
             } else {
                 ++it;
             }

@@ -23,8 +23,5 @@ private:
     std::vector<NoteSprite*> unspawnedNotes;
     flixel::FlxCamera* hudCamera;
     
-    NoteSprite* createNote(float strumTime, int noteType, NoteSprite* prevNote, bool mustPress);
-    NoteSprite* createSustainNote(float strumTime, int noteType, NoteSprite* prevNote, 
-                                   bool mustPress, NoteSprite* parentNote, int pieceIndex, 
-                                   int totalPieces, float speed);
+    NoteSprite* createNote(float strumTime, int noteType, float sustainLength, bool mustPress);
 };

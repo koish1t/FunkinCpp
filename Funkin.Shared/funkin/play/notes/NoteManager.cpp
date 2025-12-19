@@ -44,27 +44,8 @@ void NoteManager::generateNotes(const SwagSong& song) {
                 
                 float sustainLength = (noteData.size() > 2) ? noteData[2] : 0;
                 
-                NoteSprite* oldNote = !unspawnedNotes.empty() ? unspawnedNotes.back() : nullptr;
-                NoteSprite* swagNote = createNote(strumTime, noteType, oldNote, mustPress);
-                swagNote->sustainLength = sustainLength;
-                
-                if (sustainLength > 0) {
-                    float susLength = sustainLength / Conductor::stepCrochet;
-                    int numSustainPieces = static_cast<int>(std::round(susLength));
-                    
-                    for (int susNote = 0; susNote < numSustainPieces; susNote++) {
-                        oldNote = !unspawnedNotes.empty() ? unspawnedNotes.back() : nullptr;
-                        float sustainNoteTime = strumTime + (Conductor::stepCrochet * susNote);
-                        
-                        NoteSprite* sustainNote = createSustainNote(sustainNoteTime, noteType, oldNote, 
-                                                                     mustPress, swagNote, susNote, 
-                                                                     numSustainPieces, song.speed);
-                        unspawnedNotes.push_back(sustainNote);
-                        totalNotes++;
-                    }
-                }
-                
-                unspawnedNotes.push_back(swagNote);
+                NoteSprite* note = createNote(strumTime, noteType, sustainLength, mustPress);
+                unspawnedNotes.push_back(note);
                 totalNotes++;
             }
         }
@@ -75,10 +56,13 @@ void NoteManager::generateNotes(const SwagSong& song) {
         [](NoteSprite* a, NoteSprite* b) {
             return a->strumTime < b->strumTime;
         });
+    
+    std::cout << "Generated " << totalNotes << " notes" << std::endl;
 }
 
-NoteSprite* NoteManager::createNote(float strumTime, int noteType, NoteSprite* prevNote, bool mustPress) {
-    NoteSprite* note = new NoteSprite(strumTime, noteType, prevNote, false);
+NoteSprite* NoteManager::createNote(float strumTime, int noteType, float sustainLength, bool mustPress) {
+    NoteSprite* note = new NoteSprite(strumTime, noteType);
+    note->sustainLength = sustainLength;
     note->mustPress = mustPress;
     note->scrollFactor.x = 0.0f;
     note->scrollFactor.y = 0.0f;
@@ -92,41 +76,6 @@ NoteSprite* NoteManager::createNote(float strumTime, int noteType, NoteSprite* p
     }
     
     return note;
-}
-
-NoteSprite* NoteManager::createSustainNote(float strumTime, int noteType, NoteSprite* prevNote, 
-                                            bool mustPress, NoteSprite* parentNote, int pieceIndex, 
-                                            int totalPieces, float speed) {
-    NoteSprite* sustainNote = new NoteSprite(strumTime, noteType, prevNote, true);
-    sustainNote->mustPress = mustPress;
-    sustainNote->scrollFactor.x = 0.0f;
-    sustainNote->scrollFactor.y = 0.0f;
-    sustainNote->parentNote = parentNote;
-    
-    if (pieceIndex == totalPieces - 1 && sustainNote->animation) {
-        sustainNote->animation->play("hold_end");
-        sustainNote->setScale(0.7f, 0.7f);
-        sustainNote->updateHitbox();
-        sustainNote->x += 34.0f;
-    } else {
-        float scaleMultiplier = Conductor::stepCrochet / 100.0f * 1.5f * speed;
-        sustainNote->setScale(0.7f, 0.7f * scaleMultiplier);
-        sustainNote->originX = 0.0f;
-        sustainNote->originY = 0.0f;
-        sustainNote->x += 34.0f;
-    }
-    
-    sustainNote->yOffset = 30.0f;
-    
-    if (mustPress) {
-        sustainNote->x += static_cast<float>(flixel::FlxG::width) / 2.0f;
-    }
-    
-    if (hudCamera) {
-        sustainNote->camera = hudCamera;
-    }
-    
-    return sustainNote;
 }
 
 void NoteManager::updateSpawning(float songPosition) {

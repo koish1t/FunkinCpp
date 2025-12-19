@@ -65,11 +65,11 @@ void NoteHitHandler::handleInput() {
     }
     
     for (auto note : notes) {
-        if (!note || note->kill || note->wasGoodHit || note->tooLate) {
+        if (!note || note->kill || note->tooLate) {
             continue;
         }
         
-        if (!note->mustPress || !note->canBeHit) {
+        if (!note->mustPress) {
             continue;
         }
         
@@ -78,10 +78,25 @@ void NoteHitHandler::handleInput() {
             continue;
         }
         
-        if (note->isSustainNote) {
-            if (heldArray[lane] && note->parentNote && note->parentNote->wasGoodHit) {
-                goodNoteHit(note);
+        if (note->wasGoodHit && note->sustainLength > 0) {
+            if (heldArray[lane]) {
+                if (boyfriend) {
+                    std::string animToPlay = "";
+                    switch (note->noteData) {
+                        case 0: animToPlay = "singLEFT"; break;
+                        case 1: animToPlay = "singDOWN"; break;
+                        case 2: animToPlay = "singUP"; break;
+                        case 3: animToPlay = "singRIGHT"; break;
+                    }
+                    if (!animToPlay.empty() && boyfriend->animation) {
+                        boyfriend->holdTimer = 0.0f;
+                    }
+                }
             }
+            continue;
+        }
+        
+        if (!note->canBeHit) {
             continue;
         }
         
@@ -160,38 +175,39 @@ void NoteHitHandler::goodNoteHit(NoteSprite* note) {
             }
         }
 
-        if (!note->isSustainNote) {
-            float noteDiff = note->strumTime - Conductor::songPosition;
-            float safeZoneOffset = (10.0f / 60.0f) * 1000.0f;
-            
-            Scoring::Judgement judgement = Scoring::judgeNote(noteDiff, safeZoneOffset);
-            
-            ScriptManager::getInstance()->callAll(ScriptCallback::ON_NOTE_HIT, {note->noteData, judgement.rating});
-            
-            if (judgement.rating == "shit") {
-                shits++;
-            } else if (judgement.rating == "bad") {
-                bads++;
-            } else if (judgement.rating == "good") {
-                goods++;
-            } else {
-                sicks++;
-            }
-            
-            if (healthBar) {
-                healthBar->setHealth(healthBar->getHealth() + 0.05f);
-            }
-            combo++;
-            
-            if (!PlayState::practiceMode) {
-                score += judgement.score;
-            }
-            
-            if (popUpStuff) {
-                popUpStuff->popUpScore(judgement.rating, combo, Conductor::crochet, camHUD);
-            }
-            
-            updateScoreText();
+        float noteDiff = note->strumTime - Conductor::songPosition;
+        float safeZoneOffset = (10.0f / 60.0f) * 1000.0f;
+        
+        Scoring::Judgement judgement = Scoring::judgeNote(noteDiff, safeZoneOffset);
+        
+        ScriptManager::getInstance()->callAll(ScriptCallback::ON_NOTE_HIT, {note->noteData, judgement.rating});
+        
+        if (judgement.rating == "shit") {
+            shits++;
+        } else if (judgement.rating == "bad") {
+            bads++;
+        } else if (judgement.rating == "good") {
+            goods++;
+        } else {
+            sicks++;
+        }
+        
+        if (healthBar) {
+            healthBar->setHealth(healthBar->getHealth() + 0.05f);
+        }
+        combo++;
+        
+        if (!PlayState::practiceMode) {
+            score += judgement.score;
+        }
+        
+        if (popUpStuff) {
+            popUpStuff->popUpScore(judgement.rating, combo, Conductor::crochet, camHUD);
+        }
+        
+        updateScoreText();
+        
+        if (note->sustainLength <= 0) {
             note->kill = true;
         }
     }

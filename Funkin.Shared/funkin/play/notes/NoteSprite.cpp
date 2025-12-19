@@ -2,10 +2,12 @@
 #include "../PlayState.h"
 #include "../song/Conductor.h"
 #include "../../game/GameConfig.h"
+#include <flixel/FlxG.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <cmath>
 
 const float NoteSprite::STRUM_X = 42.0f;
 const float NoteSprite::swagWidth = 160.0f * 0.7f;
@@ -21,7 +23,8 @@ void NoteSprite::loadAssets() {
             std::string xmlText = buffer.str();
             file.close();
             
-            noteFrames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow("assets/images/play/notetypes/default/NOTE_assets.png", xmlText);
+            noteFrames = flixel::graphics::frames::FlxAtlasFrames::fromSparrow(
+                "assets/images/play/notetypes/default/NOTE_assets.png", xmlText);
             assetsLoaded = true;
             std::cout << "Note assets loaded successfully" << std::endl;
         } else {
@@ -40,17 +43,14 @@ void NoteSprite::unloadAssets() {
     }
 }
 
-NoteSprite::NoteSprite(float strumTime, int noteData, NoteSprite* prevNote, bool sustainNote) 
-    : FlxSprite(), strumTime(strumTime), noteData(noteData), prevNote(prevNote), 
-      isSustainNote(sustainNote), sustainLength(0), mustPress(false), canBeHit(false),
-      tooLate(false), wasGoodHit(false), noteScore(1.0f), parentNote(nullptr) {
-    
+NoteSprite::NoteSprite(float strumTime, int noteData) 
+    : FlxSprite(), strumTime(strumTime), noteData(noteData)
+{
     if (!assetsLoaded) {
         loadAssets();
     }
     
-    x += 42.0f;
-    x += 50.0f;
+    x += STRUM_X + 50.0f;
     y -= 2000.0f;
     
     if (noteFrames) {
@@ -68,144 +68,69 @@ NoteSprite::NoteSprite(float strumTime, int noteData, NoteSprite* prevNote, bool
             height = static_cast<float>(frameHeight);
         }
         
-        std::string noteType;
-        if (noteData == LEFT_NOTE) {
-            noteType = "purple";
+        cacheFrameIndices();
+        
+        std::string framePrefix;
+        switch (noteData) {
+            case LEFT_NOTE:  framePrefix = "purple"; break;
+            case DOWN_NOTE:  framePrefix = "blue"; break;
+            case UP_NOTE:    framePrefix = "green"; break;
+            case RIGHT_NOTE: framePrefix = "red"; break;
+            default:         framePrefix = "purple"; break;
         }
-        else if (noteData == DOWN_NOTE) {
-            noteType = "blue";
-        }
-        else if (noteData == UP_NOTE) {
-            noteType = "green";
-        }
-        else if (noteData == RIGHT_NOTE) {
-            noteType = "red";
-        }
-        else {
-            noteType = "purple";
-            std::cout << "Unknown note type: " << noteData << std::endl;
-        }
-
-        if (sustainNote) {
-            std::string holdPiecePrefix, holdEndPrefix;
-            switch (noteData) {
-                case LEFT_NOTE:
-                    holdPiecePrefix = "purple hold piece";
-                    holdEndPrefix = "pruple end hold";
-                    break;
-                case DOWN_NOTE:
-                    holdPiecePrefix = "blue hold piece";
-                    holdEndPrefix = "blue hold end";
-                    break;
-                case UP_NOTE:
-                    holdPiecePrefix = "green hold piece";
-                    holdEndPrefix = "green hold end";
-                    break;
-                case RIGHT_NOTE:
-                    holdPiecePrefix = "red hold piece";
-                    holdEndPrefix = "red hold end";
-                    break;
-                default:
-                    holdPiecePrefix = "purple hold piece";
-                    holdEndPrefix = "pruple end hold";
-                    break;
-            }
-            
-            auto scrollFrames = frames->getFramesByPrefix(holdPiecePrefix);
-            auto endFrames = frames->getFramesByPrefix(holdEndPrefix);
-            if (!scrollFrames.empty()) {
-                animation->addByPrefix("hold", scrollFrames, 24, false);
-            }
-            if (!endFrames.empty()) {
-                animation->addByPrefix("hold_end", endFrames, 24, false);
-            }
-            animation->play("hold");
-        } else {
-            std::string framePrefix;
-            switch (noteData) {
-                case LEFT_NOTE:
-                    framePrefix = "purple";
-                    break;
-                case DOWN_NOTE:
-                    framePrefix = "blue";
-                    break;
-                case UP_NOTE:
-                    framePrefix = "green";
-                    break;
-                case RIGHT_NOTE:
-                    framePrefix = "red";
-                    break;
-                default:
-                    framePrefix = "purple";
-                    break;
-            }
-            
-            auto scrollFrames = frames->getFramesByPrefix(framePrefix);
-            if (!scrollFrames.empty()) {
-                animation->addByPrefix("scroll", scrollFrames, 24, false);
-                animation->play("scroll");
-            } else {
-                std::cout << "Warning: No frames found for frame prefix: " << framePrefix << std::endl;
-            }
+        
+        auto scrollFrames = frames->getFramesByPrefix(framePrefix);
+        if (!scrollFrames.empty()) {
+            animation->addByPrefix("scroll", scrollFrames, 24, false);
+            animation->play("scroll");
         }
     }
     
     x += swagWidth * noteData;
-
     setScale(0.7f, 0.7f);
     updateHitbox();
     visible = true;
 }
 
-void NoteSprite::setupNote() {
-    std::string colorPrefix;
-    switch (noteData) {
-        case LEFT_NOTE:
-            colorPrefix = "purple";
-            break;
-        case DOWN_NOTE:
-            colorPrefix = "blue";
-            break;
-        case UP_NOTE:
-            colorPrefix = "green";
-            break;
-        case RIGHT_NOTE:
-            colorPrefix = "red";
-            break;
-    }
-}
-
-void NoteSprite::setupSustainNote() {
-    noteScore *= 0.2f;
-    alpha = 0.6f;
-
-    x += width / 2;
+void NoteSprite::cacheFrameIndices() {
+    if (!noteFrames) return;
     
-    flipY = GameConfig::getInstance()->isDownscroll();
-
-    std::string colorPrefix;
+    std::string headPrefix, bodyPrefix, tailPrefix;
     switch (noteData) {
         case LEFT_NOTE:
-            colorPrefix = "purple";
+            headPrefix = "purple";
+            bodyPrefix = "purple hold piece";
+            tailPrefix = "pruple end hold";
             break;
         case DOWN_NOTE:
-            colorPrefix = "blue";
+            headPrefix = "blue";
+            bodyPrefix = "blue hold piece";
+            tailPrefix = "blue hold end";
             break;
         case UP_NOTE:
-            colorPrefix = "green";
+            headPrefix = "green";
+            bodyPrefix = "green hold piece";
+            tailPrefix = "green hold end";
             break;
         case RIGHT_NOTE:
-            colorPrefix = "red";
+            headPrefix = "red";
+            bodyPrefix = "red hold piece";
+            tailPrefix = "red hold end";
+            break;
+        default:
+            headPrefix = "purple";
+            bodyPrefix = "purple hold piece";
+            tailPrefix = "pruple end hold";
             break;
     }
-
-    updateHitbox();
-    x -= width / 2;
-
-    if (prevNote && prevNote->isSustainNote) {
-        prevNote->scaleY *= static_cast<float>(Conductor::stepCrochet) / 100.0f * 1.5f * 1.0f;
-        prevNote->updateHitbox();
-    }
+    
+    auto headFrames = noteFrames->getFramesByPrefix(headPrefix);
+    auto bodyFrames = noteFrames->getFramesByPrefix(bodyPrefix);
+    auto tailFrames = noteFrames->getFramesByPrefix(tailPrefix);
+    
+    if (!headFrames.empty()) headFrameIndex = headFrames[0];
+    if (!bodyFrames.empty()) bodyFrameIndex = bodyFrames[0];
+    if (!tailFrames.empty()) tailFrameIndex = tailFrames[0];
 }
 
 float NoteSprite::getTargetY() {
@@ -214,6 +139,129 @@ float NoteSprite::getTargetY() {
         return windowHeight - 150.0f;
     }
     return 50.0f;
+}
+
+float NoteSprite::getHoldClipAmount() const {
+    if (sustainLength <= 0) return 0.0f;
+    if (!wasGoodHit) return 0.0f;
+    
+    float targetY = getTargetY();
+    bool isDownscroll = GameConfig::getInstance()->isDownscroll();
+    
+    if (isDownscroll) {
+        return std::max(0.0f, y - (targetY + swagWidth / 2.0f));
+    } else {
+        return std::max(0.0f, (targetY + swagWidth / 2.0f) - y);
+    }
+}
+
+void NoteSprite::drawFrame(int frameIndex, float drawX, float drawY, float drawScaleX, float drawScaleY) {
+    if (frameIndex < 0 || frameIndex >= static_cast<int>(noteFrames->frames.size())) return;
+    
+    const auto& frame = noteFrames->frames[frameIndex];
+    SDL_Rect srcRect = frame.rect;
+    
+    float camScrollX = 0.0f;
+    float camScrollY = 0.0f;
+    float camZoom = 1.0f;
+    if (camera) {
+        camScrollX = camera->scroll.x * scrollFactor.x;
+        camScrollY = camera->scroll.y * scrollFactor.y;
+        camZoom = camera->zoom;
+    }
+    
+    float finalX = (drawX - camScrollX) * camZoom;
+    float finalY = (drawY - camScrollY) * camZoom;
+    float finalW = srcRect.w * drawScaleX * camZoom;
+    float finalH = srcRect.h * drawScaleY * camZoom;
+    
+    SDL_FRect destRectF = {finalX, finalY, finalW, finalH};
+    
+    SDL_SetTextureAlphaMod(texture, static_cast<Uint8>(alpha * 255.0f));
+    
+    SDL_RendererFlip flip = SDL_FLIP_NONE;
+    if (flipY) {
+        flip = SDL_FLIP_VERTICAL;
+    }
+    
+    SDL_RenderCopyExF(flixel::FlxG::renderer, texture, &srcRect, &destRectF, 0.0f, nullptr, flip);
+}
+
+void NoteSprite::draw() {
+    if (!texture || !visible || alpha <= 0.0f) return;
+    
+    bool isDownscroll = GameConfig::getInstance()->isDownscroll();
+    float baseScale = 0.7f;
+    
+    FlxSprite::draw();
+    
+    if (sustainLength <= 0 || bodyFrameIndex < 0 || tailFrameIndex < 0) return;
+    
+    float scrollSpeed = PlayState::SONG.speed;
+    float holdLength = sustainLength * 0.45f * scrollSpeed;
+    
+    const auto& bodyFrame = noteFrames->frames[bodyFrameIndex];
+    const auto& tailFrame = noteFrames->frames[tailFrameIndex];
+    
+    float bodyHeight = bodyFrame.rect.h * baseScale;
+    float tailHeight = tailFrame.rect.h * baseScale;
+    
+    float headCenterX = x + (width * baseScale) / 2.0f;
+    float bodyX = headCenterX - (bodyFrame.rect.w * baseScale) / 2.0f;
+    
+    float holdStartY;
+    if (isDownscroll) {
+        holdStartY = y - bodyHeight;
+    } else {
+        holdStartY = y + (height * baseScale);
+    }
+    
+    float clipAmount = getHoldClipAmount();
+    float remainingLength = std::max(0.0f, holdLength - clipAmount);
+    
+    if (remainingLength <= 0) return;
+    
+    float originalAlpha = alpha;
+    alpha = 0.6f;
+    
+    float bodyLengthToDraw = std::max(0.0f, remainingLength - tailHeight);
+    float currentY = holdStartY;
+    
+    if (isDownscroll) {
+        currentY = holdStartY;
+        float drawnLength = 0.0f;
+        
+        while (drawnLength < bodyLengthToDraw) {
+            float segmentHeight = std::min(bodyHeight, bodyLengthToDraw - drawnLength);
+            float segmentScale = segmentHeight / (bodyFrame.rect.h * baseScale);
+            
+            drawFrame(bodyFrameIndex, bodyX, currentY, baseScale, baseScale * segmentScale);
+            
+            currentY -= segmentHeight;
+            drawnLength += segmentHeight;
+        }
+        
+        float tailX = headCenterX - (tailFrame.rect.w * baseScale) / 2.0f;
+        drawFrame(tailFrameIndex, tailX, currentY, baseScale, baseScale);
+    } else {
+        currentY = holdStartY;
+        float drawnLength = 0.0f;
+        
+        while (drawnLength < bodyLengthToDraw) {
+            float segmentHeight = std::min(bodyHeight, bodyLengthToDraw - drawnLength);
+            float segmentScale = segmentHeight / (bodyFrame.rect.h * baseScale);
+            
+            drawFrame(bodyFrameIndex, bodyX, currentY, baseScale, baseScale * segmentScale);
+            
+            currentY += segmentHeight;
+            drawnLength += segmentHeight;
+        }
+        
+        float tailX = headCenterX - (tailFrame.rect.w * baseScale) / 2.0f;
+        drawFrame(tailFrameIndex, tailX, currentY, baseScale, baseScale);
+    }
+    
+    alpha = originalAlpha;
 }
 
 void NoteSprite::update(float elapsed) {
@@ -231,47 +279,12 @@ void NoteSprite::update(float elapsed) {
     float timeDiff = strumTime - songPos;
     float distance = timeDiff * 0.45f * scrollSpeed;
     
-    float x = this->x;
-    float y = targetY + (GameConfig::getInstance()->isDownscroll() ? -distance : distance) + yOffset;
+    float newY = targetY + (GameConfig::getInstance()->isDownscroll() ? -distance : distance);
     
-    setPosition(x, y);
+    setPosition(x, newY);
     visible = true;
     
-    bool isDownscroll = GameConfig::getInstance()->isDownscroll();
-    
-    if (isSustainNote) {
-        bool shouldClip = false;
-        
-        float effectiveOffsetY = isDownscroll ? -offsetY : offsetY;
-        
-        if (isDownscroll) {
-            shouldClip = (y + effectiveOffsetY >= targetY + swagWidth / 2.0f) &&
-                        (!mustPress || (wasGoodHit || (prevNote && prevNote->wasGoodHit && !canBeHit)));
-        } else {
-            shouldClip = (y + effectiveOffsetY <= targetY + swagWidth / 2.0f) &&
-                        (!mustPress || (wasGoodHit || (prevNote && prevNote->wasGoodHit && !canBeHit)));
-        }
-        
-        if (shouldClip) {
-            float clipAmount = isDownscroll ? (y - (targetY + swagWidth / 2.0f)) : (targetY + swagWidth / 2.0f - y);
-            clipRect.x = 0;
-            clipRect.y = isDownscroll ? 0 : static_cast<int>(clipAmount / getScaleY());
-            clipRect.w = static_cast<int>(width * 2.0f);
-            clipRect.h = isDownscroll ? 
-                        static_cast<int>(height * 2.0f) - static_cast<int>(clipAmount / getScaleY()) : 
-                        static_cast<int>(height * 2.0f) - clipRect.y;
-            
-            if (clipRect.h > 0) {
-                useClipRect = true;
-            } else {
-                useClipRect = false;
-            }
-        } else {
-            useClipRect = false;
-        }
-    } else {
-        useClipRect = false;
-    }
+    flipY = GameConfig::getInstance()->isDownscroll();
 
     if (mustPress) {
         if (strumTime > songPos - Conductor::safeZoneOffset &&
