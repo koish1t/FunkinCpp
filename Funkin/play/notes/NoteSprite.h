@@ -36,7 +36,11 @@ public:
     bool wasGoodHit = false;
     bool tooLate = false;
     float noteScore = 1.0f;
-    bool kill = false;
+    bool kill = false;    
+    float hitTime = 0.0f;
+    bool isHolding = false;
+    bool holdReleased = false;
+    float holdClipTime = 0.0f;
 
 private:
     int headFrameIndex = -1;

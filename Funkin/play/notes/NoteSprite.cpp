@@ -145,14 +145,9 @@ float NoteSprite::getHoldClipAmount() const {
     if (sustainLength <= 0) return 0.0f;
     if (!wasGoodHit) return 0.0f;
     
-    float targetY = getTargetY();
-    bool isDownscroll = GameConfig::getInstance()->isDownscroll();
+    float elapsedSinceHit = Conductor::songPosition - hitTime;
     
-    if (isDownscroll) {
-        return std::max(0.0f, y - (targetY + swagWidth / 2.0f));
-    } else {
-        return std::max(0.0f, (targetY + swagWidth / 2.0f) - y);
-    }
+    return std::max(0.0f, std::min(elapsedSinceHit, sustainLength));
 }
 
 void NoteSprite::drawFrame(int frameIndex, float drawX, float drawY, float drawScaleX, float drawScaleY) {
@@ -193,12 +188,14 @@ void NoteSprite::draw() {
     bool isDownscroll = GameConfig::getInstance()->isDownscroll();
     float baseScale = 0.7f;
     
-    FlxSprite::draw();
+    if (sustainLength <= 0 || !wasGoodHit) {
+        FlxSprite::draw();
+    }
     
     if (sustainLength <= 0 || bodyFrameIndex < 0 || tailFrameIndex < 0) return;
     
     float scrollSpeed = PlayState::SONG.speed;
-    float holdLength = sustainLength * 0.45f * scrollSpeed;
+    float fullHoldLength = sustainLength * 0.45f * scrollSpeed;
     
     const auto& bodyFrame = noteFrames->frames[bodyFrameIndex];
     const auto& tailFrame = noteFrames->frames[tailFrameIndex];
@@ -207,22 +204,37 @@ void NoteSprite::draw() {
     float tailHeight = tailFrame.rect.h * baseScale;
     
     float headCenterX = x + (width * baseScale) / 2.0f;
-    float bodyX = headCenterX - (bodyFrame.rect.w * baseScale) / 2.0f;
+    float bodyX = headCenterX - (bodyFrame.rect.w * baseScale) / 2.0f - 9.0f;
     
-    float holdStartY;
-    if (isDownscroll) {
-        holdStartY = y - bodyHeight;
-    } else {
-        holdStartY = y + (height * baseScale);
-    }
-    
-    float clipAmount = getHoldClipAmount();
-    float remainingLength = std::max(0.0f, holdLength - clipAmount);
-    
-    if (remainingLength <= 0) return;
+    float clipTimeAmount = getHoldClipAmount();    
+    float clipVisualAmount = clipTimeAmount * 0.45f * scrollSpeed;
+    float remainingLength = std::max(0.0f, fullHoldLength - clipVisualAmount);
+    if (remainingLength <= 0 || holdReleased) return;
     
     float originalAlpha = alpha;
-    alpha = 0.6f;
+    
+    if (wasGoodHit && !isHolding && !holdReleased) {
+        alpha = 0.3f;
+    } else {
+        alpha = 0.6f;
+    }
+    
+    float targetY = getTargetY();
+    float holdStartY;
+    
+    if (wasGoodHit && isHolding) {
+        if (isDownscroll) {
+            holdStartY = targetY - bodyHeight;
+        } else {
+            holdStartY = targetY + (height * baseScale);
+        }
+    } else {
+        if (isDownscroll) {
+            holdStartY = y - bodyHeight;
+        } else {
+            holdStartY = y + (height * baseScale);
+        }
+    }
     
     float bodyLengthToDraw = std::max(0.0f, remainingLength - tailHeight);
     float currentY = holdStartY;
@@ -241,7 +253,7 @@ void NoteSprite::draw() {
             drawnLength += segmentHeight;
         }
         
-        float tailX = headCenterX - (tailFrame.rect.w * baseScale) / 2.0f;
+        float tailX = headCenterX - (tailFrame.rect.w * baseScale) / 2.0f - 9.0f;
         drawFrame(tailFrameIndex, tailX, currentY, baseScale, baseScale);
     } else {
         currentY = holdStartY;
@@ -257,7 +269,7 @@ void NoteSprite::draw() {
             drawnLength += segmentHeight;
         }
         
-        float tailX = headCenterX - (tailFrame.rect.w * baseScale) / 2.0f;
+        float tailX = headCenterX - (tailFrame.rect.w * baseScale) / 2.0f - 9.0f;
         drawFrame(tailFrameIndex, tailX, currentY, baseScale, baseScale);
     }
     

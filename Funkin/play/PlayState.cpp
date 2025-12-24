@@ -52,7 +52,6 @@ PlayState::PlayState() {
     healthBar = nullptr;
     persistentUpdate = true;
     persistentDraw = true;
-    NoteSprite::loadAssets();
     scoreText = new flixel::FlxText(0, 0, 0, "");
     scoreText->setFont("assets/fonts/vcr.ttf");
     scoreText->setSize(16);
@@ -172,7 +171,6 @@ PlayState::~PlayState() {
     }
     
     NoteSprite::unloadAssets();
-    destroy();
 }
 
 void PlayState::create() {
@@ -182,10 +180,14 @@ void PlayState::create() {
     startingSong = true;
     startedCountdown = false;
     
+    NoteSprite::loadAssets();
+    
     camGame = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 0.0f);
     camHUD = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 1.0f);
     
     flixel::FlxG::camera = camGame;
+    
+    startTransitionIn(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, -1));
     
     setupHUDCamera();
     
@@ -294,6 +296,9 @@ void PlayState::create() {
     
     opponentStrumline = new Strumline(opponentX, strumYPos, 0, camHUD);
     playerStrumline = new Strumline(playerX, strumYPos, 1, camHUD);
+    
+    opponentStrumline->fadeInArrows();
+    playerStrumline->fadeInArrows();
     
     noteHitHandler = new NoteHitHandler(GameConfig::getInstance()->controls, noteManager, playerStrumline, boyfriend, healthBar, popUpStuff, scoreText, vocals, camHUD);
     gameplayManager = new GameplayManager(noteManager, opponentStrumline, dad, gf, healthBar, vocals, SONG);
@@ -448,56 +453,62 @@ void PlayState::endSong() {
         }
     }
     
-    if (isStoryMode) {
-        campaignScore += songScore;
-        
-        std::string songName = SONG.song;
-        std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
-        Highscore::saveScore(songName, songScore, storyDifficulty, accuracy);
-        
-        if (!storyPlaylist.empty()) {
-            storyPlaylist.erase(storyPlaylist.begin());
-        }
-        
-        if (storyPlaylist.empty()) {
-            Highscore::saveWeekScore(storyWeek, campaignScore, storyDifficulty, accuracy);
+    if (camGame) {
+        camGame->fade(flixel::util::FlxColor::BLACK, 0.6f);
+    }
+    
+    startTransitionOut(0.6f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, 1), [this, songScore, accuracy]() {
+        if (isStoryMode) {
+            campaignScore += songScore;
+            
+            std::string songName = SONG.song;
+            std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
+            Highscore::saveScore(songName, songScore, storyDifficulty, accuracy);
+            
+            if (!storyPlaylist.empty()) {
+                storyPlaylist.erase(storyPlaylist.begin());
+            }
+            
+            if (storyPlaylist.empty()) {
+                Highscore::saveWeekScore(storyWeek, campaignScore, storyDifficulty, accuracy);
+                
+                if (flixel::FlxG::sound.music) {
+                    flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg");
+                }
+                
+                flixel::FlxG::game->switchState(new StoryMenuState());
+            } else {
+                std::string difficulty = "";
+                if (storyDifficulty == 0) {
+                    difficulty = "-easy";
+                } else if (storyDifficulty == 2) {
+                    difficulty = "-hard";
+                }
+                
+                std::string nextSong = storyPlaylist[0];
+                std::transform(nextSong.begin(), nextSong.end(), nextSong.begin(), ::tolower);
+                
+                if (inst) {
+                    inst->stop();
+                }
+                if (vocals) {
+                    vocals->stop();
+                }
+                
+                SONG = Song::loadFromJson(nextSong + difficulty, nextSong);
+                flixel::FlxG::game->switchState(new PlayState());
+            }
+        } else {
+            std::string songName = SONG.song;
+            std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
+            Highscore::saveScore(songName, songScore, storyDifficulty, accuracy);
             
             if (flixel::FlxG::sound.music) {
                 flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg");
             }
-            
-            flixel::FlxG::game->switchState(new StoryMenuState());
-        } else {
-            std::string difficulty = "";
-            if (storyDifficulty == 0) {
-                difficulty = "-easy";
-            } else if (storyDifficulty == 2) {
-                difficulty = "-hard";
-            }
-            
-            std::string nextSong = storyPlaylist[0];
-            std::transform(nextSong.begin(), nextSong.end(), nextSong.begin(), ::tolower);
-            
-            if (inst) {
-                inst->stop();
-            }
-            if (vocals) {
-                vocals->stop();
-            }
-            
-            SONG = Song::loadFromJson(nextSong + difficulty, nextSong);
-            flixel::FlxG::game->switchState(new PlayState());
+            flixel::FlxG::game->switchState(new NewFreeplayState(true, flixel::FlxPoint(0.0f, 0.0f)));
         }
-    } else {
-        std::string songName = SONG.song;
-        std::transform(songName.begin(), songName.end(), songName.begin(), ::tolower);
-        Highscore::saveScore(songName, songScore, storyDifficulty, accuracy);
-        
-        if (flixel::FlxG::sound.music) {
-            flixel::FlxG::sound.playMusic("assets/music/freakyMenu.ogg");
-        }
-        flixel::FlxG::game->switchState(new NewFreeplayState(true, flixel::FlxPoint(0.0f, 0.0f)));
-    }
+    });
 }
 
 void PlayState::startCountdown() {
@@ -518,6 +529,8 @@ void PlayState::draw() {
                       noteManager, healthBar, scoreText, popUpStuff, countdown, subState);
     }
     ScriptManager::getInstance()->drawScriptObjects();
+    
+    FunkinState::draw();
 }
 
 void PlayState::destroy() {

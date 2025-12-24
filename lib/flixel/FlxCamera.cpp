@@ -47,6 +47,10 @@ FlxCamera::FlxCamera(float x, float y, int width, int height, float zoom)
     _fill = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1, 1);
     if (_fill) {
         SDL_SetTextureBlendMode(_fill, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderTarget(renderer, _fill);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+        SDL_SetRenderTarget(renderer, nullptr);
     }
 
     if (zoom == 0) {
@@ -426,28 +430,28 @@ FlxCamera& FlxCamera::copyFrom(const FlxCamera& camera) {
 }
 
 void FlxCamera::fill(util::FlxColor color, bool blendAlpha, float fxAlpha) {
-    if (!renderer || !_fill) return;
+    if (!renderer) return;
 
-    SDL_SetTextureColorMod(_fill, color.red(), color.green(), color.blue());
-    
-    Uint8 finalAlpha = static_cast<Uint8>(color.alpha() * fxAlpha);
+    float colorAlphaFloat = static_cast<float>(color.alpha()) / 255.0f;
+    float finalAlphaFloat = colorAlphaFloat * fxAlpha;
+    Uint8 finalAlpha = static_cast<Uint8>(finalAlphaFloat * 255.0f);
     
     if (blendAlpha) {
-        SDL_SetTextureAlphaMod(_fill, finalAlpha);
-        SDL_SetTextureBlendMode(_fill, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     } else {
-        SDL_SetTextureAlphaMod(_fill, 255);
-        SDL_SetTextureBlendMode(_fill, SDL_BLENDMODE_NONE);
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     }
-
+    
+    SDL_SetRenderDrawColor(renderer, color.red(), color.green(), color.blue(), finalAlpha);
+    
     SDL_Rect dest = {
-        0,
-        0,
-        FlxG::width,
-        FlxG::height
+        -1,
+        -1,
+        FlxG::width + 2,
+        FlxG::height + 2
     };
 
-    SDL_RenderCopy(renderer, _fill, nullptr, &dest);
+    SDL_RenderFillRect(renderer, &dest);
 }
 
 void FlxCamera::drawFX() {
@@ -468,6 +472,13 @@ void FlxCamera::checkResize() {
         _flashRect.h = height;
         SDL_DestroyTexture(_fill);
         _fill = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
+        if (_fill) {
+            SDL_SetTextureBlendMode(_fill, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderTarget(renderer, _fill);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderClear(renderer);
+            SDL_SetRenderTarget(renderer, nullptr);
+        }
         updateBlitMatrix();
     }
 }

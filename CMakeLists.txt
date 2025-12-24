@@ -120,6 +120,7 @@ add_executable(Funkin
     lib/tinyxml2/tinyxml2.cpp
     
     # neoflixel
+    lib/flixel/addons/transition/FlxTransitionEffect.cpp
     lib/flixel/addons/FlxBackdrop.cpp
     lib/flixel/animation/FlxAnimationController.cpp
     lib/flixel/effects/FlxFlicker.cpp

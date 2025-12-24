@@ -5,6 +5,7 @@
 #include "../game/GameConfig.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
+#include <flixel/util/FlxColor.h>
 #include <SDL.h>
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -191,6 +192,8 @@ void OptionsState::create() {
     }
     
     updateControlBindings();
+    
+    startTransitionIn(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, -1));
 }
 
 void OptionsState::update(float elapsed) {
@@ -384,6 +387,8 @@ void OptionsState::draw() {
     } else if (currentSubMenu == SubMenu::Controls) {
         drawControlsMenu();
     }
+    
+    FunkinState::draw();
 }
 
 void OptionsState::destroy() {
@@ -464,7 +469,10 @@ void OptionsState::selectItem() {
 
 void OptionsState::goBack() {
     flixel::FlxG::sound.playAsChunk("assets/sounds/cancelMenu.ogg");
-    flixel::FlxG::game->switchState(new MainMenuState());
+    
+    startTransitionOut(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, 1), []() {
+        flixel::FlxG::game->switchState(new MainMenuState());
+    });
 }
 
 void OptionsState::enterPreferencesMenu() {

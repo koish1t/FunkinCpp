@@ -1,6 +1,7 @@
 #include "FlxGame.h"
 #include "FlxG.h"
 #include "FlxState.h"
+#include "FlxCamera.h"
 #include "tweens/FlxTween.h"
 #include "util/FlxTimer.h"
 #include <SDL_mixer.h>
@@ -135,6 +136,10 @@ void FlxGame::draw() {
     SDL_RenderClear(FlxG::renderer);
 
     currentState->draw();
+
+    if (FlxG::camera) {
+        FlxG::camera->drawFX();
+    }
 
     SDL_RenderPresent(FlxG::renderer);
 }

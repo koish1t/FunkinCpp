@@ -11,6 +11,7 @@
 #include <flixel/animation/FlxAnimationController.h>
 #include <flixel/tweens/FlxTween.h>
 #include <flixel/util/FlxTimer.h>
+#include <flixel/util/FlxColor.h>
 #include <flixel/math/FlxMath.h>
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -270,6 +271,8 @@ void StoryMenuState::create() {
     changeDifficulty(0);
     updateText();
     updateAvailableDifficulties();
+    
+    startTransitionIn(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, -1));
 }
 
 void StoryMenuState::update(float elapsed) {
@@ -378,7 +381,10 @@ void StoryMenuState::update(float elapsed) {
         if (controls->justPressedAction(ControlAction::BACK)) {
             flixel::FlxG::sound.playAsChunk("assets/sounds/cancelMenu.ogg");
             movedBack = true;
-            flixel::FlxG::game->switchState(new MainMenuState());
+            
+            startTransitionOut(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, 1), []() {
+                flixel::FlxG::game->switchState(new MainMenuState());
+            });
         }
     }
 }
@@ -409,6 +415,8 @@ void StoryMenuState::draw() {
     if (txtTracklist) txtTracklist->draw();
     if (scoreText) scoreText->draw();
     if (txtWeekTitle) txtWeekTitle->draw();
+    
+    FunkinState::draw();
 }
 
 void StoryMenuState::destroy() {
@@ -618,11 +626,13 @@ void StoryMenuState::selectWeek() {
         PlayState::campaignScore = 0;
         
         flixel::util::FlxTimer* timer = new flixel::util::FlxTimer();
-        timer->start(1.5f, [](flixel::util::FlxTimer* tmr) {
-            if (flixel::FlxG::sound.music) {
-                flixel::FlxG::sound.music->stop();
-            }
-            flixel::FlxG::game->switchState(new PlayState());
+        timer->start(1.0f, [this](flixel::util::FlxTimer* tmr) {
+            startTransitionOut(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, 1), []() {
+                if (flixel::FlxG::sound.music) {
+                    flixel::FlxG::sound.music->stop();
+                }
+                flixel::FlxG::game->switchState(new PlayState());
+            });
             delete tmr;
         });
     }

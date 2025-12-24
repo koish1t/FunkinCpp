@@ -6,8 +6,10 @@
 #include "../play/input/Controls.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
+#include <flixel/FlxCamera.h>
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
 #include <flixel/util/FlxTimer.h>
+#include <flixel/util/FlxColor.h>
 #include <SDL.h>
 #include <iostream>
 #include <fstream>
@@ -31,6 +33,10 @@ TitleState::~TitleState() {
 }
 
 void TitleState::create() {
+    if (!flixel::FlxG::camera) {
+        flixel::FlxG::camera = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 1.0f);
+    }
+    
     Conductor::changeBPM(102.0f);    
     Highscore::load();
     
@@ -171,8 +177,10 @@ void TitleState::update(float elapsed) {
         transitioning = true;
         
         auto timer = new flixel::util::FlxTimer();
-        timer->start(2.0f, [](flixel::util::FlxTimer* t) {
-            flixel::FlxG::game->switchState(new MainMenuState());
+        timer->start(1.0f, [this](flixel::util::FlxTimer* t) {
+            startTransitionOut(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, 1), []() {
+                flixel::FlxG::game->switchState(new MainMenuState());
+            });
             delete t;
         });
     }
@@ -200,6 +208,8 @@ void TitleState::draw() {
         SDL_Rect rect = {0, 0, flixel::FlxG::width, flixel::FlxG::height};
         SDL_RenderFillRect(renderer, &rect);
     }
+    
+    FunkinState::draw();
 }
 
 void TitleState::destroy() {

@@ -4,6 +4,7 @@
 #include "song/Song.h"
 #include "../game/GameConfig.h"
 #include "../ui/NewFreeplayState.h"
+#include "../ui/StoryMenuState.h"
 #include "input/Controls.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
@@ -72,15 +73,27 @@ void GameOverSubState::update(float elapsed) {
         endBullshit();
     }
     
-    if (controls->justPressedAction(ControlAction::BACK)) {
+    if (controls->justPressedAction(ControlAction::BACK) && !isEnding) {
+        isEnding = true;
+        
         if (gameOverMusic) {
             gameOverMusic->stop();
         }
         
-        if (PlayState::isStoryMode) {
-            std::cout << "Story mode menu not implemented" << std::endl;
+        if (flixel::FlxG::camera) {
+            flixel::FlxG::camera->fade(flixel::util::FlxColor::BLACK, 0.5f, false, []() {
+                if (PlayState::isStoryMode) {
+                    flixel::FlxG::game->switchState(new StoryMenuState());
+                } else {
+                    flixel::FlxG::game->switchState(new NewFreeplayState(false, flixel::FlxPoint(0.0f, 0.0f)));
+                }
+            });
         } else {
-            flixel::FlxG::game->switchState(new NewFreeplayState(false, flixel::FlxPoint(0.0f, 0.0f)));
+            if (PlayState::isStoryMode) {
+                flixel::FlxG::game->switchState(new StoryMenuState());
+            } else {
+                flixel::FlxG::game->switchState(new NewFreeplayState(false, flixel::FlxPoint(0.0f, 0.0f)));
+            }
         }
     }
     
@@ -131,9 +144,16 @@ void GameOverSubState::endBullshit() {
         flixel::FlxG::sound.playAsChunk("assets/music/gameOverEnd.ogg");
         
         flixel::util::FlxTimer* timer = new flixel::util::FlxTimer();
-        timer->start(2.0f, [](flixel::util::FlxTimer* t) {
-            PlayState::deathCounter++;
-            flixel::FlxG::game->switchState(new PlayState());
+        timer->start(0.7f, [this](flixel::util::FlxTimer* t) {
+            if (flixel::FlxG::camera) {
+                flixel::FlxG::camera->fade(flixel::util::FlxColor::BLACK, 2.0f, false, []() {
+                    PlayState::deathCounter++;
+                    flixel::FlxG::game->switchState(new PlayState());
+                });
+            } else {
+                PlayState::deathCounter++;
+                flixel::FlxG::game->switchState(new PlayState());
+            }
             delete t;
         }, 1);
     }

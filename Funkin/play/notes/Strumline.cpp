@@ -2,6 +2,7 @@
 #include "NoteSprite.h"
 #include <flixel/FlxG.h>
 #include <flixel/animation/FlxAnimationController.h>
+#include <flixel/tweens/FlxTweenUtil.h>
 #include <iostream>
 
 Strumline::Strumline(float x, float y, int player, flixel::FlxCamera* camera)
@@ -173,4 +174,24 @@ flixel::FlxSprite* Strumline::getNote(int index) {
         return notes[index];
     }
     return nullptr;
+}
+
+void Strumline::fadeInArrow(int index, flixel::FlxSprite* arrow) {
+    if (!arrow) return;
+    
+    arrow->y -= 10.0f;
+    arrow->alpha = 0.0f;
+    
+    float targetY = arrow->y + 10.0f;
+    float duration = 1.0f;
+    float startDelay = 0.5f + (0.2f * index);
+    
+    flixel::tweens::tweenY(arrow, targetY, duration, flixel::tweens::FlxEase::circOut, nullptr, startDelay);
+    flixel::tweens::tweenAlpha(arrow, 1.0f, duration, flixel::tweens::FlxEase::circOut, nullptr, startDelay);
+}
+
+void Strumline::fadeInArrows() {
+    for (int i = 0; i < static_cast<int>(notes.size()); i++) {
+        fadeInArrow(i, notes[i]);
+    }
 }

@@ -4,6 +4,8 @@
 #include "../play/input/Controls.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
+#include <flixel/FlxCamera.h>
+#include <flixel/util/FlxColor.h>
 #include <SDL_mixer.h>
 #include <iostream>
 
@@ -42,6 +44,10 @@ CreditsState::~CreditsState() {
 }
 
 void CreditsState::create() {
+    if (!flixel::FlxG::camera) {
+        flixel::FlxG::camera = new flixel::FlxCamera(0.0f, 0.0f, 0, 0, 1.0f);
+    }
+    
     bg = new flixel::FlxSprite(-80, 0);
     bg->loadGraphic("assets/images/menuDesat.png");
     bg->scrollFactor.x = 0.0f;
@@ -62,6 +68,8 @@ void CreditsState::create() {
     }
     
     FunkinState::create();
+    
+    startTransitionIn(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, -1));
 }
 
 void CreditsState::buildCreditsGroup() {
@@ -151,13 +159,18 @@ bool CreditsState::hasEnded() {
 }
 
 void CreditsState::exitCredits() {
+    if (scrollPaused) return;
+    scrollPaused = true;
+    
     flixel::FlxG::sound.playAsChunk("assets/sounds/cancelMenu.ogg");
     
     if (Mix_PlayingMusic()) {
         Mix_FadeOutMusic(500);
     }
     
-    flixel::FlxG::game->switchState(new MainMenuState());
+    startTransitionOut(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, 1), []() {
+        flixel::FlxG::game->switchState(new MainMenuState());
+    });
 }
 
 void CreditsState::destroy() {

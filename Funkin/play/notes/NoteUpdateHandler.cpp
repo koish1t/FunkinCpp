@@ -44,6 +44,12 @@ void NoteUpdateHandler::updateNotes(float elapsed, Character* boyfriend, flixel:
                 float sustainEndTime = note->strumTime + note->sustainLength;
                 if (Conductor::songPosition >= sustainEndTime) {
                     note->kill = true;
+                } else if (note->holdReleased) {
+                    float timeSinceRelease = Conductor::songPosition - note->hitTime - 
+                        (note->sustainLength - (sustainEndTime - Conductor::songPosition));
+                    if (timeSinceRelease > 200.0f) {
+                        note->kill = true;
+                    }
                 }
             }
 

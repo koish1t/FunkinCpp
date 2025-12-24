@@ -40,36 +40,62 @@ void GameplayManager::handleOpponentNotes(float deltaTime) {
     
     auto& notes = noteManager->getActiveNotes();
     for (auto note : notes) {
-        if (note && !note->mustPress && !note->wasGoodHit) {
-            float timeDiff = note->strumTime - Conductor::songPosition;
-            
-            if (timeDiff <= 45.0f && timeDiff >= -Conductor::safeZoneOffset) {
-                note->canBeHit = true;
+        if (note && !note->mustPress) {
+            if (!note->wasGoodHit) {
+                float timeDiff = note->strumTime - Conductor::songPosition;
                 
-                if (vocals && song.needsVoices) {
-                    vocals->setVolume(1.0f);
-                }
-                
-                if (opponentStrumline) {
-                    opponentStrumline->playNote(note->noteData, true);
-                }
-                
-                if (dad) {
-                    std::string animToPlay = "";
-                    switch (note->noteData) {
-                        case 0: animToPlay = "singLEFT"; break;
-                        case 1: animToPlay = "singDOWN"; break;
-                        case 2: animToPlay = "singUP"; break;
-                        case 3: animToPlay = "singRIGHT"; break;
+                if (timeDiff <= 45.0f && timeDiff >= -Conductor::safeZoneOffset) {
+                    note->canBeHit = true;
+                    
+                    if (vocals && song.needsVoices) {
+                        vocals->setVolume(1.0f);
                     }
-                    if (!animToPlay.empty()) {
-                        dad->playAnim(animToPlay, true);
+                    
+                    if (opponentStrumline) {
+                        opponentStrumline->playNote(note->noteData, true);
+                    }
+                    
+                    if (dad) {
+                        std::string animToPlay = "";
+                        switch (note->noteData) {
+                            case 0: animToPlay = "singLEFT"; break;
+                            case 1: animToPlay = "singDOWN"; break;
+                            case 2: animToPlay = "singUP"; break;
+                            case 3: animToPlay = "singRIGHT"; break;
+                        }
+                        if (!animToPlay.empty()) {
+                            dad->playAnim(animToPlay, true);
+                            dad->holdTimer = 0.0f;
+                        }
+                    }
+                    
+                    note->wasGoodHit = true;
+                    note->hitTime = Conductor::songPosition;
+                    
+                    if (note->sustainLength > 0) {
+                        note->isHolding = true;
+                    } else {
+                        note->kill = true;
+                    }
+                }
+            }
+            else if (note->sustainLength > 0 && note->isHolding) {
+                float sustainEndTime = note->strumTime + note->sustainLength;
+                
+                if (Conductor::songPosition < sustainEndTime) {
+                    if (opponentStrumline) {
+                        opponentStrumline->playNote(note->noteData, true);
+                    }
+                    if (dad) {
                         dad->holdTimer = 0.0f;
                     }
+                } else {
+                    note->isHolding = false;
+                    note->kill = true;
+                    if (opponentStrumline) {
+                        opponentStrumline->playStatic(note->noteData);
+                    }
                 }
-                
-                note->wasGoodHit = true;
-                note->kill = true;
             }
         }
     }

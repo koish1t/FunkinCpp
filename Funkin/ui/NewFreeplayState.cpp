@@ -14,6 +14,7 @@
 #include <flixel/sound/FlxSound.h>
 #include <flixel/text/FlxText.h>
 #include <flixel/tweens/FlxTweenUtil.h>
+#include <flixel/util/FlxColor.h>
 #include <SDL.h>
 #include <sstream>
 #include <cmath>
@@ -280,7 +281,17 @@ void NewFreeplayState::update(float elapsed) {
     
     if (exitingToMenu) {
         exitTimer += elapsed;
-        if (exitTimer >= transitionTimeExit + (staggerTimeExit * 4.0f)) {
+        float transitionEndTime = transitionTimeExit + (staggerTimeExit * 4.0f);
+        
+        if (exitTimer >= transitionEndTime - 0.4f && exitTimer < transitionEndTime) {
+            static bool fadeStarted = false;
+            if (!fadeStarted) {
+                fadeStarted = true;
+                startTransitionOut(0.4f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, 1), nullptr);
+            }
+        }
+        
+        if (exitTimer >= transitionEndTime) {
             exitingToMenu = false;
             flixel::FlxG::game->switchState(new MainMenuState());
         }
@@ -1351,6 +1362,8 @@ void NewFreeplayState::startSong() {
     Conductor::songPosition = 0.0f;
     Conductor::changeBPM(100.0f);
     
-    PlayState* playState = new PlayState();
-    flixel::FlxG::game->switchState(playState);
+    startTransitionOut(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, 1), []() {
+        PlayState* playState = new PlayState();
+        flixel::FlxG::game->switchState(playState);
+    });
 }

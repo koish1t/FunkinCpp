@@ -16,6 +16,7 @@ public:
     void playNote(int direction, bool confirm);
     void playStatic(int direction);
     void playPressed(int direction);
+    void fadeInArrows();
     
     std::vector<flixel::FlxSprite*>& getNotes() { return notes; }
     flixel::FlxSprite* getNote(int index);
@@ -28,4 +29,5 @@ private:
     flixel::FlxCamera* camera;
     
     void createNote(int i, float xPos, float yPos);
+    void fadeInArrow(int index, flixel::FlxSprite* arrow);
 };

@@ -12,6 +12,7 @@
 #include <flixel/sound/FlxSound.h>
 #include <flixel/effects/FlxFlicker.h>
 #include <flixel/util/FlxTimer.h>
+#include <flixel/util/FlxColor.h>
 #include <flixel/tweens/FlxTween.h>
 #include <SDL_mixer.h>
 #include <iostream>
@@ -103,6 +104,8 @@ void MainMenuState::create() {
     }
     
     onMenuItemChange();
+    
+    startTransitionIn(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, -1));
 }
 
 void MainMenuState::update(float elapsed) {
@@ -157,7 +160,10 @@ void MainMenuState::update(float elapsed) {
         
         if (controls->justPressedAction(ControlAction::BACK)) {
             flixel::FlxG::sound.playAsChunk("assets/sounds/cancelMenu.ogg");
-            startExitState([]() {
+            exiting = true;
+            canSelect = false;
+            
+            startTransitionOut(0.5f, flixel::util::FlxColor::BLACK, flixel::FlxPoint(0, 1), []() {
                 flixel::FlxG::game->switchState(new TitleState(true));
             });
         }
@@ -173,6 +179,8 @@ void MainMenuState::draw() {
             item->draw();
         }
     }
+    
+    FunkinState::draw();
 }
 
 void MainMenuState::destroy() {

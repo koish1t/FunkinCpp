@@ -9,6 +9,7 @@
 #include "../components/PopUpStuff.h"
 #include "../components/HealthBar.h"
 #include <vector>
+#include <random>
 #include <flixel/sound/FlxSound.h>
 #include <flixel/text/FlxText.h>
 
@@ -19,6 +20,7 @@ public:
                    HealthBar* healthBar, PopUpStuff* popUpStuff,
                    flixel::FlxText* scoreText, flixel::FlxSound* vocals,
                    flixel::FlxCamera* camHUD);
+    ~NoteHitHandler();
     
     void handleInput();
     
@@ -63,6 +65,12 @@ private:
     int bads;
     int shits;
     
+    flixel::FlxSound* missSound1;
+    flixel::FlxSound* missSound2;
+    flixel::FlxSound* missSound3;
+    std::mt19937 rng;
+    
     void goodNoteHit(NoteSprite* note);
     void updateScoreText();
+    void playMissSound();
 };

@@ -29,7 +29,35 @@ NoteHitHandler::NoteHitHandler(Controls* controls, NoteManager* noteManager,
     , goods(0)
     , bads(0)
     , shits(0)
+    , missSound1(nullptr)
+    , missSound2(nullptr)
+    , missSound3(nullptr)
 {
+    std::random_device rd;
+    rng = std::mt19937(rd());
+    
+    std::string soundExt = ".ogg";
+    missSound1 = new flixel::FlxSound();
+    missSound1->loadAsChunk("assets/sounds/missnote1" + soundExt, false, false);
+    missSound2 = new flixel::FlxSound();
+    missSound2->loadAsChunk("assets/sounds/missnote2" + soundExt, false, false);
+    missSound3 = new flixel::FlxSound();
+    missSound3->loadAsChunk("assets/sounds/missnote3" + soundExt, false, false);
+}
+
+NoteHitHandler::~NoteHitHandler() {
+    if (missSound1) {
+        delete missSound1;
+        missSound1 = nullptr;
+    }
+    if (missSound2) {
+        delete missSound2;
+        missSound2 = nullptr;
+    }
+    if (missSound3) {
+        delete missSound3;
+        missSound3 = nullptr;
+    }
 }
 
 void NoteHitHandler::handleInput() {
@@ -79,18 +107,61 @@ void NoteHitHandler::handleInput() {
         }
         
         if (note->wasGoodHit && note->sustainLength > 0) {
-            if (heldArray[lane]) {
-                if (boyfriend) {
-                    std::string animToPlay = "";
-                    switch (note->noteData) {
-                        case 0: animToPlay = "singLEFT"; break;
-                        case 1: animToPlay = "singDOWN"; break;
-                        case 2: animToPlay = "singUP"; break;
-                        case 3: animToPlay = "singRIGHT"; break;
+            float sustainEndTime = note->strumTime + note->sustainLength;
+            bool sustainStillActive = Conductor::songPosition < sustainEndTime;
+            
+            if (sustainStillActive) {
+                if (heldArray[lane]) {
+                    note->isHolding = true;
+                    
+                    if (boyfriend) {
+                        std::string animToPlay = "";
+                        switch (note->noteData) {
+                            case 0: animToPlay = "singLEFT"; break;
+                            case 1: animToPlay = "singDOWN"; break;
+                            case 2: animToPlay = "singUP"; break;
+                            case 3: animToPlay = "singRIGHT"; break;
+                        }
+                        if (!animToPlay.empty() && boyfriend->animation) {
+                            boyfriend->holdTimer = 0.0f;
+                            boyfriend->playAnim(animToPlay, true);
+                        }
                     }
-                    if (!animToPlay.empty() && boyfriend->animation) {
-                        boyfriend->holdTimer = 0.0f;
+                    
+                    if (playerStrumline) {
+                        playerStrumline->playNote(lane, true);
                     }
+                } else if (note->isHolding && !note->holdReleased) {
+                    note->isHolding = false;
+                    note->holdReleased = true;
+                    
+                    misses++;
+                    combo = 0;
+                    
+                    if (healthBar) {
+                        healthBar->setHealth(healthBar->getHealth() - 0.05f);
+                    }
+                    
+                    playMissSound();
+                    
+                    if (boyfriend) {
+                        std::string missAnim = "";
+                        switch (lane) {
+                            case 0: missAnim = "singLEFTmiss"; break;
+                            case 1: missAnim = "singDOWNmiss"; break;
+                            case 2: missAnim = "singUPmiss"; break;
+                            case 3: missAnim = "singRIGHTmiss"; break;
+                        }
+                        if (!missAnim.empty()) {
+                            boyfriend->playAnim(missAnim, true);
+                        }
+                    }
+                    
+                    if (playerStrumline) {
+                        playerStrumline->playStatic(lane);
+                    }
+                    
+                    updateScoreText();
                 }
             }
             continue;
@@ -150,6 +221,11 @@ void NoteHitHandler::handleInput() {
 void NoteHitHandler::goodNoteHit(NoteSprite* note) {
     if (!note->wasGoodHit) {
         note->wasGoodHit = true;
+        note->hitTime = Conductor::songPosition;
+        
+        if (note->sustainLength > 0) {
+            note->isHolding = true;
+        }
         
         if (vocals) {
             vocals->setVolume(1.0f);
@@ -226,4 +302,24 @@ void NoteHitHandler::updateScoreText() {
     text += accStr;
     
     scoreText->setText(text);
+}
+
+void NoteHitHandler::playMissSound() {
+    std::uniform_int_distribution<> missNoteDist(1, 3);
+    std::uniform_real_distribution<> volumeDist(0.5, 0.8);
+    
+    int missNoteNum = missNoteDist(rng);
+    float volume = static_cast<float>(volumeDist(rng));
+    
+    flixel::FlxSound* selectedSound = nullptr;
+    switch(missNoteNum) {
+        case 1: selectedSound = missSound1; break;
+        case 2: selectedSound = missSound2; break;
+        case 3: selectedSound = missSound3; break;
+    }
+    
+    if (selectedSound) {
+        selectedSound->setVolume(volume);
+        selectedSound->play(true);
+    }
 }
