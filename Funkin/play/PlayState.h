@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "../FunkinState.h"
 #include "notes/NoteSprite.h"
 #include "song/Song.h"

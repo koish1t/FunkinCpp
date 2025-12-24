@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FlxObject.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "flixel/graphics/frames/FlxAtlasFrames.h"
 #include "flixel/animation/FlxAnimationController.h"
 

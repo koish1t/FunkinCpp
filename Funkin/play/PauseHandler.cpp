@@ -2,7 +2,7 @@
 #include "../game/GameConfig.h"
 #include "input/Controls.h"
 #include <flixel/FlxG.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <iostream>
 
 PauseHandler::PauseHandler()

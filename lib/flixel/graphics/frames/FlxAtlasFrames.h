@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <tinyxml2.h>
 
 namespace flixel {

@@ -14,7 +14,7 @@
 #include <flixel/sound/FlxSound.h>
 #include <flixel/text/FlxText.h>
 #include <flixel/tweens/FlxTweenUtil.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <sstream>
 #include <cmath>
 #include <algorithm>

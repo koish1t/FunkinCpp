@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "FlxText.h"
 #include "../FlxG.h"
-#include <SDL2/SDL_ttf.h>
+#include <SDL_ttf.h>
 #include <algorithm>
 #include <iostream>
 #include <cstdio>

@@ -402,3 +402,4 @@ FodyWeavers.xsd
 /platforms/NX/build
 *.nro
 *.elf
+/build

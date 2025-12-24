@@ -4,7 +4,7 @@
 #include "../FlxG.h"
 #include "../math/FlxPoint.h"
 #include <string>
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include <functional>
 
 namespace flixel {

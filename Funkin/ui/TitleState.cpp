@@ -8,7 +8,7 @@
 #include <flixel/FlxGame.h>
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
 #include <flixel/util/FlxTimer.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>

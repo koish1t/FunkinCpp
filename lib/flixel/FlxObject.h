@@ -2,7 +2,7 @@
 
 #include "FlxBasic.h"
 #include "util/FlxAxes.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <string>
 #include "math/FlxPoint.h"
 #include "FlxCamera.h"

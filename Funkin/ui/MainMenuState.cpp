@@ -13,7 +13,7 @@
 #include <flixel/effects/FlxFlicker.h>
 #include <flixel/util/FlxTimer.h>
 #include <flixel/tweens/FlxTween.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include <iostream>
 
 MainMenuState::MainMenuState() 

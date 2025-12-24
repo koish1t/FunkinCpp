@@ -8,7 +8,7 @@
 #include "math/FlxRect.h"
 #include "util/FlxAxes.h"
 #include "util/FlxColor.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <algorithm>
 #include <cmath>
 

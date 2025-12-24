@@ -12,7 +12,7 @@
 #include <flixel/math/FlxPoint.h>
 #include <flixel/tweens/FlxTween.h>
 #include <flixel/tweens/FlxEase.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include <iostream>
 #include <algorithm>
 

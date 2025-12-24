@@ -3,7 +3,7 @@
 #include "FlxState.h"
 #include "tweens/FlxTween.h"
 #include "util/FlxTimer.h"
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include <stdexcept>
 #include <iostream>
 

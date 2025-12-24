@@ -1,7 +1,7 @@
 #include "FlxSound.h"
 #include "../FlxG.h"
 #include "../math/FlxMath.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <algorithm>
 
 namespace flixel {

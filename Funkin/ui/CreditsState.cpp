@@ -4,7 +4,7 @@
 #include "../play/input/Controls.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include <iostream>
 
 CreditsState::CreditsState()

@@ -5,7 +5,7 @@
 #include "../game/GameConfig.h"
 #include <flixel/FlxG.h>
 #include <flixel/FlxGame.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>

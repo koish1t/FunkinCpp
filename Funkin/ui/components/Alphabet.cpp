@@ -1,7 +1,7 @@
 #include "Alphabet.h"
 #include <flixel/FlxG.h>
 #include <flixel/graphics/frames/FlxAtlasFrames.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <cctype>
 #include <fstream>
 #include <sstream>
