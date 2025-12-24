@@ -27,6 +27,8 @@ public:
 
     void update(float elapsed) override;
     void draw() override;
+    
+    void reset(float newStrumTime, int newNoteData, float newSustainLength, bool newMustPress);
 
     float strumTime;
     int noteData;
@@ -40,6 +42,7 @@ public:
     float hitTime = 0.0f;
     bool isHolding = false;
     bool holdReleased = false;
+    bool handledMiss = false;
     float holdClipTime = 0.0f;
 
 private:

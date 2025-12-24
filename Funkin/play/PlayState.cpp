@@ -25,6 +25,8 @@ bool PlayState::practiceMode = false;
 std::vector<std::string> PlayState::storyPlaylist;
 int PlayState::storyWeek = 0;
 int PlayState::campaignScore = 0;
+std::vector<CachedNoteData> PlayState::cachedNoteData;
+std::string PlayState::cachedSongName;
 
 const char* PlayState::NOTE_STYLES[] = {"purple", "blue", "green", "red"};
 const char* PlayState::NOTE_DIRS[] = {"LEFT", "DOWN", "UP", "RIGHT"};
@@ -169,8 +171,6 @@ PlayState::~PlayState() {
         delete popUpStuff;
         popUpStuff = nullptr;
     }
-    
-    NoteSprite::unloadAssets();
 }
 
 void PlayState::create() {
@@ -288,7 +288,18 @@ void PlayState::create() {
     scoreText->setPosition(static_cast<float>(windowWidth / 2 - 100), scoreTextY);
     
     noteManager = new NoteManager(camHUD);
-    noteManager->generateNotes(SONG);
+    
+    std::string currentSongName = SONG.song;
+    std::transform(currentSongName.begin(), currentSongName.end(), currentSongName.begin(), ::tolower);
+    
+    if (!cachedNoteData.empty() && cachedSongName == currentSongName) {
+        noteManager->setCachedNotes(cachedNoteData);
+        noteManager->regenerateFromCache();
+    } else {
+        noteManager->generateNotes(SONG);
+        cachedNoteData = noteManager->getCachedNotes();
+        cachedSongName = currentSongName;
+    }
     
     float strumYPos = GameConfig::getInstance()->isDownscroll() ? (windowHeight - 150.0f) : 50.0f;
     float opponentX = 42.0f + 50.0f;

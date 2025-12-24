@@ -48,6 +48,8 @@ public:
     static std::vector<std::string> storyPlaylist;
     static int storyWeek;
     static int campaignScore;
+    static std::vector<CachedNoteData> cachedNoteData;
+    static std::string cachedSongName;
 
     PlayState();
     ~PlayState() override;

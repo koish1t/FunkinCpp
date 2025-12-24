@@ -4,17 +4,30 @@
 #include <algorithm>
 #include <cmath>
 
+std::vector<NoteSprite*> NoteManager::notePool;
+
 NoteManager::NoteManager(flixel::FlxCamera* hudCamera)
     : hudCamera(hudCamera)
 {
 }
 
 NoteManager::~NoteManager() {
-    clear();
+    for (auto note : activeNotes) {
+        returnToPool(note);
+    }
+    activeNotes.clear();
+    
+    for (auto note : unspawnedNotes) {
+        returnToPool(note);
+    }
+    unspawnedNotes.clear();
+    
+    cachedNotes.clear();
 }
 
 void NoteManager::generateNotes(const SwagSong& song) {
     clear();
+    cachedNotes.clear();
     
     if (song.notes.empty()) {
         return;
@@ -44,7 +57,9 @@ void NoteManager::generateNotes(const SwagSong& song) {
                 
                 float sustainLength = (noteData.size() > 2) ? noteData[2] : 0;
                 
-                NoteSprite* note = createNote(strumTime, noteType, sustainLength, mustPress);
+                cachedNotes.push_back({strumTime, noteType, sustainLength, mustPress});
+                
+                NoteSprite* note = getPooledNote(strumTime, noteType, sustainLength, mustPress);
                 unspawnedNotes.push_back(note);
                 totalNotes++;
             }
@@ -52,12 +67,67 @@ void NoteManager::generateNotes(const SwagSong& song) {
         currentSection++;
     }
     
+    std::sort(cachedNotes.begin(), cachedNotes.end(),
+        [](const CachedNoteData& a, const CachedNoteData& b) {
+            return a.strumTime < b.strumTime;
+        });
+    
     std::sort(unspawnedNotes.begin(), unspawnedNotes.end(),
         [](NoteSprite* a, NoteSprite* b) {
             return a->strumTime < b->strumTime;
         });
     
     std::cout << "Generated " << totalNotes << " notes" << std::endl;
+}
+
+void NoteManager::regenerateFromCache() {
+    for (auto note : activeNotes) {
+        returnToPool(note);
+    }
+    activeNotes.clear();
+    
+    for (auto note : unspawnedNotes) {
+        returnToPool(note);
+    }
+    unspawnedNotes.clear();
+    
+    if (cachedNotes.empty()) {
+        std::cout << "No cached notes to regenerate from" << std::endl;
+        return;
+    }
+    
+    std::cout << "Regenerating " << cachedNotes.size() << " notes from cache (pool size: " << notePool.size() << ")" << std::endl;
+    
+    for (const auto& cached : cachedNotes) {
+        NoteSprite* note = getPooledNote(cached.strumTime, cached.noteType, cached.sustainLength, cached.mustPress);
+        unspawnedNotes.push_back(note);
+    }
+    
+    std::cout << "Regenerated " << unspawnedNotes.size() << " notes from cache" << std::endl;
+}
+
+NoteSprite* NoteManager::getPooledNote(float strumTime, int noteType, float sustainLength, bool mustPress) {
+    NoteSprite* note = nullptr;
+    
+    if (!notePool.empty()) {
+        note = notePool.back();
+        notePool.pop_back();
+        note->reset(strumTime, noteType, sustainLength, mustPress);
+        if (hudCamera) {
+            note->camera = hudCamera;
+        }
+    } else {
+        note = createNote(strumTime, noteType, sustainLength, mustPress);
+    }
+    
+    return note;
+}
+
+void NoteManager::returnToPool(NoteSprite* note) {
+    if (note) {
+        note->visible = false;
+        notePool.push_back(note);
+    }
 }
 
 NoteSprite* NoteManager::createNote(float strumTime, int noteType, float sustainLength, bool mustPress) {
@@ -92,12 +162,12 @@ void NoteManager::updateSpawning(float songPosition) {
 
 void NoteManager::clear() {
     for (auto note : activeNotes) {
-        delete note;
+        returnToPool(note);
     }
     activeNotes.clear();
     
     for (auto note : unspawnedNotes) {
-        delete note;
+        returnToPool(note);
     }
     unspawnedNotes.clear();
 }

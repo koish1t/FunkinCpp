@@ -318,3 +318,54 @@ void NoteSprite::update(float elapsed) {
 }
 
 NoteSprite::~NoteSprite() {}
+
+void NoteSprite::reset(float newStrumTime, int newNoteData, float newSustainLength, bool newMustPress) {
+    strumTime = newStrumTime;
+    sustainLength = newSustainLength;
+    mustPress = newMustPress;
+    
+    canBeHit = false;
+    wasGoodHit = false;
+    tooLate = false;
+    noteScore = 1.0f;
+    kill = false;
+    hitTime = 0.0f;
+    isHolding = false;
+    holdReleased = false;
+    handledMiss = false;
+    holdClipTime = 0.0f;
+    visible = true;
+    alpha = 1.0f;
+    
+    bool needsAnimUpdate = (noteData != newNoteData);
+    noteData = newNoteData;
+    
+    if (needsAnimUpdate) {
+        cacheFrameIndices();
+        
+        std::string framePrefix;
+        switch (noteData) {
+            case LEFT_NOTE:  framePrefix = "purple"; break;
+            case DOWN_NOTE:  framePrefix = "blue"; break;
+            case UP_NOTE:    framePrefix = "green"; break;
+            case RIGHT_NOTE: framePrefix = "red"; break;
+            default:         framePrefix = "purple"; break;
+        }
+        
+        if (noteFrames && animation) {
+            auto scrollFrames = noteFrames->getFramesByPrefix(framePrefix);
+            if (!scrollFrames.empty()) {
+                animation->addByPrefix("scroll", scrollFrames, 24, false);
+                animation->play("scroll");
+            }
+        }
+    } else if (animation) {
+        animation->play("scroll");
+    }
+    
+    x = STRUM_X + 50.0f + swagWidth * noteData;
+    if (mustPress) {
+        x += static_cast<float>(flixel::FlxG::width) / 2.0f;
+    }
+    y = -2000.0f;
+}
