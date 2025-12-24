@@ -132,36 +132,51 @@ void NoteHitHandler::handleInput() {
                         playerStrumline->playNote(lane, true);
                     }
                 } else if (note->isHolding && !note->holdReleased) {
+                    bool hasUpcomingNote = false;
+                    for (auto otherNote : notes) {
+                        if (otherNote && otherNote != note && 
+                            otherNote->mustPress && otherNote->noteData == lane &&
+                            !otherNote->wasGoodHit && !otherNote->tooLate && !otherNote->kill) {
+                            float timeDiff = otherNote->strumTime - Conductor::songPosition;
+                            if (timeDiff >= -50.0f && timeDiff <= 200.0f) {
+                                hasUpcomingNote = true;
+                                break;
+                            }
+                        }
+                    }
+                    
                     note->isHolding = false;
                     note->holdReleased = true;
                     
-                    misses++;
-                    combo = 0;
-                    
-                    if (healthBar) {
-                        healthBar->setHealth(healthBar->getHealth() - 0.05f);
-                    }
-                    
-                    playMissSound();
-                    
-                    if (boyfriend) {
-                        std::string missAnim = "";
-                        switch (lane) {
-                            case 0: missAnim = "singLEFTmiss"; break;
-                            case 1: missAnim = "singDOWNmiss"; break;
-                            case 2: missAnim = "singUPmiss"; break;
-                            case 3: missAnim = "singRIGHTmiss"; break;
+                    if (!hasUpcomingNote) {
+                        misses++;
+                        combo = 0;
+                        
+                        if (healthBar) {
+                            healthBar->setHealth(healthBar->getHealth() - 0.05f);
                         }
-                        if (!missAnim.empty()) {
-                            boyfriend->playAnim(missAnim, true);
+                        
+                        playMissSound();
+                        
+                        if (boyfriend) {
+                            std::string missAnim = "";
+                            switch (lane) {
+                                case 0: missAnim = "singLEFTmiss"; break;
+                                case 1: missAnim = "singDOWNmiss"; break;
+                                case 2: missAnim = "singUPmiss"; break;
+                                case 3: missAnim = "singRIGHTmiss"; break;
+                            }
+                            if (!missAnim.empty()) {
+                                boyfriend->playAnim(missAnim, true);
+                            }
                         }
+                        
+                        updateScoreText();
                     }
                     
                     if (playerStrumline) {
                         playerStrumline->playStatic(lane);
                     }
-                    
-                    updateScoreText();
                 }
             }
             continue;
