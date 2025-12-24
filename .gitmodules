@@ -17,3 +17,6 @@
 [submodule "lib/json"]
 	path = lib/json
 	url = https://github.com/nlohmann/json.git
+[submodule "lib/tinyxml2"]
+	path = lib/tinyxml2
+	url = https://github.com/leethomason/tinyxml2.git
